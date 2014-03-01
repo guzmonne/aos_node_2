@@ -1,0 +1,147 @@
+.navbar-header
+	button(type="button", class="navbar-toggle", data-toggle="collapse", data-target=".sidebar-collapse")
+		span.sr-only Toggle navigation
+		span.icon-bar
+		span.icon-bar
+		span.icon-bar
+	a(class="navbar-brand", href="/") AOS
+// NAVBAR HEADER
+ul(class="nav navbar-top-links navbar-left")
+	li.tooltip-sidebar-toggle
+		a(href="#", id="sidebar-toggle", data-toggle="tooltip", data-placement="right", title, data-original-title="Sidebar Toggle")
+			i.fa.fa-bars 
+ul(class="nav navbar-top-links navbar-right")
+	// DROPDOWN BEGIN
+	li.dropdown
+		a(class="dropdown-toggle messages-link" data-toggle="dropdown" href="#")
+			i(class="fa fa-envelope fa-fw")
+			i(class="fa fa-caret-down")
+		// DROPDOWN MESSAGES BEGIN
+		ul.dropdown-menu.dropdown-messages
+			li
+				a(href="#")
+					div
+						strong Guzman Monne
+						span.pull-right.text-muted
+							em Yesterday
+					div lorem ipsum sit amet, concsefic adipscil elit.
+			li.divider
+			li
+				a(class="#")
+					div
+						strong Guzman Monne
+						span.pull-right.text-muted
+							em Yesterday
+					div All my troubles seem so far away. Now I'm here just seeing you say. Oh, I believe in yesterday
+			li.divider
+			li
+				a(class="text-center" href="#")
+					strong Read all messages 
+					i(class="fa fa-angle-right")
+		// DROPDOWN MESSAGES END
+	li.dropdown
+		a(class="dropdown-toggle tasks-link", data-toggle="dropdown" href="#")
+			i(class="fa fa-tasks fa-fw")
+			i(class="fa fa-caret-down")
+		ul.dropdown-menu.dropdown-tasks
+			li
+				a(href="#")
+					div
+						p 
+							strong Task 1
+							span.pull-right.text-muted 40% Complete (success)
+						div.progress.progress-striped.active
+							div(class="progress-bar progress-bar-success", role="progressbar", aria-valuenow="40" aria-valuemin="0", aria-valuemax="100" style="width: 40%")
+								span.sr-only 40% Complete (success)
+			li.divider
+			li
+				a(href="#")
+					div
+						p 
+							strong Task 2
+							span.pull-right.text-muted 60% Complete (warning)
+						div.progress.progress-striped.active
+							div(class="progress-bar progress-bar-warning", role="progressbar", aria-valuenow="60" aria-valuemin="0", aria-valuemax="100" style="width: 60%")
+								span.sr-only 60% Complete (warning)
+			li.divider
+			li
+				a(href="#")
+					div
+						p 
+							strong Task 3
+							span.pull-right.text-muted 20% Complete (info)
+						div.progress.progress-striped.active
+							div(class="progress-bar progress-bar-info", role="progressbar", aria-valuenow="20" aria-valuemin="0", aria-valuemax="100" style="width: 20%")
+								span.sr-only 20% Complete (info)
+			li.divider
+			li
+				a(href="#")
+					div
+						p 
+							strong Task 4
+							span.pull-right.text-muted 80% Complete (danger)
+						div.progress.progress-striped.active
+							div(class="progress-bar progress-bar-danger", role="progressbar", aria-valuenow="80" aria-valuemin="0", aria-valuemax="100" style="width: 80%")
+								span.sr-only 80% Complete (danger)
+		li.dropdown
+			a(class="dropdown-toggle alerts-link" data-toggle="dropdown" href="#")
+				i(class="fa fa-bell fa-fw")
+				i(class="fa fa-caret-down")
+			ul.dropdown-menu.dropdown-alerts
+				li
+					a(href="#")
+						div
+							i.fa.fa-comment.fa-fw 
+							|  New Comment 
+							span.pull-right.text-muted.small 4 minutes ago
+				li.divider
+				li
+					a(href="#")
+						div
+							i.fa.fa-twitter.fa-fw 
+							|  3 New Followers
+							span.pull-right.text-muted.small 12 minutes ago
+				li.divider
+				li
+					a(href="#")
+						div
+							i.fa.fa-envelope.fa-fw 
+							|  Message Sent
+							span.pull-right.text-muted.small 6 minutes ago
+				li.divider
+				li
+					a(href="#")
+						div
+							i.fa.fa-tasks.fa-fw 
+							|  New Task
+							span.pull-right.text-muted.small 20 minutes ago
+				li.divider
+				li
+					a(href="#")
+						div
+							i.fa.fa-upload.fa-fw 
+							|  Server Rebooted
+							span.pull-right.text-muted.small 20 minutes ago
+				li.divider
+				li
+					a(class="text-center", href="#")
+						strong See All Alerts 
+						i.fa.fa-angle-right
+		li.dropdown
+			a(class="dropdown-toggle", data-toggle="dropdown", href="#")
+				i.fa.fa-user.da-fw
+				i.fa.fa-caret-down
+			ul(class="dropdown-menu dropdown-user")
+				li
+					a(href="#")
+						i.fa.fa-user.fa-fw 
+						|  User Profile
+				li
+					a(href="#")
+						i.fa.fa-gear.fa-fw 
+						|  Settings
+				li.divider
+				li
+					a(href="#")
+						i.fa.fa-sign-out.fa-fw 
+						|  Logout
