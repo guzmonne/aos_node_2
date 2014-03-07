@@ -10,19 +10,26 @@ html(lang="en")
 
 		script(src='/js/libs/jquery.min.js')
 		script(src='/js/libs/bootstrap.min.js')
+		script(src='/js/libs/handlebars.js')
+		script(src='/js/libs/underscore.min.js')
+		script(src='/js/libs/backbone.min.js')
+		script(src='/js/libs/backbone.giraffe.min.js')
 		script(src='/js/libs/jquery.metisMenu.js')
 		script(src='/js/libs/sb-admin.js')
+		script(src='/js/templates.js')
+		script(src='/js/client.js')
 
 		link(rel='stylesheet', href='/css/bootstrap.min.css')
-		link(rel='stylesheet', href='/css/style.css')
 		link(rel='stylesheet', href='/css/font-awesome/css/font-awesome.css')
+		link(rel='stylesheet', href='/css/styles.min.css')
 	body
 		#wrapper
 			// ======
 			// HEADER
 			// ======
-			nav(class="navbar navbar-inverse navbar-static-top", role="navigation", style="margin-bottom: 0")
-				include includes/navbar
+			header(id="nav-el")
+			//nav(class="navbar navbar-inverse navbar-static-top", role="navigation", style="margin-bottom: 0")
+				//include includes/navbar
 			// =======
 			// SIDEBAR 
 			// =======

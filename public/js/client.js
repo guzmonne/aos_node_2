@@ -1,3 +1,6 @@
+// Set Template Strategies for all views to JST
+Giraffe.View.setTemplateStrategy('jst');
+
 window.App = {
 	Models     : {},
 	Collections: {},
@@ -6,14 +9,6 @@ window.App = {
 	Regions    : {},
 
 	vent: _.extend({}, Backbone.Events),
-
-	awake: function(){
-		App.start();
-	},
-
-	start: function(){
-		Backbone.history.start();
-	},
 
 	sseInit: function(){
 		if (!!window.EventSource){
@@ -37,7 +32,33 @@ window.App = {
 		}
 	},
 };
+App.Views.NavView = Giraffe.View.extend({
+	template: HBS.nav_template,
+
+	tagName: 'nav',
+	attributes: function(){
+		return {
+			'class': "navbar navbar-inverse navbar-static-top",
+			'role': "navigation", 
+			'style': "margin-bottom: 0" 
+		};
+	},
+
+});
+app = new Giraffe.App();
+
+// Build Nav
+app.addInitializer(function(options){
+	app.nav = new App.Views.NavView();
+	app.nav.attachTo('#nav-el');
+});
+
+// Start Backbone History
+app.addInitializer(function(){
+	Backbone.history.start();
+	console.log("Backbone Giraffe App is up and running");
+});
 
 $(document).ready(function(){
-	App.awake();
+	app.start();
 });

@@ -1,3 +1,6 @@
+// Set Template Strategies for all views to JST
+Giraffe.View.setTemplateStrategy('jst');
+
 window.App = {
 	Models     : {},
 	Collections: {},
@@ -6,14 +9,6 @@ window.App = {
 	Regions    : {},
 
 	vent: _.extend({}, Backbone.Events),
-
-	awake: function(){
-		App.start();
-	},
-
-	start: function(){
-		Backbone.history.start();
-	},
 
 	sseInit: function(){
 		if (!!window.EventSource){
@@ -37,7 +32,3 @@ window.App = {
 		}
 	},
 };
-
-$(document).ready(function(){
-	App.awake();
-});
