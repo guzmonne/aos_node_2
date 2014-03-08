@@ -9,9 +9,9 @@ app.addInitializer(function(options){
 // Main Content
 app.addInitializer(function(options){
 	app.breadCrumbs = new App.Views.BreadCrumbsView();
-	app.content = new App.Views.ContentView();
+	app.newClient = new App.Views.NewClientView();
 	app.breadCrumbs.attachTo('#content-el');
-	app.content.attachTo('#content-el');
+	app.newClient.attachTo('#content-el');
 });
 
 // Start Backbone History
