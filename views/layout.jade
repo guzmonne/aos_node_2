@@ -20,6 +20,7 @@ html(lang="en")
 		script(src='/js/client.js')
 
 		link(rel='stylesheet', href='/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/css/animate.css')
 		link(rel='stylesheet', href='/css/font-awesome/css/font-awesome.css')
 		link(rel='stylesheet', href='/css/styles.min.css')
 	body
@@ -28,17 +29,14 @@ html(lang="en")
 			// HEADER
 			// ======
 			header(id="nav-el")
-			//nav(class="navbar navbar-inverse navbar-static-top", role="navigation", style="margin-bottom: 0")
-				//include includes/navbar
 			// =======
 			// SIDEBAR 
 			// =======
-			nav(class="navbar-inverse navbar-static-side" role="navigation")
-				include includes/sidebar
+			aside(id="sidebar-el" class="sidebar-collapse")
+				nav(class="navbar-inverse navbar-static-side" role="navigation")
+					include includes/sidebar
 			// =======
 			// CONTENT 
 			// =======
-			section#page-wrapper
-				.row
-					.col-lg-12
-						h1.page-header Blank Page 
+			section#page-wrapper.make-space-right
+				#content-el

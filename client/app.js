@@ -10,6 +10,8 @@ window.App = {
 
 	vent: _.extend({}, Backbone.Events),
 
+	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
+
 	sseInit: function(){
 		if (!!window.EventSource){
 			this.vent.source = new EventSource();

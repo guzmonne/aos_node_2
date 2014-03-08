@@ -1,0 +1,90 @@
+<div class="col-lg-12">
+	<div class="portlet portlet-red">
+		<div class="portlet-heading">
+			<div class="portlet-title">
+				<h4>Datos de Nuevo Cliente</h4>
+			</div>
+			<div class="portlet-widgets">
+				<a href="#formControls" data-toggle="collapse" data-parent="#accordion">
+					<i class="fa fa-chevron-down"></i>
+				</a>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div id="formControls" class="panel-collapse in" style="height: auto;">
+			<div class="portlet-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="name" class="col-sm-2 control-label">Nombre</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="name" placeholder="Juan Perez">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="doc" class="col-sm-2 control-label">Documento</label>
+						<div class="col-sm-3">
+							<select name="doc-type" class="form-control">
+								<option value="CI">C.I.</option>
+								<option value="RUT">R.U.T</option>
+								<option value="DNI">DNI</option>
+								<option value="Pasaporte">Pasaporte</option>
+							</select>
+						</div>
+						<div class="col-sm-7">
+							<input type="text" class="form-control" name="doc-number" placeholder="4123456; 2123456789">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="phone" class="col-sm-2 control-label">Telefono</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="name" placeholder="099123456; 25019898">
+						</div>
+						<div class="col-sm-2">
+							<button type="submit" class="btn btn-success">
+								<i class="fa fa-plus"></i>
+							</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="address" class="col-sm-2 control-label">Dirección</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="street" placeholder="Av. 18 de Julio 123">
+						</div>
+						<label for="street" class="col-sm-2 control-label text-muted" style="text-align: left">
+							Calle
+						</label>
+						<div class="col-sm-8 col-sm-offset-2">
+							<input type="text" class="form-control form-control-under" name="city" placeholder="Las Piedras">
+						</div>
+						<label for="city" class="col-sm-2 text-muted control-label-under">
+							Ciudad
+						</label>
+						<div class="col-sm-8 col-sm-offset-2">
+							<input type="text" class="form-control form-control-under" name="department" placeholder="Artigas">
+						</div>
+						<label for="department" class="col-sm-2 text-muted control-label-under">
+							Dep.
+						</label>
+						<div class="col-sm-offset-2 col-sm-1 form-control-under">
+							<button type="submit" class="btn btn-success">
+								<i class="fa fa-plus"></i>
+							</button>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="email" class="col-sm-2 control-label">E-mail</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" name="email" placeholder="ejemplo@server.com">
+						</div>
+					</div>
+					<hr>
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-primary">Crear</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>	
+	</div>
+</div>
