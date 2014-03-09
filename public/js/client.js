@@ -100,15 +100,23 @@ App.Collections.Clients = Giraffe.Collection.extend({
 App.Views.BaseView = Giraffe.View.extend({
 	pluralize: function(value, target, singular, plural){
 		var el = $(target);
-		if (value > 0){
+		if (value > 1){
 			el.text(plural);
 		} else {
 			el.text(singular);
 		}
 	},
 });
-App.Views.NewClientView = App.Views.BaseView.extend({
-	template            : HBS.new_client_template,
+App.Views.ClientIndexView = App.Views.BaseView.extend({
+	template: HBS.client_index_template,
+	className: "row",
+
+	afterRender: function(){
+		this.oTable = this.$('#clients-table').dataTable();
+	},
+});
+App.Views.ClientNewView = App.Views.BaseView.extend({
+	template            : HBS.client_new_template,
 	phoneFieldTemplate  : HBS.phone_field_template,
 	addressFieldTemplate: HBS.address_field_template,
 	className: "row",
@@ -190,7 +198,7 @@ App.Views.NewClientView = App.Views.BaseView.extend({
 			this.addPhoneNumber();
 		}
 		if (street !== ''){
-			this.addAddress()
+			this.addAddress();
 		}
 		console.log(this.model.attributes);
 	},
@@ -283,9 +291,11 @@ app.addInitializer(function(options){
 // Main Content
 app.addInitializer(function(options){
 	app.breadCrumbs = new App.Views.BreadCrumbsView();
-	app.newClient = new App.Views.NewClientView();
+	app.clientNew   = new App.Views.ClientNewView();
+	app.clientIndex = new App.Views.ClientIndexView();
 	app.breadCrumbs.attachTo('#content-el');
-	app.newClient.attachTo('#content-el');
+	app.clientNew.attachTo('#content-el');
+	app.clientIndex.attachTo('#content-el');
 });
 
 // Start Backbone History

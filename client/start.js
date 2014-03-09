@@ -9,9 +9,11 @@ app.addInitializer(function(options){
 // Main Content
 app.addInitializer(function(options){
 	app.breadCrumbs = new App.Views.BreadCrumbsView();
-	app.newClient = new App.Views.NewClientView();
+	app.clientNew   = new App.Views.ClientNewView();
+	app.clientIndex = new App.Views.ClientIndexView();
 	app.breadCrumbs.attachTo('#content-el');
-	app.newClient.attachTo('#content-el');
+	app.clientNew.attachTo('#content-el');
+	app.clientIndex.attachTo('#content-el');
 });
 
 // Start Backbone History

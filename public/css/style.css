@@ -435,6 +435,43 @@ nav .open>a.alerts-link:hover {
 }
 
 /* FORMS */
+.input-group-sm>.form-control, 
+.input-group-sm>.input-group-addon, 
+.input-group-sm>.input-group-btn>.btn, 
+.input-group-lg>.form-control, 
+.input-group-lg>.input-group-addon, 
+.input-group-lg>.input-group-btn>.btn, 
+.list-group-item:first-child, 
+.list-group-item:last-child, 
+.modal-flex, .btn-square, 
+.squared, 
+.form-control, 
+.input-group-addon, 
+.input-group-btn .btn, 
+.dropdown-menu, 
+.panel-group .panel, 
+.panel-group 
+.panel-heading, 
+.breadcrumb, 
+.nav-tabs > li > a {
+  border-radius: 0;
+}
+
+input, select {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.428571429;
+  color: #555555;
+  vertical-align: middle;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #cccccc;
+  border-radius: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
 .portlet {
   border: 1px solid;
 }
@@ -511,3 +548,26 @@ nav .open>a.alerts-link:hover {
 .page-title small {
   font-size: 18px;
 }
+
+/* BUTTONS */
+.btn-dark-blue {
+  border-color: #314559;
+  color: #fff;
+  background-color: #34495e;
+}
+
+.btn-dark-blue:hover {
+  border-color: #2c3e50;
+  color: #fff;
+  background-color: #2f4254;
+}
+
+.btn-dark-blue:focus {
+  color: #fff;
+}
+
+/* TABLES */
+table.table-green thead {
+  color: #fff;
+  background-color: #16a085;
+} 

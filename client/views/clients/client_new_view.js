@@ -1,5 +1,5 @@
-App.Views.NewClientView = App.Views.BaseView.extend({
-	template            : HBS.new_client_template,
+App.Views.ClientNewView = App.Views.BaseView.extend({
+	template            : HBS.client_new_template,
 	phoneFieldTemplate  : HBS.phone_field_template,
 	addressFieldTemplate: HBS.address_field_template,
 	className: "row",
@@ -81,7 +81,7 @@ App.Views.NewClientView = App.Views.BaseView.extend({
 			this.addPhoneNumber();
 		}
 		if (street !== ''){
-			this.addAddress()
+			this.addAddress();
 		}
 		console.log(this.model.attributes);
 	},
