@@ -439,6 +439,19 @@ nav .open>a.alerts-link:hover {
   border: 1px solid;
 }
 
+.portlet-default,
+.portlet-dark-blue,
+.portlet-default>.portlet-heading, 
+.portlet-dark-blue>.portlet-heading {
+  border-color: #34495e;
+}
+
+.portlet-default>.portlet-heading,
+.portlet-dark-blue>.portlet-heading {
+  color: #fff;
+  background-color: #34495e;
+}
+
 .portlet-red,
 .portlet-red>.portlet-heading {
   border-color: #e74c3c;
@@ -482,7 +495,7 @@ nav .open>a.alerts-link:hover {
 
 /* BREADCRUMBS */
 .page-title {
-  margin: 30px 0;
+  margin: 15px 0;
 }
 
 .page-title h1 {

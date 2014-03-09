@@ -1,4 +1,4 @@
-App.Views.NewClientView = Giraffe.View.extend({
+App.Views.NewClientView = App.Views.BaseView.extend({
 	template            : HBS.new_client_template,
 	phoneFieldTemplate  : HBS.phone_field_template,
 	addressFieldTemplate: HBS.address_field_template,
@@ -9,39 +9,43 @@ App.Views.NewClientView = Giraffe.View.extend({
 		'click button.del-phone-number': 'delPhoneNumber',
 		'click #add-address'           : 'addAddress',
 		'click button.del-address'     : 'delAddress',
+		'submit form'                  : 'submitForm',
 	},
 
-	addPhoneNumber: function (e) {
-		var phoneNumber = $('[name=phone]');
+	initialize: function(){
+		this.model = new App.Models.Client();
+	},
+
+	addPhoneNumber: function () {
+		var number = $('[name=phone]');
 		var timestamp   = new Date().getTime();
-		if (phoneNumber.val() === ""){return;}
-		$('#phone-numbers').append(
-			this.phoneFieldTemplate({
-				phoneNumber: phoneNumber.val(),
-				timestamp  : timestamp
-			})
-		);
+		var attrs = {
+			number: number.val(),
+			timestamp  : timestamp
+		};
+		if (number.val() === ""){return;}
+		$('#phone-numbers').append(this.phoneFieldTemplate(attrs));
 		this.pluralize($('[data-phone-id]').length, '[for="phone"]', 'Telefono', 'Telefonos');
-		phoneNumber.focus();
-		phoneNumber.val('');
+		this.model.setp('phones', attrs);
+		number.focus();
+		number.val('');
 	},
 
-
-	addAddress: function(e){
+	addAddress: function(){
 		var street     = $('[name=street]');
 		var city       = $('[name=city]');
 		var department = $('[name=department]');
 		var timestamp  = new Date().getTime();
+		var attrs = {
+			street    : street.val(),
+			city      : city.val(),
+			department: department.val(),
+			timestamp : timestamp
+		};
 		if(street.val() === ""){return;}
-		$('#addresses').append(
-			this.addressFieldTemplate({
-				street    : street.val(),
-				city      : city.val(),
-				department: department.val(),
-				timestamp : timestamp
-			})
-		);
+		$('#addresses').append(this.addressFieldTemplate(attrs));
 		this.pluralize($('[data-address-id]').length, '[for="address"]', 'Dirección', 'Direcciones');
+		this.model.setp('addresses', attrs);
 		street.focus();
 		street.val('');
 		city.val('');
@@ -49,34 +53,36 @@ App.Views.NewClientView = Giraffe.View.extend({
 	},
 
 	delPhoneNumber: function(e){
-		var id = $(e.currentTarget).closest('button').data('phoneId');
+		var self = this;
+		var id   = $(e.currentTarget).closest('button').data('phoneId');
 		$('#' + id).parent().remove();
 		$('[data-phone-id=' + id + ']').parent().remove();
-		this.pluralizePhones();
+		this.model.popByEl(id, 'timestamp', this.model.attributes.phones);
+		this.pluralize($('[data-phone-id]').length, '[for="phone"]', 'Telefono', 'Telefonos');
 	},
 
 	delAddress: function(e){
-		var id = $(e.currentTarget).closest('button').data('addressId');
-		console.log(e, id);
+		var id   = $(e.currentTarget).closest('button').data('addressId');
+		var self = this;
 		$('[data-address-id='+id+']').remove();
+		this.model.popByEl(id, 'timestamp', this.model.attributes.addresses);
 		this.pluralize($('[data-address-id]').length, '[for="address"]', 'Dirección', 'Direcciones');
 	},
 
-	pluralizePhones: function(){
-		if ($('[data-phone-id]').length > 0){
-			$('[for="phone"]').text('Telefonos');
-		} else {
-			$('[for="phone"]').text('Telefono');
+	submitForm: function(e){
+		e.preventDefault();
+		this.model.set('name', $('[name=name]').val());
+		this.model.setn('doc.type', $('[name=doc-type]').val());
+		this.model.setn('doc.value', $('[name=doc-number]').val());
+		this.model.set('email', $('[name=email]').val());
+		var phone  = $('[name=phone]').val();
+		var street = $('[name=street]').val();
+		if (phone !== ''){
+			this.addPhoneNumber();
 		}
-	},
-
-	pluralize: function(value, target, singular, plural){
-		var el = $(target);
-		if (value > 0){
-			el.text(plural);
-		} else {
-			el.text(singular);
+		if (street !== ''){
+			this.addAddress()
 		}
+		console.log(this.model.attributes);
 	},
-
 });
