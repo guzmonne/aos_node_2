@@ -29,7 +29,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Clientes</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#clients-table-container\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"clients-table-container\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"table-responsive\">\n					<table id=\"clients-table\" class=\"table table-striped table-bordered table-hover table-green dataTable\" aria-describedby=\"clients-table-info\">\n						<thead>\n							<tr>\n								<th>Nombre</th>\n								<th>Documento</th>\n								<th>Telefono/s</th>\n								<th>Dirección/es</th>\n								<th>E-mail</th>\n							</tr>\n						</thead>\n						<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\">\n						</tbody>\n					</table>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
+  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Clientes</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#clients-table-container\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"clients-table-container\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"table-responsive\">\n					<table id=\"clients-table\" class=\"table table-striped table-bordered table-hover table-green dataTable\" aria-describedby=\"clients-table-info\">\n						<thead>\n							<tr>\n								<th>Nombre</th>\n								<th>Documento</th>\n								<th>Telefono/s</th>\n								<th>Dirección/es</th>\n								<th>E-mail</th>\n								<th>Controles</th>\n							</tr>\n						</thead>\n						<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\">\n						</tbody>\n					</table>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -37,7 +37,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Datos de Nuevo Cliente</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#formControls\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"formControls\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<form class=\"form-horizontal\">\n					<div class=\"form-group\">\n						<label for=\"name\" class=\"col-sm-2 control-label\">Nombre</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Juan Perez\">\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n						<div class=\"col-sm-3\">\n							<select name=\"doc-type\" class=\"form-control\">\n								<option value=\"CI\">C.I.</option>\n								<option value=\"RUT\">R.U.T</option>\n								<option value=\"DNI\">DNI</option>\n								<option value=\"Pasaporte\">Pasaporte</option>\n							</select>\n						</div>\n						<div class=\"col-sm-7\">\n							<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\">\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"phone-numbers\">\n						<label for=\"phone\" class=\"col-sm-2 control-label\">Telefono</label>\n						<div class=\"col-sm-8\">\n							<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"099123456; 25019898\" data-type=\"phone-number\">\n						</div>\n						<div class=\"col-sm-2\">\n							<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" tabindex = \"-1\">\n								<i class=\"fa fa-plus\"></i>\n							</button>\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"addresses\">\n						<div class=\"row\" style=\"margin: 0\">\n							<label for=\"address\" class=\"col-sm-2 control-label\">Dirección</label>\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control\" name=\"street\" placeholder=\"Av. 18 de Julio 123\">\n							</div>\n							<label for=\"street\" class=\"col-sm-2 control-label text-muted\" style=\"text-align: left; margin-bottom: 7px\">\n								Calle\n							</label>\n\n							<div class=\"col-sm-2 form-control-under\">\n								<button type=\"button\" class=\"btn btn-success pull-right\" id=\"add-address\" tabindex = \"-1\">\n									<i class=\"fa fa-plus\"></i>\n								</button>\n							</div>\n							\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"city\" placeholder=\"Las Piedras\">\n							</div>\n							<label for=\"city\" class=\"col-sm-2 text-muted control-label-under\">\n								Ciudad\n							</label>\n							<div class=\"col-sm-8 col-sm-offset-2\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"department\" placeholder=\"Artigas\">\n							</div>\n							<label for=\"department\" class=\"col-sm-2 text-muted control-label-under\">\n								Dep.\n							</label>\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"email\" class=\"col-sm-2 control-label\">E-mail</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"email\" placeholder=\"ejemplo@server.com\">\n						</div>\n					</div>\n					<hr>\n					<div class=\"form-group\">\n						<div class=\"col-sm-offset-2 col-sm-8\">\n							<button type=\"submit\" class=\"btn btn-dark-blue\">Crear</button>\n						</div>\n						<div class=\"col-sm-2\">\n							<button id=\"reset-form\" class=\"btn btn-danger\">Limpiar</button>\n						</div>\n					</div>\n				</form>\n			</div>\n		</div>	\n	</div>\n</div>";
+  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Nuevo Cliente</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#formControls\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"formControls\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<form class=\"form-horizontal\">\n					<div class=\"form-group\">\n						<label for=\"name\" class=\"col-sm-2 control-label\">Nombre</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Juan Perez\">\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n						<div class=\"col-sm-3\">\n							<select name=\"doc-type\" class=\"form-control\">\n								<option value=\"CI\">C.I.</option>\n								<option value=\"RUT\">R.U.T</option>\n								<option value=\"DNI\">DNI</option>\n								<option value=\"Pasaporte\">Pasaporte</option>\n							</select>\n						</div>\n						<div class=\"col-sm-7\">\n							<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\">\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"phone-numbers\">\n						<label for=\"phone\" class=\"col-sm-2 control-label\">Telefono</label>\n						<div class=\"col-sm-8\">\n							<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"099123456; 25019898\" data-type=\"phone-number\">\n						</div>\n						<div class=\"col-sm-2\">\n							<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" tabindex = \"-1\">\n								<i class=\"fa fa-plus\"></i>\n							</button>\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"addresses\">\n						<div class=\"row\" style=\"margin: 0\">\n							<label for=\"address\" class=\"col-sm-2 control-label\">Dirección</label>\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control\" name=\"street\" placeholder=\"Av. 18 de Julio 123\">\n							</div>\n							<label for=\"street\" class=\"col-sm-2 control-label text-muted\" style=\"text-align: left; margin-bottom: 7px\">\n								Calle\n							</label>\n\n							<div class=\"col-sm-2 form-control-under\">\n								<button type=\"button\" class=\"btn btn-success pull-right\" id=\"add-address\" tabindex = \"-1\">\n									<i class=\"fa fa-plus\"></i>\n								</button>\n							</div>\n							\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"city\" placeholder=\"Las Piedras\">\n							</div>\n							<label for=\"city\" class=\"col-sm-2 text-muted control-label-under\">\n								Ciudad\n							</label>\n							<div class=\"col-sm-8 col-sm-offset-2\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"department\" placeholder=\"Artigas\">\n							</div>\n							<label for=\"department\" class=\"col-sm-2 text-muted control-label-under\">\n								Dep.\n							</label>\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"email\" class=\"col-sm-2 control-label\">E-mail</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"email\" placeholder=\"ejemplo@server.com\">\n						</div>\n					</div>\n					<hr>\n					<div class=\"form-group\">\n						<div class=\"col-sm-offset-2 col-sm-8\">\n							<button type=\"submit\" class=\"btn btn-dark-blue\">Crear</button>\n						</div>\n						<div class=\"col-sm-2\">\n							<button id=\"reset-form\" class=\"btn btn-danger\">Limpiar</button>\n						</div>\n					</div>\n				</form>\n			</div>\n		</div>	\n	</div>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -58,15 +58,15 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n		<address>\n			<strong>";
+  buffer += "\n		<address>\n	  	<strong>";
   if (stack1 = helpers.street) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.street); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</strong><br>\n			";
+    + "</strong>.<br>\n	  	";
   if (stack1 = helpers.city) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.city); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + ",<br>\n			";
+    + ", ";
   if (stack1 = helpers.department) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.department); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -98,7 +98,133 @@ function program3(depth0,data) {
   if (stack2 = helpers.email) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.email); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</td>";
+    + "</td>\n<td class=\"center-vh\">\n	<button id=\"show-client\" class=\"btn btn-warning\">\n		<i class=\"fa fa-cogs\"></i>\n	</button>\n</td>";
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["client_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n		            	<p>\n		            		<i class=\"fa fa-phone fa-muted fa-fw\"></i> \n		            		";
+  if (stack1 = helpers.number) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.number); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n		            	</p>\n		            ";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n		              <p>\n		              	<i class=\"fa fa-building-o fa-muted fa-fw\"></i> \n		              	";
+  if (stack1 = helpers.street) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.street); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ".<br>\n		              	";
+  if (stack1 = helpers.city) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.city); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ", ";
+  if (stack1 = helpers.department) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.department); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n		              </p>\n		            ";
+  return buffer;
+  }
+
+  buffer += "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Cliente #";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + " - ";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#client-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"client-close\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"client-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<ul id=\"client-tabs\" class=\"nav nav-tabs\">\n	        <li class=\"active\">\n	        	<a href=\"#client-details-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\">\n	        		Datos\n	        	</a>\n	        </li>\n	        <li>\n	        	<a href=\"#client-service-orders-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\">\n	        		Ordenes de Servicio\n	        	</a>\n	        </li>\n	        <li>\n	        	<a href=\"#client-apparatus-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\">\n	        		Equipos\n	        	</a>\n	        </li>\n	        <li>\n	        	<a href=\"#client-edit-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\">\n	        		Editar Datos\n	        	</a>\n	        </li>\n	      </ul>\n	      <div id=\"client-tab-content\" class=\"tab-content\">\n	        <div class=\"tab-pane fade in active\" id=\"client-details-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n	          <div class=\"row\">\n	            <div class=\"col-lg-9 col-md-8\">\n	              <h1>";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h1>\n	              <ul class=\"list-inline\">\n	                <li><i class=\"fa fa-calendar fa-muted\"></i> Ingresado el: ";
+  if (stack1 = helpers.createdAtShort) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.createdAtShort); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n	                <li><i class=\"fa fa-calendar fa-muted\"></i> Modificado el: ";
+  if (stack1 = helpers.updatedAtShort) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.updatedAtShort); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n	                <li><i class=\"fa fa-user fa-muted\"></i> Creado por: ";
+  if (stack1 = helpers.createdBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.createdBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n	                <li><i class=\"fa fa-user fa-muted\"></i> Actualizado por: ";
+  if (stack1 = helpers.updatedBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.updatedBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n	              </ul>\n	              <h3>Equipos en Taller</h3>\n	              <div class=\"table-responsive\">\n	                <table class=\"table table-hover table-bordered table-striped\">\n	                  <thead>\n	                      <tr>\n	                          <th>ID</th>\n	                          <th>Marca</th>\n	                          <th>Modelo</th>\n	                          <th>Estado</th>\n	                      </tr>\n	                  </thead>\n	                  <tbody></tbody>\n	              	</table>\n	          		</div>\n	            </div>\n	            <div class=\"col-lg-3 col-md-4\">\n		            <h3>Detalles de Contacto</h3>\n		            ";
+  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
+  if (stack1 = helpers.phones) { stack1 = stack1.call(depth0, options); }
+  else { stack1 = (depth0 && depth0.phones); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
+  if (!helpers.phones) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		            ";
+  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
+  if (stack1 = helpers.addresses) { stack1 = stack1.call(depth0, options); }
+  else { stack1 = (depth0 && depth0.addresses); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
+  if (!helpers.addresses) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		            <p>\n		            	<i class=\"fa fa-envelope-o fa-muted fa-fw\"></i>  \n		            	<a href=\"#\">\n		            		";
+  if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n		            	</a>\n		            </p>\n	            </div>\n	          </div>\n	        </div>\n	        <div class=\"tab-pane fade in\" id=\"client-service-orders-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n	        	<h3>Ordenes de Servicio</h3>\n	        </div>\n	        <div class=\"tab-pane fade in\" id=\"client-apparatus-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n	        	<h3>Equipos</h3>\n	        </div>\n	        <div class=\"tab-pane fade in\" id=\"client-edit-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n	        	<h3>Editar Datos de Cliente</h3>\n	        	<div id=\"client-form-";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\"></div>\n	        </div>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["phone_field_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -137,6 +263,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
   return "<a data-toggle=\"dropdown\" href=\"#\" class=\"dropdown-toggle alerts-link\">\n  <i class=\"fa fa-bell fa-fw\">\n  </i>\n  <i class=\"fa fa-caret-down\">\n  </i>\n</a>\n<ul class=\"dropdown-menu dropdown-alerts\">\n  <li>\n    <a href=\"#\">\n      <div>\n        <i class=\"fa fa-comment fa-fw\">\n        </i>\n        New Comment \n        <span class=\"pull-right text-muted small\">\n          4 minutes ago\n        </span>\n      </div>\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\">\n      <div>\n        <i class=\"fa fa-twitter fa-fw\">\n        </i>\n        3 New Followers\n        <span class=\"pull-right text-muted small\">\n          12 minutes ago\n        </span>\n      </div>\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\">\n      <div>\n        <i class=\"fa fa-envelope fa-fw\">\n        </i>\n        Message Sent\n        <span class=\"pull-right text-muted small\">\n          6 minutes ago\n        </span>\n      </div>\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\">\n      <div>\n        <i class=\"fa fa-tasks fa-fw\">\n        </i>\n        New Task\n        <span class=\"pull-right text-muted small\">\n          20 minutes ago\n        </span>\n      </div>\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\">\n      <div>\n        <i class=\"fa fa-upload fa-fw\">\n        </i>\n        Server Rebooted\n        <span class=\"pull-right text-muted small\">\n          20 minutes ago\n        </span>\n      </div>\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\" class=\"text-center\">\n      <strong>\n        See All Alerts \n      </strong>\n      <i class=\"fa fa-angle-right\">\n      </i>\n    </a>\n  </li>\n</ul>\n          ";
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["app_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"content-el\"></div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["messages_layout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];

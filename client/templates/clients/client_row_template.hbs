@@ -13,10 +13,14 @@
 <td>
 	{{#addresses}}
 		<address>
-			<strong>{{street}}</strong><br>
-			{{city}},<br>
-			{{department}}
+	  	<strong>{{street}}</strong>.<br>
+	  	{{city}}, {{department}}
 		</address>
 	{{/addresses}}
 </td>
 <td>{{email}}</td>
+<td class="center-vh">
+	<button id="show-client" class="btn btn-warning">
+		<i class="fa fa-cogs"></i>
+	</button>
+</td>

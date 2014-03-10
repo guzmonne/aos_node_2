@@ -509,11 +509,16 @@ input, select {
 
 .portlet .portlet-heading .portlet-widgets {
   float: right;
-  margin: 8px 0;
+  margin: 8px 0 0 5px;
 }
 
 .portlet .portlet-heading .portlet-widgets a{
-  color: #fff}
+  color: #fff
+}
+
+.portlet .portlet-heading .portlet-widgets a.text-danger{
+  color: #FF4B45;
+}
 
 .portlet .portlet-body {
   padding: 15px;
@@ -620,7 +625,9 @@ tr {
 
 .table-hover>tbody>tr:hover>td, 
 .table-hover>tbody>tr:hover>th {
-  background-color: #55708B;
+  /*background-color: #55708B;*/
+  /*background-color: #428bca;*/
+  background-color: #2980B9;
 }
 
 .table-hover>tbody>tr.selected:hover>td, 

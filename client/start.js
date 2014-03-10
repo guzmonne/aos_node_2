@@ -90,6 +90,8 @@ var clientFixtures =
 var app = new Giraffe.App();
 var clients = new App.Collections.Clients(clientFixtures);
 
+app.template = HBS.app_template;
+
 // Build Nav
 app.addInitializer(function(options){
 	app.nav = new App.Views.NavView();
@@ -113,5 +115,6 @@ app.addInitializer(function(){
 });
 
 $(document).ready(function(){
+	app.attachTo('section#page-wrapper');
 	app.start();
 });

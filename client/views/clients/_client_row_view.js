@@ -1,14 +1,20 @@
 App.Views.ClientRowView = App.Views.BaseView.extend({
-	name: "App.Views.ClientRowView",
-	template: HBS.client_row_template,
-	tagName: 'tr',
+	template : HBS.client_row_template,
+
+	tagName  : 'tr',
+
+	ui: {
+		$showClient: '#show-client',
+	},
 
 	appEvents: {
-		'client_row:selected': 'deactivate'
+		'client:show:close': 'deactivate',
 	},
 
 	events: {
-		'click' : 'activate',
+		'mouseover'         : 'showControls',
+		'mouseout'          : 'hideControls',
+		'click #show-client': 'showClient',
 	},
 
 	serialize: function(){
@@ -25,8 +31,24 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	deactivate: function(cid){
-		if(cid !== this.cid && this.$el.hasClass('selected')){
+		if(cid === this.model.cid && this.$el.hasClass('selected')){
 			this.$el.removeClass('selected');
+		}
+	},
+
+	showClient: function(){
+		var exists = false;
+		var self   = this;
+		_.each(app.children, function(view){
+			if (view.model !== undefined && (view.model.cid === self.model.cid)){
+				exists = true;
+			}
+		});
+		if (exists === false) {
+			var clientShowView = new App.Views.ClientShowView({model: this.model});
+			app.addChild(clientShowView);
+			app.attach(clientShowView, {el: app.clientIndex.el, method: 'before'});
+			this.activate();
 		}
 	},
 });

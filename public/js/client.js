@@ -78,19 +78,32 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			}
 		});
 	},
+
+	dateDDMMYYYY: function(date){
+		return date.getDate() +
+			"/" + date.getMonth() + 
+			"/" + date.getFullYear();
+	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
 	urlRoot: '/clients',
 
-	defaults: {
-		'name'     : '',
-		'doc'      : {
-			'type' : '',
-			'number': ''
-		},
-		'phones'   : [],
-		'addresses': [],
-		'email'    : ''
+	defaults: function(){
+		return {
+			'id'  : this.cid,
+			'name': '',
+			'doc' : {
+				'type'  : '',
+				'number': ''
+			},
+			'phones'   : [],
+			'addresses': [],
+			'email'    : '',
+			'createdAt': new Date(),
+			'updatedAt': new Date(),
+			'createdBy': 'Guzmán Monné',
+			'updatedBy': 'Guzmán Monné'
+		};
 	},
 });
 App.Collections.Clients = Giraffe.Collection.extend({
@@ -108,16 +121,22 @@ App.Views.BaseView = Giraffe.View.extend({
 	},
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
-	name: "App.Views.ClientRowView",
-	template: HBS.client_row_template,
-	tagName: 'tr',
+	template : HBS.client_row_template,
+
+	tagName  : 'tr',
+
+	ui: {
+		$showClient: '#show-client',
+	},
 
 	appEvents: {
-		'client_row:selected': 'deactivate'
+		'client:show:close': 'deactivate',
 	},
 
 	events: {
-		'click' : 'activate',
+		'mouseover'         : 'showControls',
+		'mouseout'          : 'hideControls',
+		'click #show-client': 'showClient',
 	},
 
 	serialize: function(){
@@ -134,8 +153,24 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	deactivate: function(cid){
-		if(cid !== this.cid && this.$el.hasClass('selected')){
+		if(cid === this.model.cid && this.$el.hasClass('selected')){
 			this.$el.removeClass('selected');
+		}
+	},
+
+	showClient: function(){
+		var exists = false;
+		var self   = this;
+		_.each(app.children, function(view){
+			if (view.model !== undefined && (view.model.cid === self.model.cid)){
+				exists = true;
+			}
+		});
+		if (exists === false) {
+			var clientShowView = new App.Views.ClientShowView({model: this.model});
+			app.addChild(clientShowView);
+			app.attach(clientShowView, {el: app.clientIndex.el, method: 'before'});
+			this.activate();
 		}
 	},
 });
@@ -253,6 +288,33 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		this.render();
 		this.attachTo(this.app.breadCrumbs.el, {method: 'after'});
 		this.$('[name=name]').focus();
+	},
+});
+App.Views.ClientShowView = App.Views.BaseView.extend({
+	template: HBS.client_show_template,
+
+	className: 'row animated bounceIn',
+
+	events: {
+		'click #client-close' : 'closeView',
+	},
+
+	serialize: function(){
+		var createdAt = this.model.get('createdAt');
+		var updatedAt = this.model.get('updatedAt');
+		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt));
+		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt));
+		return this.model.toJSON();
+	},
+
+	closeView: function(e){
+		e.preventDefault();
+		var self = this;
+		this.$el.removeClass('bounceInRight').addClass('bounceOut');
+		setTimeout(function(){
+			self.dispose();
+			app.trigger('client:show:close', self.model.cid);
+		}, 800);
 	},
 });
 App.Views.BreadCrumbsView = Giraffe.View.extend({
@@ -424,6 +486,8 @@ var clientFixtures =
 var app = new Giraffe.App();
 var clients = new App.Collections.Clients(clientFixtures);
 
+app.template = HBS.app_template;
+
 // Build Nav
 app.addInitializer(function(options){
 	app.nav = new App.Views.NavView();
@@ -447,5 +511,6 @@ app.addInitializer(function(){
 });
 
 $(document).ready(function(){
+	app.attachTo('section#page-wrapper');
 	app.start();
 });
