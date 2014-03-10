@@ -9,6 +9,7 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		'click button.del-phone-number': 'delPhoneNumber',
 		'click #add-address'           : 'addAddress',
 		'click button.del-address'     : 'delAddress',
+		'click #reset-form'            : 'reset',
 		'submit form'                  : 'submitForm',
 	},
 
@@ -73,7 +74,7 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		e.preventDefault();
 		this.model.set('name', $('[name=name]').val());
 		this.model.setn('doc.type', $('[name=doc-type]').val());
-		this.model.setn('doc.value', $('[name=doc-number]').val());
+		this.model.setn('doc.number', $('[name=doc-number]').val());
 		this.model.set('email', $('[name=email]').val());
 		var phone  = $('[name=phone]').val();
 		var street = $('[name=street]').val();
@@ -83,6 +84,16 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		if (street !== ''){
 			this.addAddress();
 		}
-		console.log(this.model.attributes);
+		this.app.clientIndex.collection.add(this.model);
+		this.reset();
+	},
+
+	reset: function(e){
+		if(e !== undefined && e !== null){e.preventDefault();}
+		this.model.dispose();
+		this.model = new App.Models.Client();
+		this.render();
+		this.attachTo(this.app.breadCrumbs.el, {method: 'after'});
+		this.$('[name=name]').focus();
 	},
 });

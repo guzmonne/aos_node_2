@@ -568,6 +568,129 @@ input, select {
 
 /* TABLES */
 table.table-green thead {
-  color: #fff;
-  background-color: #16a085;
+  color:#D5DDE5;;
+  background: #2c3e50;
+  border-bottom:4px solid #9ea7af;
+  border-right: 1px solid #343a45;
+  padding:24px;
+  text-align:left;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  vertical-align:middle;
 } 
+
+th{
+  border-top-left-radius:3px;
+}
+
+th:last-child {
+  border-top-right-radius:3px;
+  border-right:none;
+}
+
+.table-striped>tbody>tr.selected:nth-child(odd)>td, 
+.table-striped>tbody>tr.selected:nth-child(odd)>th {
+  background-color: #405972;
+  color: #fff;
+}
+
+.table>thead>tr>.selected, 
+.table>tbody>tr>.selected, 
+.table>tfoot>tr>.selected, 
+.table>thead>.selected>td, 
+.table>tbody>.selected>td, 
+.table>tfoot>.selected>td, 
+.table>thead>.selected>th, 
+.table>tbody>.selected>th, 
+.table>tfoot>.selected>th {
+  background-color: #405972;
+  color: #fff;
+}
+
+.table-hover>tbody>tr>.selected:hover, 
+.table-hover>tbody>.selected:hover>td, 
+.table-hover>tbody>.selected:hover>th {
+  background-color: #283B4D;
+}
+
+tr {
+  border-top: 1px solid #C1C3D1;
+  border-bottom-: 1px solid #C1C3D1;
+  text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);
+}
+
+.table-hover>tbody>tr:hover>td, 
+.table-hover>tbody>tr:hover>th {
+  background-color: #55708B;
+}
+
+.table-hover>tbody>tr.selected:hover>td, 
+.table-hover>tbody>tr.selected:hover>th {
+  background-color: #283B4D;
+}
+
+tr:hover td {
+  color:#FFFFFF;
+  border-top: 1px solid #22262e;
+  border-bottom: 1px solid #22262e;
+}
+ 
+tr:first-child {
+  border-top:none;
+}
+
+tr:last-child {
+  border-bottom:none;
+}
+ 
+tr:nth-child(odd) td {
+  background:#EBEBEB;
+}
+ 
+tr:nth-child(odd):hover td {
+  background:#4E5066;
+}
+
+tr:last-child td:first-child {
+  border-bottom-left-radius:3px;
+}
+ 
+tr:last-child td:last-child {
+  border-bottom-right-radius:3px;
+}
+ 
+td {
+  background:#FFFFFF;
+  padding:20px;
+  text-align:left;
+  vertical-align:middle;
+  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid #C1C3D1;
+}
+
+td:last-child {
+  border-right: 0px;
+}
+
+th.text-left {
+  text-align: left;
+}
+
+th.text-center {
+  text-align: center;
+}
+
+th.text-right {
+  text-align: right;
+}
+
+td.text-left {
+  text-align: left;
+}
+
+td.text-center {
+  text-align: center;
+}
+
+td.text-right {
+  text-align: right;
+}

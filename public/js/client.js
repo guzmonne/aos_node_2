@@ -86,7 +86,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 		'name'     : '',
 		'doc'      : {
 			'type' : '',
-			'value': ''
+			'number': ''
 		},
 		'phones'   : [],
 		'addresses': [],
@@ -107,12 +107,53 @@ App.Views.BaseView = Giraffe.View.extend({
 		}
 	},
 });
-App.Views.ClientIndexView = App.Views.BaseView.extend({
-	template: HBS.client_index_template,
+App.Views.ClientRowView = App.Views.BaseView.extend({
+	name: "App.Views.ClientRowView",
+	template: HBS.client_row_template,
+	tagName: 'tr',
+
+	appEvents: {
+		'client_row:selected': 'deactivate'
+	},
+
+	events: {
+		'click' : 'activate',
+	},
+
+	serialize: function(){
+		return this.model.toJSON();
+	},
+
+	onDelete: function(){
+		this.model.dispose();
+	},
+
+	activate: function(e){
+		this.$el.addClass('selected');
+		this.app.trigger('client_row:selected', this.cid);
+	},
+
+	deactivate: function(cid){
+		if(cid !== this.cid && this.$el.hasClass('selected')){
+			this.$el.removeClass('selected');
+		}
+	},
+});
+App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
+	name       : "App.Views.ClientIndexView",
+	template   : HBS.client_index_template,
+	modelView  : App.Views.ClientRowView,
+	modelViewEl: '#clients',
+
 	className: "row",
 
 	afterRender: function(){
 		this.oTable = this.$('#clients-table').dataTable();
+		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
+	},
+
+	attach: function(view, options){
+		this.app.clientIndex.oTable.fnAddTr(view.render().el);
 	},
 });
 App.Views.ClientNewView = App.Views.BaseView.extend({
@@ -126,6 +167,7 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		'click button.del-phone-number': 'delPhoneNumber',
 		'click #add-address'           : 'addAddress',
 		'click button.del-address'     : 'delAddress',
+		'click #reset-form'            : 'reset',
 		'submit form'                  : 'submitForm',
 	},
 
@@ -190,7 +232,7 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		e.preventDefault();
 		this.model.set('name', $('[name=name]').val());
 		this.model.setn('doc.type', $('[name=doc-type]').val());
-		this.model.setn('doc.value', $('[name=doc-number]').val());
+		this.model.setn('doc.number', $('[name=doc-number]').val());
 		this.model.set('email', $('[name=email]').val());
 		var phone  = $('[name=phone]').val();
 		var street = $('[name=street]').val();
@@ -200,7 +242,17 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		if (street !== ''){
 			this.addAddress();
 		}
-		console.log(this.model.attributes);
+		this.app.clientIndex.collection.add(this.model);
+		this.reset();
+	},
+
+	reset: function(e){
+		if(e !== undefined && e !== null){e.preventDefault();}
+		this.model.dispose();
+		this.model = new App.Models.Client();
+		this.render();
+		this.attachTo(this.app.breadCrumbs.el, {method: 'after'});
+		this.$('[name=name]').focus();
 	},
 });
 App.Views.BreadCrumbsView = Giraffe.View.extend({
@@ -280,7 +332,97 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	tagName: 'li', 
 	className: 'dropdown',
 });
-app = new Giraffe.App();
+var clientFixtures = 
+	[
+		{
+			'name': 'Guzmán Monné',
+			'doc' : 
+			{
+				'type'  : 'CI',
+				'number': '41234567',
+			},
+			'phones':
+			[
+				{
+					'number': '099123456'
+				},
+				{
+					'number': '094789456'
+				},
+			],
+			'addresses':
+			[
+				{
+					'street'    : 'Av. Italia 7274',
+					'city'      : 'Carrasco',
+					'department': 'Montevideo'
+				},
+				{
+					'street'    : '8 de Octubre 2012',
+					'city'      : 'Tres Cruces',
+					'department': 'Montevideo'
+				},
+			],
+			'email': 'guz@example.com'
+		},
+		{
+			'name': 'Juan Perez',
+			'doc' : 
+			{
+				'type'  : 'CI',
+				'number': '3456789',
+			},
+			'phones':
+			[
+				{
+					'number': '099987654'
+				},
+			],
+			'addresses':
+			[
+				{
+					'street'    : 'Av. 18 de Julio 7274',
+					'city'      : 'Centro',
+					'department': 'Montevideo'
+				},
+			],
+			'email': 'jperez@example.com'
+		},
+		{
+			'name': 'Pedro Picapiedra',
+			'doc' : 
+			{
+				'type'  : 'Pasaporte',
+				'number': '001',
+			},
+			'phones':
+			[
+				{
+					'number': '099000000'
+				},
+				{
+					'number': '091000000'
+				},
+			],
+			'addresses':
+			[
+				{
+					'street'    : 'Piedra Floja 123',
+					'city'      : 'Piedra Lisa',
+					'department': 'Pedragoza'
+				},
+				{
+					'street'    : 'Piedra Dura',
+					'city'      : 'Piedra Lisa',
+					'department': 'Pedragoza'
+				},
+			],
+			'email': 'guz@example.com'
+		},
+	];
+
+var app = new Giraffe.App();
+var clients = new App.Collections.Clients(clientFixtures);
 
 // Build Nav
 app.addInitializer(function(options){
@@ -292,7 +434,7 @@ app.addInitializer(function(options){
 app.addInitializer(function(options){
 	app.breadCrumbs = new App.Views.BreadCrumbsView();
 	app.clientNew   = new App.Views.ClientNewView();
-	app.clientIndex = new App.Views.ClientIndexView();
+	app.clientIndex = new App.Views.ClientIndexView({collection: clients});
 	app.breadCrumbs.attachTo('#content-el');
 	app.clientNew.attachTo('#content-el');
 	app.clientIndex.attachTo('#content-el');

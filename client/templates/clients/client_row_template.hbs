@@ -1,0 +1,22 @@
+<td>{{name}}</td>
+<td>
+	<dt>{{doc.type}}:</dt>
+	<dd>{{doc.number}}</dd>
+</td>
+<td>
+	<ul class="list-unstyled">
+		{{#phones}}
+			<li>{{number}}</li>
+		{{/phones}}
+	</ul>
+</td>
+<td>
+	{{#addresses}}
+		<address>
+			<strong>{{street}}</strong><br>
+			{{city}},<br>
+			{{department}}
+		</address>
+	{{/addresses}}
+</td>
+<td>{{email}}</td>

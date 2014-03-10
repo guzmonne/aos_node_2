@@ -29,7 +29,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Clientes</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#clients-table-container\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"clients-table-container\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"table-responsive\">\n					<table id=\"clients-table\" class=\"table table-striped table-bordered table-hover table-green dataTable\" aria-describedby=\"clients-table-info\">\n						<thead>\n							<tr>\n								<th>Nombre</th>\n								<th>Documento</th>\n								<th>Telefono/s</th>\n								<th>Dirección/es</th>\n								<th>E-mail</th>\n							</tr>\n						</thead>\n						<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\">\n							<tr>\n								<td>Guzmán Monné</td>\n								<td>41234567</td>\n								<td>\n									<ul class=\"list-unstyled\">\n										<li>099858585</li>\n										<li>26962131</li>\n									</ul>\n								</td>\n								<td>\n									<address>\n										<strong>Av. Italia 1234</strong>, Malvin, Montevideo\n									</address>\n									<address>\n										<strong>8 de Octubre 2022</strong>, Las Piedras, Montevideo\n									</address>\n								</td>\n								<td>prueba@example.com</td>\n							</tr>\n							<tr>\n								<td>Juan Perez</td>\n								<td>34321569</td>\n								<td>\n									<ul class=\"list-unstyled\">\n										<li>099858545</li>\n									</ul>\n								</td>\n								<td>\n									<address>\n										<strong>Andes 2021 esq Wilson Ferreira</strong>, Centro, Montevideo\n									</address>\n								</td>\n								<td>jperez@hotmail.com</td>\n							</tr>\n							<tr>\n								<td>Pedro Picapiedra</td>\n								<td>00000001</td>\n								<td>\n									<ul class=\"list-unstyled\">\n										<li>099000000</li>\n									</ul>\n								</td>\n								<td>\n									<address>\n										<strong>Piedra Floja 666</strong>, Piedra Lisa, Roca Grande\n									</address>\n								</td>\n								<td>ppicapiedra@rockmail.com</td>\n							</tr>\n						</tbody>\n					</table>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
+  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Clientes</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#clients-table-container\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"clients-table-container\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"table-responsive\">\n					<table id=\"clients-table\" class=\"table table-striped table-bordered table-hover table-green dataTable\" aria-describedby=\"clients-table-info\">\n						<thead>\n							<tr>\n								<th>Nombre</th>\n								<th>Documento</th>\n								<th>Telefono/s</th>\n								<th>Dirección/es</th>\n								<th>E-mail</th>\n							</tr>\n						</thead>\n						<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\">\n						</tbody>\n					</table>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -37,7 +37,69 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"col-lg-offset-2 col-lg-8\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Datos de Nuevo Cliente</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#formControls\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"formControls\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<form class=\"form-horizontal\">\n					<div class=\"form-group\">\n						<label for=\"name\" class=\"col-sm-2 control-label\">Nombre</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Juan Perez\">\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n						<div class=\"col-sm-3\">\n							<select name=\"doc-type\" class=\"form-control\">\n								<option value=\"CI\">C.I.</option>\n								<option value=\"RUT\">R.U.T</option>\n								<option value=\"DNI\">DNI</option>\n								<option value=\"Pasaporte\">Pasaporte</option>\n							</select>\n						</div>\n						<div class=\"col-sm-7\">\n							<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\">\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"phone-numbers\">\n						<label for=\"phone\" class=\"col-sm-2 control-label\">Telefono</label>\n						<div class=\"col-sm-8\">\n							<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"099123456; 25019898\" data-type=\"phone-number\">\n						</div>\n						<div class=\"col-sm-2\">\n							<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" tabindex = \"-1\">\n								<i class=\"fa fa-plus\"></i>\n							</button>\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"addresses\">\n						<div class=\"row\" style=\"margin: 0\">\n							<label for=\"address\" class=\"col-sm-2 control-label\">Dirección</label>\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control\" name=\"street\" placeholder=\"Av. 18 de Julio 123\">\n							</div>\n							<label for=\"street\" class=\"col-sm-2 control-label text-muted\" style=\"text-align: left; margin-bottom: 7px\">\n								Calle\n							</label>\n\n							<div class=\"col-sm-2 form-control-under\">\n								<button type=\"button\" class=\"btn btn-success pull-right\" id=\"add-address\" tabindex = \"-1\">\n									<i class=\"fa fa-plus\"></i>\n								</button>\n							</div>\n							\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"city\" placeholder=\"Las Piedras\">\n							</div>\n							<label for=\"city\" class=\"col-sm-2 text-muted control-label-under\">\n								Ciudad\n							</label>\n							<div class=\"col-sm-8 col-sm-offset-2\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"department\" placeholder=\"Artigas\">\n							</div>\n							<label for=\"department\" class=\"col-sm-2 text-muted control-label-under\">\n								Dep.\n							</label>\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"email\" class=\"col-sm-2 control-label\">E-mail</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"email\" placeholder=\"ejemplo@server.com\">\n						</div>\n					</div>\n					<hr>\n					<div class=\"form-group\">\n						<div class=\"col-sm-offset-2 col-sm-10\">\n							<button type=\"submit\" class=\"btn btn-dark-blue\">Crear</button>\n						</div>\n					</div>\n				</form>\n			</div>\n		</div>	\n	</div>\n</div>";
+  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Datos de Nuevo Cliente</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#formControls\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"formControls\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<form class=\"form-horizontal\">\n					<div class=\"form-group\">\n						<label for=\"name\" class=\"col-sm-2 control-label\">Nombre</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Juan Perez\">\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n						<div class=\"col-sm-3\">\n							<select name=\"doc-type\" class=\"form-control\">\n								<option value=\"CI\">C.I.</option>\n								<option value=\"RUT\">R.U.T</option>\n								<option value=\"DNI\">DNI</option>\n								<option value=\"Pasaporte\">Pasaporte</option>\n							</select>\n						</div>\n						<div class=\"col-sm-7\">\n							<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\">\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"phone-numbers\">\n						<label for=\"phone\" class=\"col-sm-2 control-label\">Telefono</label>\n						<div class=\"col-sm-8\">\n							<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"099123456; 25019898\" data-type=\"phone-number\">\n						</div>\n						<div class=\"col-sm-2\">\n							<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" tabindex = \"-1\">\n								<i class=\"fa fa-plus\"></i>\n							</button>\n						</div>\n					</div>\n					<div class=\"form-group\" id=\"addresses\">\n						<div class=\"row\" style=\"margin: 0\">\n							<label for=\"address\" class=\"col-sm-2 control-label\">Dirección</label>\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control\" name=\"street\" placeholder=\"Av. 18 de Julio 123\">\n							</div>\n							<label for=\"street\" class=\"col-sm-2 control-label text-muted\" style=\"text-align: left; margin-bottom: 7px\">\n								Calle\n							</label>\n\n							<div class=\"col-sm-2 form-control-under\">\n								<button type=\"button\" class=\"btn btn-success pull-right\" id=\"add-address\" tabindex = \"-1\">\n									<i class=\"fa fa-plus\"></i>\n								</button>\n							</div>\n							\n							<div class=\"col-sm-8\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"city\" placeholder=\"Las Piedras\">\n							</div>\n							<label for=\"city\" class=\"col-sm-2 text-muted control-label-under\">\n								Ciudad\n							</label>\n							<div class=\"col-sm-8 col-sm-offset-2\">\n								<input type=\"text\" class=\"form-control form-control-under\" name=\"department\" placeholder=\"Artigas\">\n							</div>\n							<label for=\"department\" class=\"col-sm-2 text-muted control-label-under\">\n								Dep.\n							</label>\n						</div>\n					</div>\n					<div class=\"form-group\">\n						<label for=\"email\" class=\"col-sm-2 control-label\">E-mail</label>\n						<div class=\"col-sm-10\">\n							<input type=\"text\" class=\"form-control\" name=\"email\" placeholder=\"ejemplo@server.com\">\n						</div>\n					</div>\n					<hr>\n					<div class=\"form-group\">\n						<div class=\"col-sm-offset-2 col-sm-8\">\n							<button type=\"submit\" class=\"btn btn-dark-blue\">Crear</button>\n						</div>\n						<div class=\"col-sm-2\">\n							<button id=\"reset-form\" class=\"btn btn-danger\">Limpiar</button>\n						</div>\n					</div>\n				</form>\n			</div>\n		</div>	\n	</div>\n</div>";
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["client_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n			<li>";
+  if (stack1 = helpers.number) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.number); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n		";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n		<address>\n			<strong>";
+  if (stack1 = helpers.street) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.street); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</strong><br>\n			";
+  if (stack1 = helpers.city) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.city); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ",<br>\n			";
+  if (stack1 = helpers.department) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.department); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n		</address>\n	";
+  return buffer;
+  }
+
+  buffer += "<td>";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td>\n	<dt>"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + ":</dt>\n	<dd>"
+    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.number)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</dd>\n</td>\n<td>\n	<ul class=\"list-unstyled\">\n		";
+  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
+  if (stack2 = helpers.phones) { stack2 = stack2.call(depth0, options); }
+  else { stack2 = (depth0 && depth0.phones); stack2 = typeof stack2 === functionType ? stack2.call(depth0, options) : stack2; }
+  if (!helpers.phones) { stack2 = blockHelperMissing.call(depth0, stack2, options); }
+  if(stack2 || stack2 === 0) { buffer += stack2; }
+  buffer += "\n	</ul>\n</td>\n<td>\n	";
+  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
+  if (stack2 = helpers.addresses) { stack2 = stack2.call(depth0, options); }
+  else { stack2 = (depth0 && depth0.addresses); stack2 = typeof stack2 === functionType ? stack2.call(depth0, options) : stack2; }
+  if (!helpers.addresses) { stack2 = blockHelperMissing.call(depth0, stack2, options); }
+  if(stack2 || stack2 === 0) { buffer += stack2; }
+  buffer += "\n</td>\n<td>";
+  if (stack2 = helpers.email) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.email); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</td>";
+  return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["phone_field_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];

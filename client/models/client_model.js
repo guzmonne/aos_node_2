@@ -5,7 +5,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 		'name'     : '',
 		'doc'      : {
 			'type' : '',
-			'value': ''
+			'number': ''
 		},
 		'phones'   : [],
 		'addresses': [],
