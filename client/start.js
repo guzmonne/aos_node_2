@@ -1,6 +1,7 @@
 var clientFixtures = 
 	[
 		{
+			'id': 1,
 			'name': 'Guzmán Monné',
 			'doc' : 
 			{
@@ -32,6 +33,7 @@ var clientFixtures =
 			'email': 'guz@example.com'
 		},
 		{
+			'id': 2,
 			'name': 'Juan Perez',
 			'doc' : 
 			{
@@ -55,6 +57,7 @@ var clientFixtures =
 			'email': 'jperez@example.com'
 		},
 		{
+			'id': 3,
 			'name': 'Pedro Picapiedra',
 			'doc' : 
 			{

@@ -25,11 +25,23 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		return aux;
 	},
 
-	setp: function(attr, value){
+	push: function(attr, value){
 		if (_.isArray(this.attributes[attr])){
 			this.attributes[attr].push(value);
 		} else {
 			this.set(attr, value);
+		}
+	},
+
+	pop: function(attr, index){
+		var array = this.get(attr);
+		if(_.isString(index)){
+			index = parseInt(index);
+		}
+		if(_.isArray(array)){
+			return array.splice(index, 1);
+		} else {
+			throw new Error( attr  + 'is not an array');
 		}
 	},
 

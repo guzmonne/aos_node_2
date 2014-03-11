@@ -30,10 +30,10 @@
 			</button>
 		</div>
 		{{#each phones}}
-		<div class="col-sm-8 col-sm-offset-2">
-			<input type="text" class="form-control form-control-under" value="{{number}}" id="{{@index}}" data-type="phone-number">
+		<div class="col-sm-8 col-sm-offset-2" data-phone-index="{{@index}}">
+			<input type="text" class="form-control form-control-under" value="{{number}}">
 		</div>​<div class="col-sm-2">
-			<button type="button" class="btn btn-danger form-control-under del-phone-number" tabindex = "-1" data-phone-id="{{@index}}">
+			<button type="button" class="btn btn-danger form-control-under del-phone-number" tabindex = "-1" data-phone-index="{{@index}}">
 				<i class="fa fa-minus"></i>
 			</button>
 		</div>
@@ -41,7 +41,13 @@
 	</div>
 	<div class="form-group" id="addresses">
 		<div class="row" style="margin: 0">
-			<label for="address" class="col-sm-2 control-label">Dirección</label>
+			<label for="address" class="col-sm-2 control-label">
+				{{#is addresses ">" 0}}
+					Direcciones
+				{{else}}
+					Dirección
+				{{/is}}
+			</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="street" placeholder="Av. 18 de Julio 123">
 			</div>
@@ -69,10 +75,10 @@
 			</label>
 		</div>
 		{{#each addresses}}
-			<div class="row" style="margin: 0" data-address-id="{{@index}}">
+			<div class="row" style="margin: 0">
 				<hr>
 				<div class="col-sm-2 form-control-under">
-					<button type="button" class="btn btn-danger pull-right del-address" tabindex = "-1">
+					<button type="button" class="btn btn-danger pull-right del-address" tabindex = "-1" data-address-index="{{@index}}">
 						<i class="fa fa-minus"></i>
 					</button>
 				</div>
@@ -105,7 +111,7 @@
 	</div>
 	<hr>
 	<div class="form-group">
-		{{#unless name}}
+		{{#unless id}}
 			<div class="col-sm-offset-2 col-sm-8">
 				<button type="submit" class="btn btn-dark-blue">Crear</button>
 			</div>

@@ -11,7 +11,6 @@ window.App = {
 	vent: _.extend({}, Backbone.Events),
 
 	animate: function(el, animation, callback){
-		console.log($(el));
 		$(el).addClass("animated " + animation);
 		var wait = window.setTimeout(function () {
 			$(el).removeClass("animated " + animation);

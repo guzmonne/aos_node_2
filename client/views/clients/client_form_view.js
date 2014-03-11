@@ -10,66 +10,54 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'click button.del-phone-number': 'delPhoneNumber',
 		'click #add-address'           : 'addAddress',
 		'click button.del-address'     : 'delAddress',
-		'click #reset-form'            : 'reset',
+		'click #reset-form'            : 'render',
 		'click #update-form'           : 'updateForm',
 		'submit form'                  : 'submitForm',
 	},
 
+	afterRender: function(){
+		this.$('[name=name]').focus();
+	},
+
 	serialize: function(){
+		this.model.set('phones-length', this.model.get('phones').length);
+		this.model.set('addresses-length', this.model.get('addresses').length);
 		return this.model.toJSON();
 	},
 
-	addPhoneNumber: function () {
-		var number = $('[name=phone]');
-		var timestamp   = new Date().getTime();
-		var attrs = {
-			number: number.val(),
-			timestamp  : timestamp
-		};
-		if (number.val() === ""){return;}
-		$('#phone-numbers').append(this.phoneFieldTemplate(attrs));
-		this.pluralize($('[data-phone-id]').length, '[for="phone"]', 'Telefono', 'Telefonos');
-		this.model.setp('phones', attrs);
-		number.focus();
-		number.val('');
+	addPhoneNumber: function(){
+		var number = this.$('[name=phone]').val();
+		if(number === ""){return;}
+		this.model.push('phones', {
+			number: number,
+		});
+		this.reRender('[name=phone]');
+	},
+
+	delPhoneNumber:function(e){
+		var index = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
+		this.model.pop('phones', index);
+		this.reRender('[name=phone]');
 	},
 
 	addAddress: function(){
-		var street     = $('[name=street]');
-		var city       = $('[name=city]');
-		var department = $('[name=department]');
-		var timestamp  = new Date().getTime();
+		var street     = this.$('[name=street]').val();
+		var city       = this.$('[name=city]').val();
+		var department = this.$('[name=department]').val();
+		if(street === ""){return;}
 		var attrs = {
-			street    : street.val(),
-			city      : city.val(),
-			department: department.val(),
-			timestamp : timestamp
+			street    : street,
+			city      : city,
+			department: department,
 		};
-		if(street.val() === ""){return;}
-		$('#addresses').append(this.addressFieldTemplate(attrs));
-		this.pluralize($('[data-address-id]').length, '[for="address"]', 'Dirección', 'Direcciones');
-		this.model.setp('addresses', attrs);
-		street.focus();
-		street.val('');
-		city.val('');
-		department.val('');
-	},
-
-	delPhoneNumber: function(e){
-		var self = this;
-		var id   = $(e.currentTarget).closest('button').data('phoneId');
-		$('#' + id).parent().remove();
-		$('[data-phone-id=' + id + ']').parent().remove();
-		this.model.popByEl(id, 'timestamp', this.model.attributes.phones);
-		this.pluralize($('[data-phone-id]').length, '[for="phone"]', 'Telefono', 'Telefonos');
+		this.model.push('addresses', attrs);
+		this.reRender('[name=street]');
 	},
 
 	delAddress: function(e){
-		var id   = $(e.currentTarget).closest('button').data('addressId');
-		var self = this;
-		$('[data-address-id='+id+']').remove();
-		this.model.popByEl(id, 'timestamp', this.model.attributes.addresses);
-		this.pluralize($('[data-address-id]').length, '[for="address"]', 'Dirección', 'Direcciones');
+		var index = parseInt(this.$(e.currentTarget).closest('button').data('addressIndex'));
+		this.model.pop('addresses', index);
+		this.reRender('[name=street]');
 	},
 
 	setModel: function(){
@@ -77,8 +65,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.model.setn('doc.type', this.$('[name=doc-type]').val());
 		this.model.setn('doc.number', this.$('[name=doc-number]').val());
 		this.model.set('email', this.$('[name=email]').val());
-		var phone  = $('[name=phone]').val();
-		var street = $('[name=street]').val();
+		var phone  = this.$('[name=phone]').val();
+		var street = this.$('[name=street]').val();
 		if (phone !== ''){
 			this.addPhoneNumber();
 		}
@@ -89,7 +77,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	submitForm: function(e){
 		e.preventDefault();
-		console.log('submitForm');
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
 		this.app.clientIndex.collection.add(this.model);
@@ -98,14 +85,12 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	updateForm: function(e){
 		e.preventDefault();
-		console.log('updateForm');
 		this.setModel();
 		this.model.trigger('updated');
 	},
 
-	reset: function(e){
-		if (e !== null && e !== undefined){e.preventDefault();}
-		this.parent.renderForm();
-		this.$('[name=name]').focus();
+	reRender: function(activeAttr){
+		this.render();
+		this.$(activeAttr).focus();
 	},
 });

@@ -3,7 +3,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'id'  : this.cid,
+			'id'  : null,
 			'name': '',
 			'doc' : {
 				'type'  : '',
