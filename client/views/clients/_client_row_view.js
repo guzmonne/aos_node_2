@@ -12,9 +12,11 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	events: {
-		'mouseover'         : 'showControls',
-		'mouseout'          : 'hideControls',
 		'click #show-client': 'showClient',
+	},
+
+	initialize: function(){
+		this.listenTo(this.model, 'updated', this.render);
 	},
 
 	serialize: function(){
@@ -39,9 +41,11 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	showClient: function(){
 		var exists = false;
 		var self   = this;
+		var cid;
 		_.each(app.children, function(view){
 			if (view.model !== undefined && (view.model.cid === self.model.cid)){
 				exists = true;
+				cid    = view.cid;
 			}
 		});
 		if (exists === false) {
@@ -49,6 +53,8 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 			app.addChild(clientShowView);
 			app.attach(clientShowView, {el: app.clientIndex.el, method: 'before'});
 			this.activate();
+		} else {
+			App.scrollTo($('[data-view-cid='+cid+']').offset().top);
 		}
 	},
 });

@@ -1,0 +1,124 @@
+<form class="form-horizontal">
+	<div class="form-group">
+		<label for="name" class="col-sm-2 control-label">Nombre</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="name" placeholder="Juan Perez" value="{{name}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="doc" class="col-sm-2 control-label">Documento</label>
+		<div class="col-sm-3">
+			<select name="doc-type" class="form-control">
+				<option value="CI" {{#is "CI" doc.type}}selected="true"{{/is}}>C.I.</option>
+				<option value="RUT" {{#is "RUT" doc.type}}selected="true"{{/is}}>R.U.T</option>
+				<option value="DNI" {{#is "DNI" doc.type}}selected="true"{{/is}}>DNI</option>
+				<option value="Pasaporte" {{#is "Pasaporte" doc.type}}selected="true"{{/is}}>Pasaporte</option>
+			</select>
+		</div>
+		<div class="col-sm-7">
+			<input type="text" class="form-control" name="doc-number" placeholder="4123456; 2123456789" value="{{doc.number}}">
+		</div>
+	</div>
+	<div class="form-group" id="phone-numbers">
+		<label for="phone" class="col-sm-2 control-label">Telefono</label>
+		<div class="col-sm-8">
+			<input type="text" class="form-control" name="phone" placeholder="099123456; 25019898" data-type="phone-number">
+		</div>
+		<div class="col-sm-2">
+			<button type="button" class="btn btn-success" id="add-phone-number" tabindex = "-1">
+				<i class="fa fa-plus"></i>
+			</button>
+		</div>
+		{{#each phones}}
+		<div class="col-sm-8 col-sm-offset-2">
+			<input type="text" class="form-control form-control-under" value="{{number}}" id="{{@index}}" data-type="phone-number">
+		</div>​<div class="col-sm-2">
+			<button type="button" class="btn btn-danger form-control-under del-phone-number" tabindex = "-1" data-phone-id="{{@index}}">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
+		{{/each}}
+	</div>
+	<div class="form-group" id="addresses">
+		<div class="row" style="margin: 0">
+			<label for="address" class="col-sm-2 control-label">Dirección</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" name="street" placeholder="Av. 18 de Julio 123">
+			</div>
+			<label for="street" class="col-sm-2 control-label text-muted" style="text-align: left; margin-bottom: 7px">
+				Calle
+			</label>
+
+			<div class="col-sm-2 form-control-under">
+				<button type="button" class="btn btn-success pull-right" id="add-address" tabindex = "-1">
+					<i class="fa fa-plus"></i>
+				</button>
+			</div>
+			
+			<div class="col-sm-8">
+				<input type="text" class="form-control form-control-under" name="city" placeholder="Las Piedras">
+			</div>
+			<label for="city" class="col-sm-2 text-muted control-label-under">
+				Ciudad
+			</label>
+			<div class="col-sm-8 col-sm-offset-2">
+				<input type="text" class="form-control form-control-under" name="department" placeholder="Artigas">
+			</div>
+			<label for="department" class="col-sm-2 text-muted control-label-under">
+				Dep.
+			</label>
+		</div>
+		{{#each addresses}}
+			<div class="row" style="margin: 0" data-address-id="{{@index}}">
+				<hr>
+				<div class="col-sm-2 form-control-under">
+					<button type="button" class="btn btn-danger pull-right del-address" tabindex = "-1">
+						<i class="fa fa-minus"></i>
+					</button>
+				</div>
+				<div class="col-sm-8 form-control-under">
+					<input type="text" class="form-control" value="{{street}}">
+				</div>
+				<label for="street" class="col-sm-2 text-muted control-label-under" style="text-align: left; margin-bottom: 8px">
+					Calle
+				</label>
+				<div class="col-sm-8 col-sm-offset-2">
+					<input type="text" class="form-control form-control-under" value="{{city}}">
+				</div>
+				<label for="city" class="col-sm-2 text-muted control-label-under">
+					Ciudad
+				</label>
+				<div class="col-sm-8 col-sm-offset-2">
+					<input type="text" class="form-control form-control-under" value="{{department}}">
+				</div>
+				<label for="department" class="col-sm-2 text-muted control-label-under">
+					Dep.
+				</label>
+			</div>
+		{{/each}}
+	</div>
+	<div class="form-group">
+		<label for="email" class="col-sm-2 control-label">E-mail</label>
+		<div class="col-sm-10">
+			<input type="text" class="form-control" name="email" placeholder="ejemplo@server.com" value="{{email}}">
+		</div>
+	</div>
+	<hr>
+	<div class="form-group">
+		{{#unless name}}
+			<div class="col-sm-offset-2 col-sm-8">
+				<button type="submit" class="btn btn-dark-blue">Crear</button>
+			</div>
+			<div class="col-sm-2">
+				<button id="reset-form" class="btn btn-danger">Limpiar</button>
+			</div>
+		{{else}}
+			<div class="col-sm-offset-2 col-sm-8">
+				<button id="update-form" class="btn btn-warning">Actualizar</button>
+			</div>
+			<div class="col-sm-2">
+				<button id="reset-form" class="btn btn-primary">Restaurar</button>
+			</div>
+		{{/unless}}
+	</div>
+</form>

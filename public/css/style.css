@@ -489,6 +489,20 @@ input, select {
   background-color: #34495e;
 }
 
+.portlet-green{
+  .border-color: #16a085;
+}
+
+.portlet-green>.portlet-heading{
+  color: #fff;
+  background-color: #16a085;
+}
+
+.portlet-green,
+.portlet-green>.portlet-heading {
+  border-color: #16a085;
+}
+
 .portlet-red,
 .portlet-red>.portlet-heading {
   border-color: #e74c3c;
@@ -569,6 +583,22 @@ input, select {
 
 .btn-dark-blue:focus {
   color: #fff;
+}
+
+.btn-orange {
+  border-color: #e79411;
+  color: #fff;
+  background-color: #f39c12;
+}
+
+.btn-orange:hover {
+  color: #fff;
+  background-color: #e79411;
+}
+
+.btn-orange:focus {
+  color: #fff;
+  background-color: #e79411;
 }
 
 /* TABLES */

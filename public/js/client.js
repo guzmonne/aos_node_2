@@ -10,7 +10,22 @@ window.App = {
 
 	vent: _.extend({}, Backbone.Events),
 
+	animate: function(el, animation, callback){
+		console.log($(el));
+		$(el).addClass("animated " + animation);
+		var wait = window.setTimeout(function () {
+			$(el).removeClass("animated " + animation);
+			if(_.isFunction(callback)){callback();}
+		}, 800);
+	},
+
 	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
+
+	scrollTo: function(position){
+		$('html, body').animate({
+			scrollTop: position
+		}, 500);
+	},
 
 	sseInit: function(){
 		if (!!window.EventSource){
@@ -134,9 +149,11 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	events: {
-		'mouseover'         : 'showControls',
-		'mouseout'          : 'hideControls',
 		'click #show-client': 'showClient',
+	},
+
+	initialize: function(){
+		this.listenTo(this.model, 'updated', this.render);
 	},
 
 	serialize: function(){
@@ -161,9 +178,11 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	showClient: function(){
 		var exists = false;
 		var self   = this;
+		var cid;
 		_.each(app.children, function(view){
 			if (view.model !== undefined && (view.model.cid === self.model.cid)){
 				exists = true;
+				cid    = view.cid;
 			}
 		});
 		if (exists === false) {
@@ -171,31 +190,17 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 			app.addChild(clientShowView);
 			app.attach(clientShowView, {el: app.clientIndex.el, method: 'before'});
 			this.activate();
+		} else {
+			App.scrollTo($('[data-view-cid='+cid+']').offset().top);
 		}
 	},
 });
-App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
-	name       : "App.Views.ClientIndexView",
-	template   : HBS.client_index_template,
-	modelView  : App.Views.ClientRowView,
-	modelViewEl: '#clients',
-
-	className: "row",
-
-	afterRender: function(){
-		this.oTable = this.$('#clients-table').dataTable();
-		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
-	},
-
-	attach: function(view, options){
-		this.app.clientIndex.oTable.fnAddTr(view.render().el);
-	},
-});
-App.Views.ClientNewView = App.Views.BaseView.extend({
-	template            : HBS.client_new_template,
+App.Views.ClientFormView = App.Views.BaseView.extend({
+	template            : HBS.client_form_template,
 	phoneFieldTemplate  : HBS.phone_field_template,
 	addressFieldTemplate: HBS.address_field_template,
-	className: "row",
+
+	className: 'col-lg-12',
 
 	events: {
 		'click #add-phone-number'      : 'addPhoneNumber',
@@ -203,11 +208,12 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		'click #add-address'           : 'addAddress',
 		'click button.del-address'     : 'delAddress',
 		'click #reset-form'            : 'reset',
+		'click #update-form'           : 'updateForm',
 		'submit form'                  : 'submitForm',
 	},
 
-	initialize: function(){
-		this.model = new App.Models.Client();
+	serialize: function(){
+		return this.model.toJSON();
 	},
 
 	addPhoneNumber: function () {
@@ -263,12 +269,11 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		this.pluralize($('[data-address-id]').length, '[for="address"]', 'Dirección', 'Direcciones');
 	},
 
-	submitForm: function(e){
-		e.preventDefault();
-		this.model.set('name', $('[name=name]').val());
-		this.model.setn('doc.type', $('[name=doc-type]').val());
-		this.model.setn('doc.number', $('[name=doc-number]').val());
-		this.model.set('email', $('[name=email]').val());
+	setModel: function(){
+		this.model.set('name', this.$('[name=name]').val());
+		this.model.setn('doc.type', this.$('[name=doc-type]').val());
+		this.model.setn('doc.number', this.$('[name=doc-number]').val());
+		this.model.set('email', this.$('[name=email]').val());
 		var phone  = $('[name=phone]').val();
 		var street = $('[name=street]').val();
 		if (phone !== ''){
@@ -277,26 +282,79 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 		if (street !== ''){
 			this.addAddress();
 		}
+	},
+
+	submitForm: function(e){
+		e.preventDefault();
+		console.log('submitForm');
+		if(this.$('button[type=submit]').length === 0){return;}
+		this.setModel();
 		this.app.clientIndex.collection.add(this.model);
 		this.reset();
 	},
 
+	updateForm: function(e){
+		e.preventDefault();
+		console.log('updateForm');
+		this.setModel();
+		this.model.trigger('updated');
+	},
+
 	reset: function(e){
-		if(e !== undefined && e !== null){e.preventDefault();}
-		this.model.dispose();
-		this.model = new App.Models.Client();
-		this.render();
-		this.attachTo(this.app.breadCrumbs.el, {method: 'after'});
+		if (e !== null && e !== undefined){e.preventDefault();}
+		this.parent.renderForm();
 		this.$('[name=name]').focus();
+	},
+});
+App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
+	name       : "App.Views.ClientIndexView",
+	template   : HBS.client_index_template,
+	modelView  : App.Views.ClientRowView,
+	modelViewEl: '#clients',
+
+	className: "row",
+
+	afterRender: function(){
+		this.oTable = this.$('#clients-table').dataTable();
+		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
+	},
+
+	attach: function(view, options){
+		this.app.clientIndex.oTable.fnAddTr(view.render().el);
+	},
+});
+App.Views.ClientNewView = App.Views.BaseView.extend({
+	template            : HBS.client_new_template,
+	
+	className: "row",
+
+	afterRender: function(){
+		this.renderForm();
+	},
+
+	renderForm: function(){
+		this.clientForm = new App.Views.ClientFormView({model: new App.Models.Client()});
+		this.clientForm.attachTo(this.$('#client-form'), {method: 'html'});
 	},
 });
 App.Views.ClientShowView = App.Views.BaseView.extend({
 	template: HBS.client_show_template,
+	form    : HBS.client_form_template,
 
-	className: 'row animated bounceIn',
+	className: 'row',
 
 	events: {
 		'click #client-close' : 'closeView',
+	},
+
+	initialize: function(){
+		this.listenTo(this.model, 'updated', this.render);
+	},
+
+	afterRender: function(){
+		App.animate(this.$el, 'fadeIn');
+		App.scrollTo($('[data-view-cid='+this.cid+']').offset().top);
+		this.renderForm();
 	},
 
 	serialize: function(){
@@ -310,11 +368,15 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	closeView: function(e){
 		e.preventDefault();
 		var self = this;
-		this.$el.removeClass('bounceInRight').addClass('bounceOut');
-		setTimeout(function(){
+		App.animate(this.$el, 'fadeOut', function(){
 			self.dispose();
 			app.trigger('client:show:close', self.model.cid);
-		}, 800);
+		});
+	},
+
+	renderForm: function(){
+		this.clientForm = new App.Views.ClientFormView({model: this.model});
+		this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
 	},
 });
 App.Views.BreadCrumbsView = Giraffe.View.extend({

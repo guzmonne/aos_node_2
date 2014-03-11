@@ -10,7 +10,22 @@ window.App = {
 
 	vent: _.extend({}, Backbone.Events),
 
+	animate: function(el, animation, callback){
+		console.log($(el));
+		$(el).addClass("animated " + animation);
+		var wait = window.setTimeout(function () {
+			$(el).removeClass("animated " + animation);
+			if(_.isFunction(callback)){callback();}
+		}, 800);
+	},
+
 	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
+
+	scrollTo: function(position){
+		$('html, body').animate({
+			scrollTop: position
+		}, 500);
+	},
 
 	sseInit: function(){
 		if (!!window.EventSource){
