@@ -220,11 +220,23 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'click button.del-address'     : 'delAddress',
 		'click #reset-form'            : 'render',
 		'click #update-form'           : 'updateForm',
+		'change input'                 : 'changeFormInput',
+		'change select'                : 'changeFormInput',
 		'submit form'                  : 'submitForm',
 	},
 
 	afterRender: function(){
 		this.$('[name=name]').focus();
+	},
+
+	changeFormInput: function(e){
+		var value = e.target.value;
+		var name = e.target.name;
+		if(name.indexOf(".") != -1){
+			this.model.setn(name, value);
+		} else {
+			this.model.set(name, value);
+		}
 	},
 
 	serialize: function(){
@@ -234,12 +246,16 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	addPhoneNumber: function(){
+		this.setPhoneNumberInModel();
+		this.reRender('[name=phone]');
+	},
+
+	setPhoneNumberInModel: function(){
 		var number = this.$('[name=phone]').val();
 		if(number === ""){return;}
 		this.model.push('phones', {
 			number: number,
 		});
-		this.reRender('[name=phone]');
 	},
 
 	delPhoneNumber:function(e){
@@ -249,6 +265,11 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	addAddress: function(){
+		this.setAddressInModel();
+		this.reRender('[name=street]');
+	},
+
+	setAddressInModel: function(){
 		var street     = this.$('[name=street]').val();
 		var city       = this.$('[name=city]').val();
 		var department = this.$('[name=department]').val();
@@ -259,7 +280,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 			department: department,
 		};
 		this.model.push('addresses', attrs);
-		this.reRender('[name=street]');
 	},
 
 	delAddress: function(e){
@@ -286,14 +306,17 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	submitForm: function(e){
 		e.preventDefault();
 		if(this.$('button[type=submit]').length === 0){return;}
-		this.setModel();
+		this.setAddressInModel();
+		this.setPhoneNumberInModel();
 		this.app.clientIndex.collection.add(this.model);
-		this.reset();
+		this.model = new App.Models.Client();
+		this.render();
 	},
 
 	updateForm: function(e){
 		e.preventDefault();
-		this.setModel();
+		this.setAddressInModel();
+		this.setPhoneNumberInModel();
 		this.model.trigger('updated');
 	},
 

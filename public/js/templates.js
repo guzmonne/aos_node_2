@@ -98,7 +98,7 @@ function program13(depth0,data) {
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n		</div>\n	</div>\n	<div class=\"form-group\">\n		<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n		<div class=\"col-sm-3\">\n			<select name=\"doc-type\" class=\"form-control\">\n				<option value=\"CI\" ";
+    + "\">\n		</div>\n	</div>\n	<div class=\"form-group\">\n		<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n		<div class=\"col-sm-3\">\n			<select name=\"doc.type\" class=\"form-control\">\n				<option value=\"CI\" ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "CI", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options) : helperMissing.call(depth0, "is", "CI", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
@@ -114,7 +114,7 @@ function program13(depth0,data) {
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "Pasaporte", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options) : helperMissing.call(depth0, "is", "Pasaporte", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += ">Pasaporte</option>\n			</select>\n		</div>\n		<div class=\"col-sm-7\">\n			<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\" value=\""
+  buffer += ">Pasaporte</option>\n			</select>\n		</div>\n		<div class=\"col-sm-7\">\n			<input type=\"text\" class=\"form-control\" name=\"doc.number\" placeholder=\"4123456; 2123456789\" value=\""
     + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.number)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\">\n		</div>\n	</div>\n	<div class=\"form-group\" id=\"phone-numbers\">\n		<label for=\"phone\" class=\"col-sm-2 control-label\">Telefono</label>\n		<div class=\"col-sm-8\">\n			<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"099123456; 25019898\" data-type=\"phone-number\">\n		</div>\n		<div class=\"col-sm-2\">\n			<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" tabindex = \"-1\">\n				<i class=\"fa fa-plus\"></i>\n			</button>\n		</div>\n		";
   stack2 = helpers.each.call(depth0, (depth0 && depth0.phones), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});

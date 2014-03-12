@@ -8,7 +8,7 @@
 	<div class="form-group">
 		<label for="doc" class="col-sm-2 control-label">Documento</label>
 		<div class="col-sm-3">
-			<select name="doc-type" class="form-control">
+			<select name="doc.type" class="form-control">
 				<option value="CI" {{#is "CI" doc.type}}selected="true"{{/is}}>C.I.</option>
 				<option value="RUT" {{#is "RUT" doc.type}}selected="true"{{/is}}>R.U.T</option>
 				<option value="DNI" {{#is "DNI" doc.type}}selected="true"{{/is}}>DNI</option>
@@ -16,7 +16,7 @@
 			</select>
 		</div>
 		<div class="col-sm-7">
-			<input type="text" class="form-control" name="doc-number" placeholder="4123456; 2123456789" value="{{doc.number}}">
+			<input type="text" class="form-control" name="doc.number" placeholder="4123456; 2123456789" value="{{doc.number}}">
 		</div>
 	</div>
 	<div class="form-group" id="phone-numbers">
