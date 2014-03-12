@@ -21,9 +21,19 @@ window.App = {
 	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
 
 	scrollTo: function(position){
+		var pos;
+		if (_.isNumber(position)){
+			pos = position;
+		} else {
+			pos = this.elPosition(position);
+		}
 		$('html, body').animate({
-			scrollTop: position
+			scrollTop: pos
 		}, 500);
+	},
+
+	elPosition: function(el){
+		return $(el).offset().top;
 	},
 
 	sseInit: function(){
@@ -167,11 +177,26 @@ App.Views.BaseView = Giraffe.View.extend({
 			el.text(singular);
 		}
 	},
+
+	closeView: function(e){
+		e.preventDefault();
+		var self = this;
+		App.animate(this.$el, 'fadeOut', function(){
+			self.dispose();
+			if(self.model !== undefined && self.model !== null){
+				app.trigger('client:show:close', self.model.cid);
+			} else {
+				app.trigger('client:show:close');
+			}
+		});
+	},
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
 	template : HBS.client_row_template,
 
 	tagName  : 'tr',
+
+	activated: false,
 
 	ui: {
 		$showClient: '#show-client',
@@ -189,6 +214,12 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'updated', this.render);
 	},
 
+	afterRender: function(){
+		if (this.activated){
+			this.spinGear();
+		}
+	},
+
 	serialize: function(){
 		return this.model.serialize();
 	},
@@ -198,20 +229,28 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	activate: function(e){
+		this.activated = true;
 		this.$el.addClass('selected');
 		this.app.trigger('client_row:selected', this.cid);
 	},
 
 	deactivate: function(cid){
 		if(cid === this.model.cid && this.$el.hasClass('selected')){
+			this.activated = false;
+			this.$('#show-client>i').removeClass('fa-spin');
 			this.$el.removeClass('selected');
 		}
+	},
+
+	spinGear: function(){
+		this.$('#show-client>i').addClass('fa-spin');
 	},
 
 	showClient: function(){
 		var exists = false;
 		var self   = this;
 		var cid;
+		this.spinGear();
 		_.each(app.children, function(view){
 			if (view.model !== undefined && (view.model.cid === self.model.cid)){
 				exists = true;
@@ -221,7 +260,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		if (exists === false) {
 			var clientShowView = new App.Views.ClientShowView({model: this.model});
 			app.addChild(clientShowView);
-			app.attach(clientShowView, {el: app.clientIndex.el, method: 'before'});
+			app.attach(clientShowView, {el: this.parent.el, method: 'after'});
 			this.activate();
 		} else {
 			App.scrollTo($('[data-view-cid='+cid+']').offset().top);
@@ -329,7 +368,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
 		this.model.set('id', this.model.cid);
-		this.app.clientIndex.collection.add(this.model);
+		this.app.ClientIndexView.collection.add(this.model);
 		this.model = new App.Models.Client();
 		this.render();
 	},
@@ -363,19 +402,36 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 
 	className: "row",
 
+	events: {
+		'click #client-close' : 'closeView',
+	},
+
+	initialize: function(){
+		this.closeView = App.Views.BaseView.prototype.closeView;
+	},
+
 	afterRender: function(){
-		this.oTable = this.$('#clients-table').dataTable();
+		this.oTable     = this.$('#clients-table').dataTable();
 		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
+		if (this.collection.length === 0){
+			this.collection = clients;
+			this.render();
+		}
 	},
 
 	attach: function(view, options){
-		this.app.clientIndex.oTable.fnAddTr(view.render().el);
+		this.addChild(view);
+		this.oTable.fnAddTr(view.render().el);
 	},
 });
 App.Views.ClientNewView = App.Views.BaseView.extend({
 	template            : HBS.client_new_template,
 	
 	className: "row",
+
+	events: {
+		'click #client-close' : 'closeView',
+	},
 
 	afterRender: function(){
 		this.renderForm();
@@ -402,7 +458,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeIn');
-		App.scrollTo($('[data-view-cid='+this.cid+']').offset().top);
+		App.scrollTo('[data-view-cid='+this.cid+']');
 		this.renderForm();
 	},
 
@@ -412,15 +468,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt));
 		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt));
 		return this.model.serialize();
-	},
-
-	closeView: function(e){
-		e.preventDefault();
-		var self = this;
-		App.animate(this.$el, 'fadeOut', function(){
-			self.dispose();
-			app.trigger('client:show:close', self.model.cid);
-		});
 	},
 
 	renderForm: function(){
@@ -513,6 +560,7 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	events: {
 		'click ul#side-menu li a'       : 'activateLi',
 		'click ul.nav-second-level li a': 'activateSecondLi',
+		'click [data-open-view]': 'openView',
 		'click a'                       : function(e){e.preventDefault();},
 	},
 
@@ -528,9 +576,28 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	},
 
 	activateSecondLi: function(e){
-		console.log(e);
 		this.$('ul.nav-second-level li a').removeClass('second-level-active');
 		this.$(e.currentTarget).closest('a').addClass('second-level-active');
+	},
+
+	openView: function(e){
+		var self = this;
+		var viewName = e.currentTarget.dataset.openView;
+		var rendered = false;
+		var viewRef;
+		_.each(this.app.children, function(view){
+			if (view instanceof(App.Views[viewName])){
+				rendered = true;
+				viewRef  = view; 
+			}
+		});
+		if(rendered){
+			App.scrollTo(viewRef.el);
+		} else {
+			app[viewName] = new App.Views[viewName]();
+			app[viewName].attachTo('#content-el');
+			App.scrollTo(app[viewName].el);
+		}
 	},
 });
 App.Views.TasksLayoutView = Giraffe.View.extend({
@@ -654,12 +721,12 @@ app.addInitializer(function(options){
 
 // Main Content
 app.addInitializer(function(options){
-	app.breadCrumbs = new App.Views.BreadCrumbsView();
-	app.clientNew   = new App.Views.ClientNewView();
-	app.clientIndex = new App.Views.ClientIndexView({collection: clients});
+	app.breadCrumbs     = new App.Views.BreadCrumbsView();
+	app.ClientNewView   = new App.Views.ClientNewView();
+	app.ClientIndexView = new App.Views.ClientIndexView({collection: clients});
 	app.breadCrumbs.attachTo('#content-el');
-	app.clientNew.attachTo('#content-el');
-	app.clientIndex.attachTo('#content-el');
+	app.ClientNewView.attachTo('#content-el');
+	app.ClientIndexView.attachTo('#content-el');
 });
 
 // Start Backbone History

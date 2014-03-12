@@ -21,9 +21,19 @@ window.App = {
 	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
 
 	scrollTo: function(position){
+		var pos;
+		if (_.isNumber(position)){
+			pos = position;
+		} else {
+			pos = this.elPosition(position);
+		}
 		$('html, body').animate({
-			scrollTop: position
+			scrollTop: pos
 		}, 500);
+	},
+
+	elPosition: function(el){
+		return $(el).offset().top;
 	},
 
 	sseInit: function(){

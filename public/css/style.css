@@ -623,6 +623,23 @@ input, select {
   background-color: #e79411;
 }
 
+.btn-green {
+  color: #fff;
+  background-color: #1abc9c;
+}
+
+.btn-green:hover,
+.btn-green:focus {
+  color: #fff;
+  background-color: #48c9b0;
+  border-color: #48c9b0;
+}
+
+.btn-green:active {
+  background: #16a085;
+  border-color: #16a085;
+}
+
 /* TABLES */
 table.table-green thead {
   color:#D5DDE5;;
@@ -718,38 +735,18 @@ tr:last-child td:last-child {
 }
  
 td {
-  background:#FFFFFF;
-  padding:20px;
-  text-align:left;
+  background    :#FFFFFF;
+  padding       :20px;
+  text-align    :left;
   vertical-align:middle;
-  text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
-  border-right: 1px solid #C1C3D1;
+  text-shadow   : -1px -1px 1px rgba(0, 0, 0, 0.1);
+  border-right  : 1px solid #C1C3D1;
 }
 
-td:last-child {
-  border-right: 0px;
+td.center-vh{
+  text-align    : center;
 }
 
-th.text-left {
-  text-align: left;
-}
-
-th.text-center {
-  text-align: center;
-}
-
-th.text-right {
-  text-align: right;
-}
-
-td.text-left {
-  text-align: left;
-}
-
-td.text-center {
-  text-align: center;
-}
-
-td.text-right {
-  text-align: right;
+.table>tbody>tr>td.center-vh{  
+  vertical-align: middle;
 }

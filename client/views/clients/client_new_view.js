@@ -3,6 +3,10 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 	
 	className: "row",
 
+	events: {
+		'click #client-close' : 'closeView',
+	},
+
 	afterRender: function(){
 		this.renderForm();
 	},

@@ -6,12 +6,25 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 
 	className: "row",
 
+	events: {
+		'click #client-close' : 'closeView',
+	},
+
+	initialize: function(){
+		this.closeView = App.Views.BaseView.prototype.closeView;
+	},
+
 	afterRender: function(){
-		this.oTable = this.$('#clients-table').dataTable();
+		this.oTable     = this.$('#clients-table').dataTable();
 		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
+		if (this.collection.length === 0){
+			this.collection = clients;
+			this.render();
+		}
 	},
 
 	attach: function(view, options){
-		this.app.clientIndex.oTable.fnAddTr(view.render().el);
+		this.addChild(view);
+		this.oTable.fnAddTr(view.render().el);
 	},
 });

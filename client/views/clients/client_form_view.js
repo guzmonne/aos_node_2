@@ -99,7 +99,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
 		this.model.set('id', this.model.cid);
-		this.app.clientIndex.collection.add(this.model);
+		this.app.ClientIndexView.collection.add(this.model);
 		this.model = new App.Models.Client();
 		this.render();
 	},

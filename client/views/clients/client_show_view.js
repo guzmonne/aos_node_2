@@ -14,7 +14,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeIn');
-		App.scrollTo($('[data-view-cid='+this.cid+']').offset().top);
+		App.scrollTo('[data-view-cid='+this.cid+']');
 		this.renderForm();
 	},
 
@@ -24,15 +24,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt));
 		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt));
 		return this.model.serialize();
-	},
-
-	closeView: function(e){
-		e.preventDefault();
-		var self = this;
-		App.animate(this.$el, 'fadeOut', function(){
-			self.dispose();
-			app.trigger('client:show:close', self.model.cid);
-		});
 	},
 
 	renderForm: function(){

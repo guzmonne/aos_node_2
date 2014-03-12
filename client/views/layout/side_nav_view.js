@@ -12,6 +12,7 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	events: {
 		'click ul#side-menu li a'       : 'activateLi',
 		'click ul.nav-second-level li a': 'activateSecondLi',
+		'click [data-open-view]': 'openView',
 		'click a'                       : function(e){e.preventDefault();},
 	},
 
@@ -27,8 +28,27 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	},
 
 	activateSecondLi: function(e){
-		console.log(e);
 		this.$('ul.nav-second-level li a').removeClass('second-level-active');
 		this.$(e.currentTarget).closest('a').addClass('second-level-active');
+	},
+
+	openView: function(e){
+		var self = this;
+		var viewName = e.currentTarget.dataset.openView;
+		var rendered = false;
+		var viewRef;
+		_.each(this.app.children, function(view){
+			if (view instanceof(App.Views[viewName])){
+				rendered = true;
+				viewRef  = view; 
+			}
+		});
+		if(rendered){
+			App.scrollTo(viewRef.el);
+		} else {
+			app[viewName] = new App.Views[viewName]();
+			app[viewName].attachTo('#content-el');
+			App.scrollTo(app[viewName].el);
+		}
 	},
 });
