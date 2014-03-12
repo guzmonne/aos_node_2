@@ -101,6 +101,12 @@ app.addInitializer(function(options){
 	app.nav.attachTo('#nav-el');
 });
 
+// Build SideNav
+app.addInitializer(function(options){
+	app.sideNav = new App.Views.SideNavView();
+	app.sideNav.attachTo('#sidebar-el');
+});
+
 // Main Content
 app.addInitializer(function(options){
 	app.breadCrumbs = new App.Views.BreadCrumbsView();

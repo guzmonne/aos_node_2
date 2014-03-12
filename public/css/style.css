@@ -117,6 +117,28 @@
     content: "\f107";
 }
 
+.nav-second-level li a.second-level-active {
+  background-color: #C2C2C2;
+}
+
+.nav-second-level li a.third-level {
+  border-bottom: 1px solid #AFAFAF;
+}
+
+.nav-second-level li a.second-level-active.third-level {
+  background-color: #DFDFDF;
+  border-bottom: 2px solid #AFAFAF;
+}
+
+.nav-second-level li a.second-level-active:hover {
+  background-color: #B2B2B2;
+}
+
+.nav-second-level li a.second-level-active.third-level:hover {
+  background-color: #CFCFCF;
+  border-bottom: 2px solid #BFBFBF;
+}
+
 .nav-second-level li,
 .nav-third-level li {
     border-bottom: none !important;
