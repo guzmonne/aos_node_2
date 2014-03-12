@@ -23,7 +23,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		var updatedAt = this.model.get('updatedAt');
 		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt));
 		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt));
-		return this.model.toJSON();
+		return this.model.serialize();
 	},
 
 	closeView: function(e){

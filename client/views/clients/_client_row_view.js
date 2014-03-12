@@ -20,7 +20,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		return this.model.toJSON();
+		return this.model.serialize();
 	},
 
 	onDelete: function(){

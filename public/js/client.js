@@ -49,62 +49,6 @@ window.App = {
 	},
 };
 App.Models.BaseModel = Giraffe.Model.extend({
-	getn: function(nestedAttrs){
-		var attrs = nestedAttrs.split('.');
-		var aux   = this.get(attrs[0]);
-		_.each(attrs, function(attr, i){
-			if (i !== 0){	
-				aux = aux[attr];
-			}
-		});
-		return aux;
-	},
-
-	setn: function(nestedAttrs, value){
-		var self  = this;
-		var attrs = nestedAttrs.split('.');
-		var aux   = this.get(attrs[0]);
-		_.each(attrs, function(attr, i){
-			if (i === (attrs.length - 1)){
-				aux[attr] = value;
-				self.trigger('change:' + nestedAttrs);
-			} else if (i !== 0){
-				aux = aux[attr];
-			}
-		});
-		return aux;
-	},
-
-	push: function(attr, value){
-		if (_.isArray(this.attributes[attr])){
-			this.attributes[attr].push(value);
-		} else {
-			this.set(attr, value);
-		}
-	},
-
-	pop: function(attr, index){
-		var array = this.get(attr);
-		if(_.isString(index)){
-			index = parseInt(index);
-		}
-		if(_.isArray(array)){
-			return array.splice(index, 1);
-		} else {
-			throw new Error( attr  + 'is not an array');
-		}
-	},
-
-	popByEl: function(id, el, array){
-		var self = this;
-		_.each(array, function(element){
-			if (element[el] === id){
-				var index = array.indexOf(element);
-				array.splice(index, 1);
-			}
-		});
-	},
-
 	dateDDMMYYYY: function(date){
 		return date.getDate() +
 			"/" + date.getMonth() + 
@@ -116,25 +60,103 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'id'  : null,
-			'name': '',
-			'doc' : {
-				'type'  : '',
-				'number': ''
-			},
-			'phones'   : [],
-			'addresses': [],
+			'id'       : null,
+			'name'     : '',
 			'email'    : '',
+			'doc'      : new App.Models.Doc(),
+			'phones'   : new App.Collections.Phones(),
+			'addresses': new App.Collections.Addresses(),
 			'createdAt': new Date(),
 			'updatedAt': new Date(),
 			'createdBy': 'Guzmán Monné',
 			'updatedBy': 'Guzmán Monné'
 		};
 	},
+
+	initialize: function(attributes, options){
+		if (attributes !== undefined && attributes !== null){
+			this.parseAttributes(attributes);
+		}
+	},
+
+	parseAttributes: function(attributes){
+		if(attributes.phones !== undefined && attributes.phones !== null){
+			if(_.isArray(attributes.phones)){
+				this.set('phones', new App.Collections.Phones(attributes.phones));
+			}
+		}
+		if(attributes.addresses !== undefined && attributes.addresses !== null){
+			if(_.isArray(attributes.addresses)){
+				this.set('addresses', new App.Collections.Addresses(attributes.addresses));
+			}
+		}
+		if(attributes.doc.type !== undefined && attributes.doc.type !== null){
+			if (this.get('doc') instanceof(App.Models.BaseModel)){
+				this.get('doc').set('type', attributes.doc.type);
+			} else {
+				this.set('doc', new App.Models.Doc({type: attributes.doc.type}));
+			}
+		}
+		if(attributes.doc.number !== undefined && attributes.doc.number !== null){
+			if (this.get('doc') instanceof(App.Models.BaseModel)){
+				this.get("doc").set('number', attributes.doc.number);
+			} else {
+				this.set('doc', new App.Models.Doc({type: attributes.doc.number}));
+			}
+		}
+	},
+
+	serialize: function(){
+		var attributes = this.toJSON();
+		if(attributes.phones instanceof(Giraffe.Collection)){
+			attributes.phones = attributes.phones.toJSON();
+		}
+		if(attributes.addresses instanceof(Giraffe.Collection)){
+			attributes.addresses = attributes.addresses.toJSON();
+		}
+		if(attributes.doc instanceof(Giraffe.Model)){
+			attributes.doc = attributes.doc.toJSON();
+		}
+		return attributes;
+	},
+});
+
+App.Models.Doc = App.Models.BaseModel.extend({
+	defaults: function(){
+		return {
+			type  : '',
+			number: '',
+		};
+	},
+});
+
+App.Models.Phone = App.Models.BaseModel.extend({
+	defaults: function(){
+		return {
+			number: '',
+		};
+	},
+});
+
+App.Models.Address = App.Models.BaseModel.extend({
+	defaults: function(){
+		return {
+			street    : '',
+			city      : '',
+			department: '',
+		};
+	},
 });
 App.Collections.Clients = Giraffe.Collection.extend({
 	model: App.Models.Client,
+});
 
+App.Collections.Phones = Giraffe.Collection.extend({
+	model: App.Models.Phone,
+});
+
+App.Collections.Addresses = Giraffe.Collection.extend({
+	model: App.Models.Address,
 });
 App.Views.BaseView = Giraffe.View.extend({
 	pluralize: function(value, target, singular, plural){
@@ -168,7 +190,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		return this.model.toJSON();
+		return this.model.serialize();
 	},
 
 	onDelete: function(){
@@ -214,62 +236,47 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	className: 'col-lg-12',
 
 	events: {
-		'click #add-phone-number'      : 'addPhoneNumber',
-		'click button.del-phone-number': 'delPhoneNumber',
-		'click #add-address'           : 'addAddress',
-		'click button.del-address'     : 'delAddress',
-		'click #reset-form'            : 'render',
-		'click #update-form'           : 'updateForm',
-		'change input'                 : 'changeFormInput',
-		'change select'                : 'changeFormInput',
-		'submit form'                  : 'submitForm',
-	},
-
-	afterRender: function(){
-		this.$('[name=name]').focus();
-	},
-
-	changeFormInput: function(e){
-		var value = e.target.value;
-		var name = e.target.name;
-		if(name.indexOf(".") != -1){
-			this.model.setn(name, value);
-		} else {
-			this.model.set(name, value);
-		}
+		'click #add-phone-number'        : 'reRender',
+		'click button.del-phone-number'  : 'delPhoneNumber',
+		'click button.edit-phone-number' : 'editPhoneNumber',
+		'click #add-address'             : 'reRender',
+		'click button.del-address'       : 'delAddress',
+		'click button.edit-address'      : 'editAddress',
+		'click #reset-form'              : 'render',
+		'click #update-form'             : 'updateForm',
+		'submit form'                    : 'submitForm',
 	},
 
 	serialize: function(){
-		this.model.set('phones-length', this.model.get('phones').length);
-		this.model.set('addresses-length', this.model.get('addresses').length);
-		return this.model.toJSON();
+		this.model.set('phonesLength', this.model.get('phones').length);
+		this.model.set('addressesLength', this.model.get('addresses').length);
+		return this.model.serialize();
 	},
 
-	addPhoneNumber: function(){
-		this.setPhoneNumberInModel();
-		this.reRender('[name=phone]');
-	},
-
-	setPhoneNumberInModel: function(){
+	addPhoneToCollection: function(){
 		var number = this.$('[name=phone]').val();
 		if(number === ""){return;}
-		this.model.push('phones', {
-			number: number,
-		});
+		this.model.get('phones').add({number: number});
 	},
 
 	delPhoneNumber:function(e){
-		var index = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		this.model.pop('phones', index);
+		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
+		var phones = this.model.get('phones');
+		var model  = phones.models[index];
+		phones.remove(model);
 		this.reRender('[name=phone]');
 	},
 
-	addAddress: function(){
-		this.setAddressInModel();
-		this.reRender('[name=street]');
+	editPhoneNumber: function(e){
+		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
+		var phones = this.model.get('phones');
+		var model  = phones.models[index];
+		phones.remove(model);
+		this.reRender("[name=phone]");
+		this.$('[name=phone]').val(model.get('number'));
 	},
 
-	setAddressInModel: function(){
+	addAddressToCollection: function(){
 		var street     = this.$('[name=street]').val();
 		var city       = this.$('[name=city]').val();
 		var department = this.$('[name=department]').val();
@@ -279,35 +286,49 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 			city      : city,
 			department: department,
 		};
-		this.model.push('addresses', attrs);
+		this.model.get('addresses').add(attrs);
 	},
 
 	delAddress: function(e){
-		var index = parseInt(this.$(e.currentTarget).closest('button').data('addressIndex'));
-		this.model.pop('addresses', index);
+		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
+		var addresses = this.model.get('addresses');
+		var model     = addresses.models[index];
+		addresses.remove(model);
 		this.reRender('[name=street]');
+	},
+
+	editAddress: function(e){
+		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
+		var addresses = this.model.get('addresses');
+		var model     = addresses.models[index];
+		console.log(model);
+		addresses.remove(model);
+		this.reRender('[name=street]');
+		this.$('[name=street]').val(model.get('street'));
+		this.$('[name=city]').val(model.get('city'));
+		this.$('[name=department]').val(model.get('department'));
 	},
 
 	setModel: function(){
 		this.model.set('name', this.$('[name=name]').val());
-		this.model.setn('doc.type', this.$('[name=doc-type]').val());
-		this.model.setn('doc.number', this.$('[name=doc-number]').val());
+		this.model.get('doc').set('type', this.$('[name=doc-type]').val());
+		this.model.get('doc').set('number', this.$('[name=doc-number]').val());
 		this.model.set('email', this.$('[name=email]').val());
 		var phone  = this.$('[name=phone]').val();
 		var street = this.$('[name=street]').val();
 		if (phone !== ''){
-			this.addPhoneNumber();
+			this.addPhoneToCollection();
 		}
 		if (street !== ''){
-			this.addAddress();
+			this.addAddressToCollection();
 		}
 	},
 
 	submitForm: function(e){
 		e.preventDefault();
 		if(this.$('button[type=submit]').length === 0){return;}
-		this.setAddressInModel();
-		this.setPhoneNumberInModel();
+		this.setModel();
+		this.model.set('id', this.model.cid);
 		this.app.clientIndex.collection.add(this.model);
 		this.model = new App.Models.Client();
 		this.render();
@@ -315,14 +336,23 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	updateForm: function(e){
 		e.preventDefault();
-		this.setAddressInModel();
-		this.setPhoneNumberInModel();
+		this.setModel();
 		this.model.trigger('updated');
 	},
 
-	reRender: function(activeAttr){
+	reRender: function(elToFocus){
+		this.setModel();
 		this.render();
-		this.$(activeAttr).focus();
+		if (
+			_.isObject(elToFocus) && 
+			elToFocus.currentTarget !== undefined &&
+			elToFocus.currentTarget.dataset !== undefined &&
+			elToFocus.currentTarget.dataset.for !== undefined
+		){
+			this.$('[name='+ elToFocus.currentTarget.dataset.for +']').focus();
+		} else {
+			this.$(elToFocus).focus();
+		}
 	},
 });
 App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
@@ -381,7 +411,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		var updatedAt = this.model.get('updatedAt');
 		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt));
 		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt));
-		return this.model.toJSON();
+		return this.model.serialize();
 	},
 
 	closeView: function(e){
