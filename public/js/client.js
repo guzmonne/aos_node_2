@@ -422,6 +422,7 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 		if (this.oTable === null){
 			this.oTable = this.$('#clients-table').dataTable();
 		}
+		this.$el.tooltip();
 		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
 	},
 
@@ -441,6 +442,7 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInLeft');
+		this.$el.tooltip();
 		this.renderForm();
 	},
 
@@ -466,6 +468,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInDown');
 		App.scrollTo('[data-view-cid='+this.cid+']');
+		this.$el.tooltip();
 		this.renderForm();
 	},
 
@@ -641,6 +644,7 @@ App.Views.GoToTopView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		this.toggleViewOnOverflow();
+		this.$el.tooptip();
 	},
 
 	windowHeight: function(){

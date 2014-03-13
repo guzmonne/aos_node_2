@@ -15,6 +15,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInDown');
 		App.scrollTo('[data-view-cid='+this.cid+']');
+		this.$el.tooltip();
 		this.renderForm();
 	},
 

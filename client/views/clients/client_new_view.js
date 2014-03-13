@@ -9,6 +9,7 @@ App.Views.ClientNewView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInLeft');
+		this.$el.tooltip();
 		this.renderForm();
 	},
 

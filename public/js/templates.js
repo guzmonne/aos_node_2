@@ -162,7 +162,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Clientes</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#clients-table-container\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"client-close\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"clients-table-container\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"table-responsive\">\n					<table id=\"clients-table\" class=\"table table-striped table-bordered table-hover table-green dataTable\" aria-describedby=\"clients-table-info\">\n						<thead>\n							<tr>\n								<th>Nombre</th>\n								<th>Documento</th>\n								<th>Telefono/s</th>\n								<th>Dirección/es</th>\n								<th>E-mail</th>\n								<th>Controles</th>\n							</tr>\n						</thead>\n						<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\">\n						</tbody>\n					</table>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
+  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Clientes</h4>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Colapsar\">\n				<a href=\"#clients-table-container\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Cerrar\">\n				<a href=\"#\" id=\"client-close\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"clients-table-container\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"table-responsive\">\n					<table id=\"clients-table\" class=\"table table-striped table-bordered table-hover table-green dataTable\" aria-describedby=\"clients-table-info\">\n						<thead>\n							<tr>\n								<th>Nombre</th>\n								<th>Documento</th>\n								<th>Telefono/s</th>\n								<th>Dirección/es</th>\n								<th>E-mail</th>\n								<th>Controles</th>\n							</tr>\n						</thead>\n						<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\">\n						</tbody>\n					</table>\n				</div>\n			</div>\n		</div>\n	</div>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -170,7 +170,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Nuevo Cliente</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#formControls\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"client-close\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"formControls\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"row\" id=\"client-form\"></div>\n			</div>\n		</div>	\n	</div>\n</div>";
+  return "<div class=\"col-lg-12\">\n	<div class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4>Nuevo Cliente</h4>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Colapsar\">\n				<a href=\"#formControls\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"client-close\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Cerrar\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"formControls\" class=\"panel-collapse in\" style=\"height: auto;\">\n			<div class=\"portlet-body\">\n				<div class=\"row\" id=\"client-form\"></div>\n			</div>\n		</div>	\n	</div>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -277,11 +277,11 @@ function program3(depth0,data) {
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#client-";
+    + "</h4>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Colapsar\">\n				<a href=\"#client-";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"client-close\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"client-";
+    + "\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Cerrar\">\n				<a href=\"#\" id=\"client-close\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"client-";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -411,7 +411,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<a href=\"#\" class=\"btn btn-sm btn-fixed btn-fixed-r-d-corner\">\n	<i class=\"fa fa-angle-double-up\"></i>\n</a>";
+  return "<a href=\"#\" class=\"btn btn-sm btn-fixed btn-fixed-r-d-corner\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Subir\">\n	<i class=\"fa fa-angle-double-up\"></i>\n</a>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["messages_layout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];

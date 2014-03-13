@@ -26,6 +26,7 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 		if (this.oTable === null){
 			this.oTable = this.$('#clients-table').dataTable();
 		}
+		this.$el.tooltip();
 		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
 	},
 
