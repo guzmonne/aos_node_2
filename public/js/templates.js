@@ -405,6 +405,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
   return "<div id=\"content-el\"></div>";
   });
+this["HBS"] = this["HBS"] || {};this["HBS"]["go_to_top_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<a href=\"#\" class=\"btn btn-sm btn-fixed btn-fixed-r-d-corner\">\n	<i class=\"fa fa-angle-double-up\"></i>\n</a>";
+  });
 this["HBS"] = this["HBS"] || {};this["HBS"]["messages_layout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};

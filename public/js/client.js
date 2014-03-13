@@ -402,22 +402,27 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 
 	className: "row",
 
+	oTable: null,
+
 	events: {
 		'click #client-close' : 'closeView',
 	},
 
 	initialize: function(){
 		this.closeView = App.Views.BaseView.prototype.closeView;
+		if (this.collection === undefined || this.collection === null || this.collection.length === 0){
+			this.collection = clients;
+			this.render();
+		}
 	},
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInLeft');
-		this.oTable     = this.$('#clients-table').dataTable();
-		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
-		if (this.collection.length === 0){
-			this.collection = clients;
-			this.render();
+		console.log(this.oTable);
+		if (this.oTable === null){
+			this.oTable = this.$('#clients-table').dataTable();
 		}
+		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
 	},
 
 	attach: function(view, options){
@@ -512,9 +517,9 @@ App.Views.NavView = Giraffe.View.extend({
 	},
 
 	afterRender: function(){
-		this.messagesLayout = new App.Views.MessagesLayoutView();
-		this.tasksLayout    = new App.Views.TasksLayoutView();
-		this.alertsLayout = new App.Views.AlertsLayoutView();
+		this.messagesLayout   = new App.Views.MessagesLayoutView();
+		this.tasksLayout      = new App.Views.TasksLayoutView();
+		this.alertsLayout     = new App.Views.AlertsLayoutView();
 		this.userSettingsView = new App.Views.UserSettingsView();
 		this.messagesLayout.attachTo('#nav-monitor-el');
 		this.tasksLayout.attachTo('#nav-monitor-el');
@@ -526,22 +531,8 @@ App.Views.NavView = Giraffe.View.extend({
 		e.preventDefault();
 		var wrapper = $('#page-wrapper');
 		var sidebar = $('#sidebar-el');
-		sidebar.off(App.animationEnd);
-		if(wrapper.css('margin') === "0px"){
-			wrapper.addClass('make-space-right');
-			sidebar.show();
-			sidebar.addClass('animated slideInLeft')
-				.on(App.animationEnd, function(){
-					sidebar.removeClass('animated slideInLeft');
-				});
-		} else {
-			wrapper.removeClass('make-space-right');
-			sidebar.addClass('animated slideOutLeft')
-				.on(App.animationEnd, function(){
-					sidebar.hide();
-					sidebar.removeClass('animated slideOutLeft');
-				});
-		}
+		wrapper.toggleClass('make-space-right');
+		app.trigger('nav:toggleMenu');
 	},
 });
 App.Views.SearchView = App.Views.BaseView.extend({
@@ -551,12 +542,18 @@ App.Views.SearchView = App.Views.BaseView.extend({
 App.Views.SideNavView = App.Views.BaseView.extend({
 	template: HBS.side_nav_template,
 
+	show: false,
+
 	tagName: 'nav',
 	attributes: function(){
 		return {
-			'class': 'navbar-inverse navbar-static-side',
+			'class': 'navbar-inverse navbar-static-side animated fadeOutLeft',
 			'role' : 'navigation',
 		};
+	},
+
+	appEvents: {
+		'nav:toggleMenu': 'toggleMenu',
 	},
 
 	events: {
@@ -601,6 +598,16 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 			App.scrollTo(app[viewName].el);
 		}
 	},
+
+	toggleMenu: function(){
+		if(this.show){
+			this.show = false;
+			this.$el.removeClass('fadeInLeft').addClass('fadeOutLeft');
+		} else {
+			this.show = true;
+			this.$el.removeClass('fadeOutLeft').addClass('fadeInLeft');
+		}
+	},
 });
 App.Views.TasksLayoutView = Giraffe.View.extend({
 	template: HBS.tasks_layout_template,
@@ -611,6 +618,54 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	template: HBS.user_settings_template,
 	tagName: 'li', 
 	className: 'dropdown',
+});
+App.Views.GoToTopView = App.Views.BaseView.extend({
+	template: HBS.go_to_top_template,
+
+	winH: 0,
+	winW: 0,
+	win: null,
+
+	events: {
+		'click': function(e){e.preventDefault(); App.scrollTo(0);},
+	},
+
+	initialize: function(){
+		var self = this;
+		this.win = $(window);
+		this.win.scroll(function(){
+			self.toggleViewOnOverflow();
+		});
+		//this.toggleViewOnOverflow = _.throttle(this.toggleViewOnOverflow, 10 * 1000);
+	},
+
+	afterRender: function(){
+		this.toggleViewOnOverflow();
+	},
+
+	windowHeight: function(){
+		if( typeof( window.innerWidth ) == 'number' ) {
+			//Non-IE
+			this.winW = window.innerWidth;
+			this.winH = window.innerHeight;
+		} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+			//IE 6+ in 'standards compliant mode'
+			this.winW = document.documentElement.clientWidth;
+			this.winH = document.documentElement.clientHeight;
+		} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+			//IE 4 compatible
+			this.winW = document.body.clientWidth;
+			this.winH = document.body.clientHeight;
+		}
+	},
+
+	toggleViewOnOverflow: function(){
+		if(this.win.scrollTop() > 300){
+			this.$el.fadeIn();
+		} else {
+			this.$el.fadeOut();
+		}
+	},
 });
 var clientFixtures = 
 	[
@@ -723,12 +778,14 @@ app.addInitializer(function(options){
 
 // Main Content
 app.addInitializer(function(options){
-	app.breadCrumbs     = new App.Views.BreadCrumbsView();
+	app.BreadCrumbsView     = new App.Views.BreadCrumbsView();
 	app.ClientNewView   = new App.Views.ClientNewView();
 	app.ClientIndexView = new App.Views.ClientIndexView({collection: clients});
-	app.breadCrumbs.attachTo('#content-el');
+	app.GoToTopView     = new App.Views.GoToTopView();
+	app.BreadCrumbsView.attachTo('#content-el');
 	app.ClientNewView.attachTo('#content-el');
 	app.ClientIndexView.attachTo('#content-el');
+	app.GoToTopView.attachTo('#content-el');
 });
 
 // Start Backbone History

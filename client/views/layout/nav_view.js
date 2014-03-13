@@ -19,9 +19,9 @@ App.Views.NavView = Giraffe.View.extend({
 	},
 
 	afterRender: function(){
-		this.messagesLayout = new App.Views.MessagesLayoutView();
-		this.tasksLayout    = new App.Views.TasksLayoutView();
-		this.alertsLayout = new App.Views.AlertsLayoutView();
+		this.messagesLayout   = new App.Views.MessagesLayoutView();
+		this.tasksLayout      = new App.Views.TasksLayoutView();
+		this.alertsLayout     = new App.Views.AlertsLayoutView();
 		this.userSettingsView = new App.Views.UserSettingsView();
 		this.messagesLayout.attachTo('#nav-monitor-el');
 		this.tasksLayout.attachTo('#nav-monitor-el');
@@ -33,21 +33,7 @@ App.Views.NavView = Giraffe.View.extend({
 		e.preventDefault();
 		var wrapper = $('#page-wrapper');
 		var sidebar = $('#sidebar-el');
-		sidebar.off(App.animationEnd);
-		if(wrapper.css('margin') === "0px"){
-			wrapper.addClass('make-space-right');
-			sidebar.show();
-			sidebar.addClass('animated slideInLeft')
-				.on(App.animationEnd, function(){
-					sidebar.removeClass('animated slideInLeft');
-				});
-		} else {
-			wrapper.removeClass('make-space-right');
-			sidebar.addClass('animated slideOutLeft')
-				.on(App.animationEnd, function(){
-					sidebar.hide();
-					sidebar.removeClass('animated slideOutLeft');
-				});
-		}
+		wrapper.toggleClass('make-space-right');
+		app.trigger('nav:toggleMenu');
 	},
 });

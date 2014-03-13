@@ -1,12 +1,18 @@
 App.Views.SideNavView = App.Views.BaseView.extend({
 	template: HBS.side_nav_template,
 
+	show: false,
+
 	tagName: 'nav',
 	attributes: function(){
 		return {
-			'class': 'navbar-inverse navbar-static-side',
+			'class': 'navbar-inverse navbar-static-side animated fadeOutLeft',
 			'role' : 'navigation',
 		};
+	},
+
+	appEvents: {
+		'nav:toggleMenu': 'toggleMenu',
 	},
 
 	events: {
@@ -49,6 +55,16 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 			app[viewName] = new App.Views[viewName]();
 			app[viewName].attachTo('#content-el');
 			App.scrollTo(app[viewName].el);
+		}
+	},
+
+	toggleMenu: function(){
+		if(this.show){
+			this.show = false;
+			this.$el.removeClass('fadeInLeft').addClass('fadeOutLeft');
+		} else {
+			this.show = true;
+			this.$el.removeClass('fadeOutLeft').addClass('fadeInLeft');
 		}
 	},
 });

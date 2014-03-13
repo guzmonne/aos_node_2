@@ -109,12 +109,14 @@ app.addInitializer(function(options){
 
 // Main Content
 app.addInitializer(function(options){
-	app.breadCrumbs     = new App.Views.BreadCrumbsView();
+	app.BreadCrumbsView     = new App.Views.BreadCrumbsView();
 	app.ClientNewView   = new App.Views.ClientNewView();
 	app.ClientIndexView = new App.Views.ClientIndexView({collection: clients});
-	app.breadCrumbs.attachTo('#content-el');
+	app.GoToTopView     = new App.Views.GoToTopView();
+	app.BreadCrumbsView.attachTo('#content-el');
 	app.ClientNewView.attachTo('#content-el');
 	app.ClientIndexView.attachTo('#content-el');
+	app.GoToTopView.attachTo('#content-el');
 });
 
 // Start Backbone History

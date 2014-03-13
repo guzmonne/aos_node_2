@@ -640,6 +640,31 @@ input, select {
   border-color: #16a085;
 }
 
+.btn-fixed {
+  position: fixed;
+  display: block;
+  background-color: #000;
+  color: #fff;
+  z-index: 1;
+  opacity: 0.3;
+  transition: all 1s;
+}
+
+.btn-fixed:hover {
+  opacity: 1;
+  color: #fff;
+}
+
+.btn-fixed.btn-fixed-l-d-corner {
+  right: 1%;
+  top: 96%;
+}
+
+.btn-fixed.btn-fixed-r-d-corner {
+  left: 1%;
+  top: 96%;
+}
+
 /* TABLES */
 table.table-green thead {
   color:#D5DDE5;;
