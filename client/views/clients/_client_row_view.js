@@ -74,6 +74,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 				viewName         : 'ClientShowView', 
 				viewModel        : this.model,
 				portletFrameClass: 'green',
+				entrance         : 'fadeInUp',
 			});
 			app.addChild(clientShowView);
 			app.attach(clientShowView, {el: app.ClientIndexView.el, method: 'before'});

@@ -187,16 +187,60 @@ App.Views.BaseView = Giraffe.View.extend({
 	},
 
 	closeView: function(e){
-		e.preventDefault();
+		if(App.defined(e)){
+			e.preventDefault();
+		}
 		var self = this;
 		App.animate(this.$el, 'fadeOut', function(){
 			self.dispose();
-			if(self.model !== undefined && self.model !== null){
-				app.trigger('client:show:close', self.model.cid);
-			} else {
-				app.trigger('client:show:close');
+		});
+	},
+
+	serialize: function(){
+		if (App.defined(this.model)){
+			return this.model.toJSON();
+		}
+	},
+
+	capitaliseFirstLetter: function(string){
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	},
+});
+App.Views.Renderer = App.Views.BaseView.extend({
+	
+	appEvents: {
+		'route:doc:index': 'openIndexView',
+		'route:doc:new'  : 'openNewView',
+	},
+
+	openIndexView: function(doc){
+		var viewName = this.capitaliseFirstLetter(doc) + 'IndexView';
+		this.showOrGoTo(viewName);
+	},
+
+	openNewView: function(doc){
+		var viewName = this.capitaliseFirstLetter(doc) + 'NewView';
+		this.showOrGoTo(viewName);
+	},
+
+	showOrGoTo: function(viewName){
+		var rendered, viewRef;
+		if(!App.defined(App.Views[viewName])){return;}
+		_.each(app.children, function(view){
+			if (view instanceof(App.Views.PortletView) && 
+					App.defined(view.viewName) && 
+					view.viewName === viewName){
+				rendered = true;
+				viewRef  = view; 
 			}
 		});
+		if(rendered){
+			App.scrollTo(viewRef.el);
+		} else {
+			app[viewName] = new App.Views.PortletView({viewName: viewName});
+			app[viewName].attachTo('#content-el', {method: 'prepend'});
+			App.scrollTo(app[viewName].el);
+		}
 	},
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
@@ -275,6 +319,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 				viewName         : 'ClientShowView', 
 				viewModel        : this.model,
 				portletFrameClass: 'green',
+				entrance         : 'fadeInUp',
 			});
 			app.addChild(clientShowView);
 			app.attach(clientShowView, {el: app.ClientIndexView.el, method: 'before'});
@@ -386,9 +431,19 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
 		this.model.set('id', this.model.cid);
-		this.app.ClientIndexView.view.collection.add(this.model);
+		if (App.defined(app.ClientIndexView)){
+			this.app.ClientIndexView.view.collection.add(this.model);
+		}
 		this.model = new App.Models.Client();
+		var message = {
+			viewCid: this.parent.cid,
+			title  : 'Cliente Creado',
+			message: 'El nuevo cliente se ha creado con exito.',
+			class  : 'success',
+		};
+		app.trigger('portlet:message', message);
 		this.render();
+		this.$('[name=name]').focus();
 	},
 
 	updateForm: function(e){
@@ -506,6 +561,31 @@ App.Views.AlertsLayoutView = Giraffe.View.extend({
 	tagName: 'li', 
 	className: 'dropdown',
 });
+App.Views.BSCalloutView = App.Views.BaseView.extend({
+	template: HBS.bs_callout_template,
+
+	className: "bs-callout",
+
+	lifetime: 3000,
+
+	events: {
+		'click .close': 'closeView',
+	},
+
+	afterRender: function(){
+		var self = this;
+		var className = this.model.get('class');
+		if(App.defined(className)){
+			this.$el.addClass('bs-callout-' + className);
+		}
+		if(this.lifetime > 0){
+			this.timer = setTimeout(function(){
+				self.closeView();
+			}, this.lifetime);
+		}
+		App.animate(this.$el, 'fadeInDown');
+	},
+});
 App.Views.MessagesLayoutView = Giraffe.View.extend({
 	template: HBS.messages_layout_template,
 	tagName: 'li', 
@@ -559,6 +639,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	viewName         : null,
 	viewModel        : null,
 	portletFrameClass: null,
+	entrance         : 'fadeInLeft',
+
+	appEvents: {
+		'portlet:message': 'message',
+	},
 
 	events: {
 		'click #client-close' : 'closeView',
@@ -580,7 +665,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			this.setHeader();
 			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
 		}
-		App.animate(this.$el, 'fadeInLeft');
+		App.animate(this.$el, this.entrance);
 		this.$el.tooltip();
 	},
 
@@ -593,6 +678,17 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	setFrame: function(){
 		if(App.defined(this.portletFrameClass)){
 			this.$('#portlet-frame').addClass('portlet-' + this.portletFrameClass);
+		}
+	},
+
+	message: function(data){
+		console.log(this.view.cid);
+		if (!App.defined(data)){
+			return;
+		}
+		if (this.view.cid === data.viewCid){
+			var callout = new App.Views.BSCalloutView({model: new Backbone.Model(data)});
+			this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
 		}
 	},
 });
@@ -620,8 +716,6 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	events: {
 		'click ul#side-menu li a'       : 'activateLi',
 		'click ul.nav-second-level li a': 'activateSecondLi',
-		'click [data-open-view]'        : 'openView',
-		'click a'                       : function(e){e.preventDefault();},
 	},
 
 	afterRender: function(){
@@ -638,28 +732,6 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	activateSecondLi: function(e){
 		this.$('ul.nav-second-level li a').removeClass('second-level-active');
 		this.$(e.currentTarget).closest('a').addClass('second-level-active');
-	},
-
-	openView: function(e){
-		var self = this;
-		var viewName = e.currentTarget.dataset.openView;
-		var rendered = false;
-		var viewRef;
-		_.each(this.app.children, function(view){
-			if (view instanceof(App.Views.PortletView) && 
-					App.defined(view.viewName) && 
-					view.viewName === viewName){
-				rendered = true;
-				viewRef  = view; 
-			}
-		});
-		if(rendered){
-			App.scrollTo(viewRef.el);
-		} else {
-			app[viewName] = new App.Views.PortletView({viewName: viewName});
-			app[viewName].attachTo('#content-el', {method: 'prepend'});
-			App.scrollTo(app[viewName].el);
-		}
 	},
 
 	toggleMenu: function(){
@@ -681,6 +753,12 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	template: HBS.user_settings_template,
 	tagName: 'li', 
 	className: 'dropdown',
+});
+App.Routers.MainRouter = Giraffe.Router.extend({
+	triggers: {
+		':doc/index': 'route:doc:index',
+		':doc/new'  : 'route:doc:new'
+	},
 });
 App.Views.GoToTopView = App.Views.BaseView.extend({
 	template: HBS.go_to_top_template,
@@ -846,8 +924,10 @@ app.addInitializer(function(options){
 	app.GoToTopView.attachTo('#content-el');
 });
 
-// Start Backbone History
+// Start Backbone History, Renderer and main router
 app.addInitializer(function(){
+	app.Renderer   = new App.Views.Renderer();
+	app.MainRouter = new App.Routers.MainRouter();
 	Backbone.history.start();
 	console.log("Backbone Giraffe App is up and running");
 });

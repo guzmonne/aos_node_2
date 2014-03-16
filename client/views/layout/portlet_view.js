@@ -7,6 +7,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	viewName         : null,
 	viewModel        : null,
 	portletFrameClass: null,
+	entrance         : 'fadeInLeft',
+
+	appEvents: {
+		'portlet:message': 'message',
+	},
 
 	events: {
 		'click #client-close' : 'closeView',
@@ -28,7 +33,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			this.setHeader();
 			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
 		}
-		App.animate(this.$el, 'fadeInLeft');
+		App.animate(this.$el, this.entrance);
 		this.$el.tooltip();
 	},
 
@@ -41,6 +46,17 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	setFrame: function(){
 		if(App.defined(this.portletFrameClass)){
 			this.$('#portlet-frame').addClass('portlet-' + this.portletFrameClass);
+		}
+	},
+
+	message: function(data){
+		console.log(this.view.cid);
+		if (!App.defined(data)){
+			return;
+		}
+		if (this.view.cid === data.viewCid){
+			var callout = new App.Views.BSCalloutView({model: new Backbone.Model(data)});
+			this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
 		}
 	},
 });

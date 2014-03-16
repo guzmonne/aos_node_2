@@ -669,7 +669,7 @@ input, select {
 }
 
 /* TABLES */
-table.table-green thead {
+table.table-office thead {
   color:#D5DDE5;;
   background: #2c3e50;
   border-bottom:4px solid #9ea7af;
@@ -678,7 +678,12 @@ table.table-green thead {
   text-align:left;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
   vertical-align:middle;
-} 
+}
+
+table.table-office-green thead {
+  color:#FFF;;
+  background: #16a085;
+}  
 
 th{
   border-top-left-radius:3px;
@@ -777,4 +782,59 @@ td.center-vh{
 
 .table>tbody>tr>td.center-vh{  
   vertical-align: middle;
+}
+
+/* BS-CALLOUT */
+.bs-callout {
+  margin: 20px;
+  padding: 20px;
+  border-left: 3px solid #ddd;
+  background-color: #eee;
+}
+
+.bs-callout:hover {
+  background-color: #D4D4D4;
+  border-color: #636363;
+}
+
+.bs-callout h4 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.bs-callout p:last-child {
+  margin-bottom: 0; 
+}
+
+.bs-callout code {
+  background-color: #fff;
+  border-radius: 3px;
+}
+
+.bs-callout-danger:hover {
+  background-color: #FBE8E8;
+  border-color: #CC3B36;
+}
+
+.bs-callout-danger {
+  background-color: #fdf7f7;
+  border-color: #d9534f;
+}
+
+.bs-callout-danger h4 {
+  color: #d9534f;
+}
+
+.bs-callout-success {
+  background-color: #E5FFE5;
+  border-color: #5BB75B;
+}
+
+.bs-callout-success:hover {
+  background-color: #C5FFC5;
+  border-color: #47CC47;
+}
+
+.bs-callout-success h4 {
+  color: #317931;
 }

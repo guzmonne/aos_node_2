@@ -113,8 +113,10 @@ app.addInitializer(function(options){
 	app.GoToTopView.attachTo('#content-el');
 });
 
-// Start Backbone History
+// Start Backbone History, Renderer and main router
 app.addInitializer(function(){
+	app.Renderer   = new App.Views.Renderer();
+	app.MainRouter = new App.Routers.MainRouter();
 	Backbone.history.start();
 	console.log("Backbone Giraffe App is up and running");
 });
