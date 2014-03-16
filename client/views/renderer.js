@@ -1,18 +1,19 @@
 App.Views.Renderer = App.Views.BaseView.extend({
 	
 	appEvents: {
-		'route:doc:index': 'openIndexView',
-		'route:doc:new'  : 'openNewView',
+		'render:route': 'openView',
 	},
 
-	openIndexView: function(doc){
-		var viewName = this.capitaliseFirstLetter(doc) + 'IndexView';
-		this.showOrGoTo(viewName);
-	},
-
-	openNewView: function(doc){
-		var viewName = this.capitaliseFirstLetter(doc) + 'NewView';
-		this.showOrGoTo(viewName);
+	openView: function(doc, type){
+		var docName  = this.capitaliseFirstLetter(doc);
+		var typeName = this.capitaliseFirstLetter(type);
+		var viewName = docName + typeName + 'View';
+		if(App.defined(App.Views[viewName])){
+			Backbone.history.navigate(doc + '/' + type);
+			this.showOrGoTo(viewName);
+		} else {
+			return;
+		}
 	},
 
 	showOrGoTo: function(viewName){
