@@ -1,19 +1,14 @@
 App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
-	name       : "App.Views.ClientIndexView",
+	name       : "Clientes",
 	template   : HBS.client_index_template,
 	modelView  : App.Views.ClientRowView,
 	modelViewEl: '#clients',
 
-	className: "row",
+	className: "table-responisve",
 
 	oTable: null,
 
-	events: {
-		'click #client-close' : 'closeView',
-	},
-
 	initialize: function(){
-		this.closeView = App.Views.BaseView.prototype.closeView;
 		if (this.collection === undefined || this.collection === null || this.collection.length === 0){
 			this.collection = clients;
 			this.render();
@@ -21,13 +16,11 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 	},
 
 	afterRender: function(){
-		App.animate(this.$el, 'fadeInLeft');
-		console.log(this.oTable);
 		if (this.oTable === null){
 			this.oTable = this.$('#clients-table').dataTable();
 		}
-		this.$el.tooltip();
 		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
+		app.trigger('client:index:render');
 	},
 
 	attach: function(view, options){

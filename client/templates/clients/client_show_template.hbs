@@ -1,107 +1,83 @@
-<div class="col-lg-12">
-	<div class="portlet portlet-green">
-		<div class="portlet-heading">
-			<div class="portlet-title">
-				<h4>Cliente #{{id}} - {{name}}</h4>
-			</div>
-			<div class="portlet-widgets" data-toggle="tooltip" data-placement="top" title="Colapsar">
-				<a href="#client-{{id}}" data-toggle="collapse" data-parent="#accordion">
-					<i class="fa fa-chevron-down"></i>
-				</a>
-			</div>
-			<div class="portlet-widgets" data-toggle="tooltip" data-placement="top" title="Cerrar">
-				<a href="#" id="client-close">
-					<i class="fa fa-times"></i>
-				</a>
-			</div>
-			<div class="clearfix"></div>
-		</div>
-		<div id="client-{{id}}" class="panel-collapse in" style="height: auto;">
-			<div class="portlet-body">
-				<ul id="client-tabs" class="nav nav-tabs">
-	        <li class="active">
-	        	<a href="#client-details-{{id}}" data-toggle="tab">
-	        		Datos
-	        	</a>
-	        </li>
-	        <li>
-	        	<a href="#client-service-orders-{{id}}" data-toggle="tab">
-	        		Ordenes de Servicio
-	        	</a>
-	        </li>
-	        <li>
-	        	<a href="#client-apparatus-{{id}}" data-toggle="tab">
-	        		Equipos
-	        	</a>
-	        </li>
-	        <li>
-	        	<a href="#client-edit-{{id}}" data-toggle="tab">
-	        		Editar Datos
-	        	</a>
-	        </li>
-	      </ul>
-	      <div id="client-tab-content" class="tab-content">
-	        <div class="tab-pane fade in active" id="client-details-{{id}}">
-	          <div class="row">
-	            <div class="col-lg-9 col-md-8">
-	              <h1>{{name}}</h1>
-	              <ul class="list-inline">
-	                <li><i class="fa fa-calendar fa-muted"></i> Ingresado: {{createdAtShort}}</li>
-	                <li><i class="fa fa-calendar fa-muted"></i> Modificado: {{updatedAtShort}}</li>
-	                <li><i class="fa fa-user fa-muted"></i> Creado por: {{createdBy}}</li>
-	                <li><i class="fa fa-user fa-muted"></i> Actualizado por: {{updatedBy}}</li>
-	              </ul>
-	              <h3>Equipos en Taller</h3>
-	              <div class="table-responsive">
-	                <table class="table table-hover table-bordered table-striped">
-	                  <thead>
-	                      <tr>
-	                          <th>ID</th>
-	                          <th>Marca</th>
-	                          <th>Modelo</th>
-	                          <th>Estado</th>
-	                      </tr>
-	                  </thead>
-	                  <tbody></tbody>
-	              	</table>
-	          		</div>
-	            </div>
-	            <div class="col-lg-3 col-md-4">
-		            <h3>Detalles de Contacto</h3>
-		            {{#phones}}
-		            	<p>
-		            		<i class="fa fa-phone fa-muted fa-fw"></i> 
-		            		{{number}}
-		            	</p>
-		            {{/phones}}
-		            {{#addresses}}
-		              <p>
-		              	<i class="fa fa-building-o fa-muted fa-fw"></i> 
-		              	{{street}}.<br>
-		              	{{city}}, {{department}}
-		              </p>
-		            {{/addresses}}
-		            <p>
-		            	<i class="fa fa-envelope-o fa-muted fa-fw"></i>  
-		            	<a href="#">
-		            		{{email}}
-		            	</a>
-		            </p>
-	            </div>
-	          </div>
-	        </div>
-	        <div class="tab-pane fade in" id="client-service-orders-{{id}}">
-	        	<h3>Ordenes de Servicio</h3>
-	        </div>
-	        <div class="tab-pane fade in" id="client-apparatus-{{id}}">
-	        	<h3>Equipos</h3>
-	        </div>
-	        <div class="tab-pane fade in" id="client-edit-{{id}}">
-	        	<h3>Editar Datos de Cliente</h3>
-	        	<div id="client-form-{{id}}" class="row"></div>
-	        </div>
-				</div>
-			</div>
-		</div>
-	</div>
+<ul id="client-tabs" class="nav nav-tabs">
+  <li class="active">
+  	<a href="#client-details-{{id}}" data-toggle="tab">
+  		Datos
+  	</a>
+  </li>
+  <li>
+  	<a href="#client-service-orders-{{id}}" data-toggle="tab">
+  		Ordenes de Servicio
+  	</a>
+  </li>
+  <li>
+  	<a href="#client-apparatus-{{id}}" data-toggle="tab">
+  		Equipos
+  	</a>
+  </li>
+  <li>
+  	<a href="#client-edit-{{id}}" data-toggle="tab">
+  		Editar Datos
+  	</a>
+  </li>
+</ul>
+<div id="client-tab-content" class="tab-content">
+  <div class="tab-pane fade in active" id="client-details-{{id}}">
+    <div class="row">
+      <div class="col-lg-9 col-md-8">
+        <h1>{{name}}</h1>
+        <ul class="list-inline">
+          <li><i class="fa fa-calendar fa-muted"></i> Ingresado: {{createdAtShort}}</li>
+          <li><i class="fa fa-calendar fa-muted"></i> Modificado: {{updatedAtShort}}</li>
+          <li><i class="fa fa-user fa-muted"></i> Creado por: {{createdBy}}</li>
+          <li><i class="fa fa-user fa-muted"></i> Actualizado por: {{updatedBy}}</li>
+        </ul>
+        <h3>Equipos en Taller</h3>
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        	</table>
+    		</div>
+      </div>
+      <div class="col-lg-3 col-md-4">
+        <h3>Detalles de Contacto</h3>
+        {{#phones}}
+        	<p>
+        		<i class="fa fa-phone fa-muted fa-fw"></i> 
+        		{{number}}
+        	</p>
+        {{/phones}}
+        {{#addresses}}
+          <p>
+          	<i class="fa fa-building-o fa-muted fa-fw"></i> 
+          	{{street}}.<br>
+          	{{city}}, {{department}}
+          </p>
+        {{/addresses}}
+        <p>
+        	<i class="fa fa-envelope-o fa-muted fa-fw"></i>  
+        	<a href="#">
+        		{{email}}
+        	</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane fade in" id="client-service-orders-{{id}}">
+  	<h3>Ordenes de Servicio</h3>
+  </div>
+  <div class="tab-pane fade in" id="client-apparatus-{{id}}">
+  	<h3>Equipos</h3>
+  </div>
+  <div class="tab-pane fade in" id="client-edit-{{id}}">
+  	<h3>Editar Datos de Cliente</h3>
+  	<div id="client-form-{{id}}" class="row"></div>
+  </div>
 </div>

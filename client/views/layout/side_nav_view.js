@@ -18,7 +18,7 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	events: {
 		'click ul#side-menu li a'       : 'activateLi',
 		'click ul.nav-second-level li a': 'activateSecondLi',
-		'click [data-open-view]': 'openView',
+		'click [data-open-view]'        : 'openView',
 		'click a'                       : function(e){e.preventDefault();},
 	},
 
@@ -44,7 +44,9 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 		var rendered = false;
 		var viewRef;
 		_.each(this.app.children, function(view){
-			if (view instanceof(App.Views[viewName])){
+			if (view instanceof(App.Views.PortletView) && 
+					App.defined(view.viewName) && 
+					view.viewName === viewName){
 				rendered = true;
 				viewRef  = view; 
 			}
@@ -52,8 +54,8 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 		if(rendered){
 			App.scrollTo(viewRef.el);
 		} else {
-			app[viewName] = new App.Views[viewName]();
-			app[viewName].attachTo('#content-el');
+			app[viewName] = new App.Views.PortletView({viewName: viewName});
+			app[viewName].attachTo('#content-el', {method: 'prepend'});
 			App.scrollTo(app[viewName].el);
 		}
 	},
@@ -61,10 +63,10 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	toggleMenu: function(){
 		if(this.show){
 			this.show = false;
-			this.$el.removeClass('fadeInLeft').addClass('fadeOutLeft');
+			this.$el.removeClass('slideInLeft').addClass('slideOutLeft');
 		} else {
 			this.show = true;
-			this.$el.removeClass('fadeOutLeft').addClass('fadeInLeft');
+			this.$el.removeClass('slideOutLeft').addClass('slideInLeft');
 		}
 	},
 });

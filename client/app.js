@@ -10,6 +10,14 @@ window.App = {
 
 	vent: _.extend({}, Backbone.Events),
 
+	defined: function(object){
+		if (typeof object !== "undefined" && object !== null) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
 	animate: function(el, animation, callback){
 		$(el).addClass("animated " + animation);
 		var wait = window.setTimeout(function () {

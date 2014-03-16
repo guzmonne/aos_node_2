@@ -2,20 +2,19 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	template: HBS.client_show_template,
 	form    : HBS.client_form_template,
 
-	className: 'row',
+	name: null,
 
-	events: {
-		'click #client-close' : 'closeView',
+	appEvents: {
+		"client:index:render": 'announce',
 	},
 
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
+		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
 	},
 
 	afterRender: function(){
-		App.animate(this.$el, 'fadeInDown');
-		App.scrollTo('[data-view-cid='+this.cid+']');
-		this.$el.tooltip();
+		App.scrollTo(this.parent.el);
 		this.renderForm();
 	},
 
@@ -30,5 +29,13 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	renderForm: function(){
 		this.clientForm = new App.Views.ClientFormView({model: this.model});
 		this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+	},
+
+	announce: function(){
+		app.trigger('client:show:active', this.model.cid);
+	},
+
+	beforeDispose: function(){
+		app.trigger('client:show:close', this.model.cid);
 	},
 });

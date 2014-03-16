@@ -1,0 +1,23 @@
+<div class="col-lg-12">
+	<div id="portlet-frame" class="portlet portlet-default">
+		<div class="portlet-heading">
+			<div class="portlet-title">
+				<h4 id="portlet-title-header"></h4>
+			</div>
+			<div class="portlet-widgets" data-toggle="tooltip" data-placement="top" title="Colapsar">
+				<a href="#view-{{cid}}" data-toggle="collapse" data-parent="#accordion">
+					<i class="fa fa-chevron-down"></i>
+				</a>
+			</div>
+			<div class="portlet-widgets">
+				<a href="#" id="client-close" data-toggle="tooltip" data-placement="top" title="Cerrar">
+					<i class="fa fa-times"></i>
+				</a>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div id="view-{{cid}}" class="panel-collapse in" style="height: auto;">
+				<div id="portlet-body" class="portlet-body"></div>
+		</div>	
+	</div>
+</div>

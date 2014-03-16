@@ -3,14 +3,15 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	tagName  : 'tr',
 
-	activated: false,
+	activated  : false,
 
 	ui: {
 		$showClient: '#show-client',
 	},
 
 	appEvents: {
-		'client:show:close': 'deactivate',
+		'client:show:close' : 'deactivate',
+		'client:show:active': 'activateRenderedViews', 
 	},
 
 	events: {
@@ -37,8 +38,14 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	activate: function(e){
 		this.activated = true;
+		this.$('#show-client>i').addClass('fa-spin');
 		this.$el.addClass('selected');
-		this.app.trigger('client_row:selected', this.cid);
+	},
+
+	activateRenderedViews: function(cid){
+		if(this.model.cid === cid){
+			this.activate();
+		}
 	},
 
 	deactivate: function(cid){
@@ -49,28 +56,31 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		}
 	},
 
-	spinGear: function(){
-		this.$('#show-client>i').addClass('fa-spin');
-	},
-
 	showClient: function(){
 		var exists = false;
 		var self   = this;
-		var cid;
-		this.spinGear();
-		_.each(app.children, function(view){
-			if (view.model !== undefined && (view.model.cid === self.model.cid)){
+		var view;
+		_.each(app.children, function(portletView){
+			if (App.defined(portletView.view) && 
+					App.defined(portletView.view.model) && 
+					portletView.view.model.cid === self.model.cid
+			){
 				exists = true;
-				cid    = view.cid;
+				view   = portletView;
 			}
 		});
 		if (exists === false) {
-			var clientShowView = new App.Views.ClientShowView({model: this.model});
+			var clientShowView = new App.Views.PortletView({
+				viewName         : 'ClientShowView', 
+				viewModel        : this.model,
+				portletFrameClass: 'green',
+			});
 			app.addChild(clientShowView);
-			app.attach(clientShowView, {el: this.parent.el, method: 'after'});
+			app.attach(clientShowView, {el: app.ClientIndexView.el, method: 'before'});
 			this.activate();
 		} else {
-			App.scrollTo($('[data-view-cid='+cid+']').offset().top);
+			console.log(view);
+			App.scrollTo(view.el);
 		}
 	},
 });
