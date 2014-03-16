@@ -644,7 +644,7 @@ App.Views.GoToTopView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		this.toggleViewOnOverflow();
-		this.$el.tooptip();
+		this.$el.tooltip();
 	},
 
 	windowHeight: function(){
