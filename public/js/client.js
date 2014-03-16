@@ -268,6 +268,12 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'updated', this.render);
 	},
 
+	afterRender: function(){
+		if(this.activated){
+			this.activate();
+		}
+	},
+
 	serialize: function(){
 		return this.model.serialize();
 	},
@@ -277,7 +283,9 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	activate: function(e){
+		console.log(this);
 		this.activated = true;
+		this.className = 'selected';
 		this.$el.addClass('selected');
 	},
 
@@ -292,6 +300,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 			this.activated = false;
 			this.$('#show-client>i').removeClass('fa-spin');
 			this.$el.removeClass('selected');
+			this.className = '';
 		}
 	},
 
@@ -522,6 +531,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	afterRender: function(){
 		this.listenTo(this.model, 'updated', this.parent.render);
 		App.scrollTo(this.parent.el);
+		this.announce();
 		this.renderForm();
 	},
 

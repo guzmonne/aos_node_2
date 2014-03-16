@@ -15,6 +15,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	afterRender: function(){
 		this.listenTo(this.model, 'updated', this.parent.render);
 		App.scrollTo(this.parent.el);
+		this.announce();
 		this.renderForm();
 	},
 
