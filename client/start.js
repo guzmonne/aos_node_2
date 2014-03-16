@@ -90,7 +90,7 @@ var clientFixtures =
 		},
 	];
 
-var app = new Giraffe.App();
+var app     = new Giraffe.App();
 var clients = new App.Collections.Clients(clientFixtures);
 
 app.template = HBS.app_template;

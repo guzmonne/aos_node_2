@@ -22,12 +22,6 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'updated', this.render);
 	},
 
-	afterRender: function(){
-		if (this.activated){
-			this.spinGear();
-		}
-	},
-
 	serialize: function(){
 		return this.model.serialize();
 	},
@@ -38,7 +32,6 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	activate: function(e){
 		this.activated = true;
-		this.$('#show-client>i').addClass('fa-spin');
 		this.$el.addClass('selected');
 	},
 

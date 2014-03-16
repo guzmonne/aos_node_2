@@ -2,18 +2,18 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	template: HBS.client_show_template,
 	form    : HBS.client_form_template,
 
-	name: null,
+	name    : null,
 
 	appEvents: {
 		"client:index:render": 'announce',
 	},
 
 	initialize: function(){
-		this.listenTo(this.model, 'updated', this.render);
 		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
 	},
 
 	afterRender: function(){
+		this.listenTo(this.model, 'updated', this.parent.render);
 		App.scrollTo(this.parent.el);
 		this.renderForm();
 	},

@@ -268,12 +268,6 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'updated', this.render);
 	},
 
-	afterRender: function(){
-		if (this.activated){
-			this.spinGear();
-		}
-	},
-
 	serialize: function(){
 		return this.model.serialize();
 	},
@@ -284,7 +278,6 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	activate: function(e){
 		this.activated = true;
-		this.$('#show-client>i').addClass('fa-spin');
 		this.$el.addClass('selected');
 	},
 
@@ -516,18 +509,18 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	template: HBS.client_show_template,
 	form    : HBS.client_form_template,
 
-	name: null,
+	name    : null,
 
 	appEvents: {
 		"client:index:render": 'announce',
 	},
 
 	initialize: function(){
-		this.listenTo(this.model, 'updated', this.render);
 		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
 	},
 
 	afterRender: function(){
+		this.listenTo(this.model, 'updated', this.parent.render);
 		App.scrollTo(this.parent.el);
 		this.renderForm();
 	},
@@ -700,12 +693,12 @@ App.Views.SearchView = App.Views.BaseView.extend({
 App.Views.SideNavView = App.Views.BaseView.extend({
 	template: HBS.side_nav_template,
 
-	show: false,
+	show: true,
 
 	tagName: 'nav',
 	attributes: function(){
 		return {
-			'class': 'navbar-inverse navbar-static-side animated fadeOutLeft',
+			'class': 'navbar-inverse navbar-static-side animated fadeInLeft',
 			'role' : 'navigation',
 		};
 	},
@@ -758,6 +751,7 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {
 		'render/:doc/:type': 'render:route',
+		':doc/:type'       : 'render:route',
 	},
 });
 App.Views.GoToTopView = App.Views.BaseView.extend({
@@ -901,7 +895,7 @@ var clientFixtures =
 		},
 	];
 
-var app = new Giraffe.App();
+var app     = new Giraffe.App();
 var clients = new App.Collections.Clients(clientFixtures);
 
 app.template = HBS.app_template;

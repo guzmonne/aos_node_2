@@ -1,12 +1,12 @@
 App.Views.SideNavView = App.Views.BaseView.extend({
 	template: HBS.side_nav_template,
 
-	show: false,
+	show: true,
 
 	tagName: 'nav',
 	attributes: function(){
 		return {
-			'class': 'navbar-inverse navbar-static-side animated fadeOutLeft',
+			'class': 'navbar-inverse navbar-static-side animated fadeInLeft',
 			'role' : 'navigation',
 		};
 	},
