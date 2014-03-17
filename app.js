@@ -8,6 +8,18 @@ var path       = require('path');
 var toobusy    = require('toobusy');
 var config     = require('./siteConf.js');
 var RedisStore = require('connect-redis')(express);
+var mongoose   = require('mongoose');
+
+// ==================
+// MONGODB & MONGOOSE
+// ==================
+mongoose.connect('mongodb://localhost/aos2');
+var db = mongoose.connection:
+// Error
+db.on('error', console.error.bind(console, 'connection error'));
+db.once('open', function callback(){
+	console.log('Connection to mongoDB successful');
+});
 
 // =======
 // EXPRESS
@@ -51,7 +63,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // DEVELOPMENT ONLY
 // ================
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+}
+
+// ===============
+// PRODUCTION ONLY
+// ===============
+if ('production' == app.get('env')) {
+	app.use(express.errorHandler());
 }
 
 // =======
@@ -65,12 +84,22 @@ app.use(function(req, res, next){
 	}
 });
 
+// ==========
+// CONTROLERS
+// ==========
+var client = require('./api/controllers/client'); 
+
 // ======
 // ROUTES
 // ======
+// Index
+// -----
 app.get('/', function(req, res){
 	res.render('index');
 });
+// Client
+// ------
+app.get('/clients', client.index);
 
 // =============
 // DEFAULT ROUTE
