@@ -10,13 +10,22 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
+		this.listenTo(this.model, 'updated', this.update);
 	},
 
 	afterRender: function(){
-		this.listenTo(this.model, 'updated', this.parent.render);
 		App.scrollTo(this.parent.el);
 		this.announce();
 		this.renderForm();
+	},
+
+	update: function(){
+		this.parent.flash = {
+			title  : 'Cliente Actualizado',
+			message: 'El cliente se ha actualizado con exito.',
+			class  : 'success',
+		};
+		this.parent.render();
 	},
 
 	serialize: function(){

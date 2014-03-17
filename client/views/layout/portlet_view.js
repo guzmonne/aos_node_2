@@ -7,6 +7,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	viewName         : null,
 	viewModel        : null,
 	portletFrameClass: null,
+	flash            : null,
 	entrance         : 'fadeInLeft',
 
 	appEvents: {
@@ -24,6 +25,25 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	afterRender: function(options){
 		this.setFrame();
+		this.setMainChildView();
+		this.startTools();
+		this.displayFlash();
+	},
+
+	displayFlash: function(){
+		if (App.defined(this.flash)){
+			this.showMessage(this.flash);
+			console.log(this.flash);
+			this.flash = null;
+		}
+	},
+
+	startTools: function(){
+		App.animate(this.$el, this.entrance);
+		this.$el.tooltip();
+	},
+
+	setMainChildView: function(){
 		if(App.defined(this.viewName)){
 			if(this.viewModel !== null){
 				this.view = new App.Views[this.viewName]({model: this.viewModel});
@@ -33,8 +53,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			this.setHeader();
 			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
 		}
-		App.animate(this.$el, this.entrance);
-		this.$el.tooltip();
 	},
 
 	setHeader: function(header){
@@ -50,13 +68,23 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	message: function(data){
-		console.log(this.view.cid);
-		if (!App.defined(data)){
+		if (!App.defined(data) && !App.defined(data.viewCid)){
 			return;
 		}
 		if (this.view.cid === data.viewCid){
-			var callout = new App.Views.BSCalloutView({model: new Backbone.Model(data)});
-			this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
+			delete data.viewCid;
+			this.showMessage(data);
 		}
+	},
+
+	showMessage: function(data){
+		var options = {};
+		if(App.defined(data.lifetime)){
+			options.lifetime = data.lifetime;
+			delete data.lifetime;
+		}
+		options.model = new Backbone.Model(data);
+		var callout = new App.Views.BSCalloutView(options);
+		this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
 	},
 });

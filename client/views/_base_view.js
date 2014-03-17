@@ -27,4 +27,14 @@ App.Views.BaseView = Giraffe.View.extend({
 	capitaliseFirstLetter: function(string){
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
+
+	displayPortletMessage: function(options){
+		var defaultOptions = {
+			viewCid: this.parent.cid,
+			title  : 'Titulo:',
+			message: 'Cuerpo del mensaje',
+		};
+		var opts = typeof options !== 'undefined' ? options : defaultOptions; 
+		app.trigger('portlet:message', opts);
+	},
 });

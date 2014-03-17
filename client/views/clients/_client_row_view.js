@@ -37,9 +37,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	activate: function(e){
-		console.log(this);
 		this.activated = true;
-		this.className = 'selected';
 		this.$el.addClass('selected');
 	},
 

@@ -205,6 +205,16 @@ App.Views.BaseView = Giraffe.View.extend({
 	capitaliseFirstLetter: function(string){
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
+
+	displayPortletMessage: function(options){
+		var defaultOptions = {
+			viewCid: this.parent.cid,
+			title  : 'Titulo:',
+			message: 'Cuerpo del mensaje',
+		};
+		var opts = typeof options !== 'undefined' ? options : defaultOptions; 
+		app.trigger('portlet:message', opts);
+	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
 	
@@ -283,9 +293,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	},
 
 	activate: function(e){
-		console.log(this);
 		this.activated = true;
-		this.className = 'selected';
 		this.$el.addClass('selected');
 	},
 
@@ -438,13 +446,12 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 			this.app.ClientIndexView.view.collection.add(this.model);
 		}
 		this.model = new App.Models.Client();
-		var message = {
+		this.displayPortletMessage({
 			viewCid: this.parent.cid,
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
 			class  : 'success',
-		};
-		app.trigger('portlet:message', message);
+		});
 		this.render();
 		this.$('[name=name]').focus();
 	},
@@ -526,13 +533,22 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
+		this.listenTo(this.model, 'updated', this.update);
 	},
 
 	afterRender: function(){
-		this.listenTo(this.model, 'updated', this.parent.render);
 		App.scrollTo(this.parent.el);
 		this.announce();
 		this.renderForm();
+	},
+
+	update: function(){
+		this.parent.flash = {
+			title  : 'Cliente Actualizado',
+			message: 'El cliente se ha actualizado con exito.',
+			class  : 'success',
+		};
+		this.parent.render();
 	},
 
 	serialize: function(){
@@ -643,6 +659,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	viewName         : null,
 	viewModel        : null,
 	portletFrameClass: null,
+	flash            : null,
 	entrance         : 'fadeInLeft',
 
 	appEvents: {
@@ -660,6 +677,25 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	afterRender: function(options){
 		this.setFrame();
+		this.setMainChildView();
+		this.startTools();
+		this.displayFlash();
+	},
+
+	displayFlash: function(){
+		if (App.defined(this.flash)){
+			this.showMessage(this.flash);
+			console.log(this.flash);
+			this.flash = null;
+		}
+	},
+
+	startTools: function(){
+		App.animate(this.$el, this.entrance);
+		this.$el.tooltip();
+	},
+
+	setMainChildView: function(){
 		if(App.defined(this.viewName)){
 			if(this.viewModel !== null){
 				this.view = new App.Views[this.viewName]({model: this.viewModel});
@@ -669,8 +705,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			this.setHeader();
 			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
 		}
-		App.animate(this.$el, this.entrance);
-		this.$el.tooltip();
 	},
 
 	setHeader: function(header){
@@ -686,14 +720,24 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	message: function(data){
-		console.log(this.view.cid);
-		if (!App.defined(data)){
+		if (!App.defined(data) && !App.defined(data.viewCid)){
 			return;
 		}
 		if (this.view.cid === data.viewCid){
-			var callout = new App.Views.BSCalloutView({model: new Backbone.Model(data)});
-			this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
+			delete data.viewCid;
+			this.showMessage(data);
 		}
+	},
+
+	showMessage: function(data){
+		var options = {};
+		if(App.defined(data.lifetime)){
+			options.lifetime = data.lifetime;
+			delete data.lifetime;
+		}
+		options.model = new Backbone.Model(data);
+		var callout = new App.Views.BSCalloutView(options);
+		this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
 	},
 });
 App.Views.SearchView = App.Views.BaseView.extend({

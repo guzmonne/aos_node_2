@@ -103,13 +103,12 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 			this.app.ClientIndexView.view.collection.add(this.model);
 		}
 		this.model = new App.Models.Client();
-		var message = {
+		this.displayPortletMessage({
 			viewCid: this.parent.cid,
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
 			class  : 'success',
-		};
-		app.trigger('portlet:message', message);
+		});
 		this.render();
 		this.$('[name=name]').focus();
 	},
