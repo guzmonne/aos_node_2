@@ -6,7 +6,11 @@ html(lang="en")
 		meta(name="description" content="Service Request Administrator")
 		meta(name="author" content="Guzman Monne")
 
-		title AOS - Login
+		title AOS
+
+		// CSRF
+		script.
+			var csrf = "#{csrf}"
 
 		script(src='/js/libs/jquery.min.js')
 		script(src='/js/libs/bootstrap.min.js')

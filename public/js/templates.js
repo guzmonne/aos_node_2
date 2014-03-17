@@ -116,22 +116,24 @@ function program17(depth0,data) {
   buffer += escapeExpression(stack1)
     + "\">\n		</div>\n	</div>\n	<div class=\"form-group\">\n		<label for=\"doc\" class=\"col-sm-2 control-label\">Documento</label>\n		<div class=\"col-sm-3\">\n			<select name=\"doc-type\" class=\"form-control\">\n				<option value=\"CI\" ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "CI", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options) : helperMissing.call(depth0, "is", "CI", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options));
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "CI", (depth0 && depth0['doc-type']), options) : helperMissing.call(depth0, "is", "CI", (depth0 && depth0['doc-type']), options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
   buffer += ">C.I.</option>\n				<option value=\"RUT\" ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "RUT", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options) : helperMissing.call(depth0, "is", "RUT", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options));
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "RUT", (depth0 && depth0['doc-type']), options) : helperMissing.call(depth0, "is", "RUT", (depth0 && depth0['doc-type']), options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
   buffer += ">R.U.T</option>\n				<option value=\"DNI\" ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "DNI", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options) : helperMissing.call(depth0, "is", "DNI", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options));
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "DNI", (depth0 && depth0['doc-type']), options) : helperMissing.call(depth0, "is", "DNI", (depth0 && depth0['doc-type']), options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
   buffer += ">DNI</option>\n				<option value=\"Pasaporte\" ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "Pasaporte", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options) : helperMissing.call(depth0, "is", "Pasaporte", ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type), options));
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, "Pasaporte", (depth0 && depth0['doc-type']), options) : helperMissing.call(depth0, "is", "Pasaporte", (depth0 && depth0['doc-type']), options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += ">Pasaporte</option>\n			</select>\n		</div>\n		<div class=\"col-sm-7\">\n			<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\" value=\""
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.number)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+  buffer += ">Pasaporte</option>\n			</select>\n		</div>\n		<div class=\"col-sm-7\">\n			<input type=\"text\" class=\"form-control\" name=\"doc-number\" placeholder=\"4123456; 2123456789\" value=\"";
+  if (stack2 = helpers['doc-number']) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0['doc-number']); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
     + "\">\n		</div>\n	</div>\n	<div class=\"form-group\" id=\"phone-numbers\">\n		<label for=\"phone\" class=\"col-sm-2 control-label\">\n			";
   options = {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, (depth0 && depth0.phonesLength), ">", 1, options) : helperMissing.call(depth0, "is", (depth0 && depth0.phonesLength), ">", 1, options));
@@ -175,7 +177,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+  var buffer = "", stack1, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
 
 function program1(depth0,data) {
   
@@ -211,26 +213,30 @@ function program3(depth0,data) {
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td>\n	<dt>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + ":</dt>\n	<dd>"
-    + escapeExpression(((stack1 = ((stack1 = (depth0 && depth0.doc)),stack1 == null || stack1 === false ? stack1 : stack1.number)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
+    + "</td>\n<td>\n	<dt>";
+  if (stack1 = helpers['doc-type']) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0['doc-type']); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ":</dt>\n	<dd>";
+  if (stack1 = helpers['doc-number']) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0['doc-number']); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "</dd>\n</td>\n<td>\n	<ul class=\"list-unstyled\">\n		";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  if (stack2 = helpers.phones) { stack2 = stack2.call(depth0, options); }
-  else { stack2 = (depth0 && depth0.phones); stack2 = typeof stack2 === functionType ? stack2.call(depth0, options) : stack2; }
-  if (!helpers.phones) { stack2 = blockHelperMissing.call(depth0, stack2, options); }
-  if(stack2 || stack2 === 0) { buffer += stack2; }
+  if (stack1 = helpers.phones) { stack1 = stack1.call(depth0, options); }
+  else { stack1 = (depth0 && depth0.phones); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
+  if (!helpers.phones) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n	</ul>\n</td>\n<td>\n	";
   options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
-  if (stack2 = helpers.addresses) { stack2 = stack2.call(depth0, options); }
-  else { stack2 = (depth0 && depth0.addresses); stack2 = typeof stack2 === functionType ? stack2.call(depth0, options) : stack2; }
-  if (!helpers.addresses) { stack2 = blockHelperMissing.call(depth0, stack2, options); }
-  if(stack2 || stack2 === 0) { buffer += stack2; }
+  if (stack1 = helpers.addresses) { stack1 = stack1.call(depth0, options); }
+  else { stack1 = (depth0 && depth0.addresses); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
+  if (!helpers.addresses) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n</td>\n<td>";
-  if (stack2 = helpers.email) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.email); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "</td>\n<td class=\"center-vh\">\n	<button id=\"show-client\" class=\"btn btn-green\">\n		<i class=\"fa fa-cog fa-2x\"></i>\n	</button>\n</td>";
   return buffer;
   });

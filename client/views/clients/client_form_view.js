@@ -81,8 +81,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	setModel: function(){
 		this.model.set('name', this.$('[name=name]').val());
-		this.model.get('doc').set('type', this.$('[name=doc-type]').val());
-		this.model.get('doc').set('number', this.$('[name=doc-number]').val());
+		this.model.set('doc-type', this.$('[name=doc-type]').val());
+		this.model.set('doc-number', this.$('[name=doc-number]').val());
 		this.model.set('email', this.$('[name=email]').val());
 		var phone  = this.$('[name=phone]').val();
 		var street = this.$('[name=street]').val();
@@ -98,7 +98,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.set('id', this.model.cid);
+		this.model.save();
 		if (App.defined(app.ClientIndexView)){
 			this.app.ClientIndexView.view.collection.add(this.model);
 		}

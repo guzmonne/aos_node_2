@@ -14,7 +14,7 @@ var mongoose   = require('mongoose');
 // MONGODB & MONGOOSE
 // ==================
 mongoose.connect('mongodb://localhost/aos2');
-var db = mongoose.connection:
+var db = mongoose.connection;
 // Error
 db.on('error', console.error.bind(console, 'connection error'));
 db.once('open', function callback(){
@@ -95,11 +95,14 @@ var client = require('./api/controllers/client');
 // Index
 // -----
 app.get('/', function(req, res){
-	res.render('index');
+	res.render('index', { 
+  	csrf : req.csrfToken()
+  });
 });
 // Client
 // ------
-app.get('/clients', client.index);
+app.get('/api/clients', client.index);
+app.post('/api/clients', client.create);
 
 // =============
 // DEFAULT ROUTE

@@ -1,14 +1,11 @@
 var clientFixtures = 
 	[
 		{
-			'id': 1,
-			'name': 'Guzmán Monné',
-			'doc' : 
-			{
-				'type'  : 'CI',
-				'number': '41234567',
-			},
-			'phones':
+			'id'        : 1,
+			'name'      : 'Guzmán Monné',
+			'doc-type'  : 'CI',
+			'doc-number': '41234567',
+			'phones'    :
 			[
 				{
 					'number': '099123456'
@@ -35,11 +32,8 @@ var clientFixtures =
 		{
 			'id': 2,
 			'name': 'Juan Perez',
-			'doc' : 
-			{
-				'type'  : 'CI',
-				'number': '3456789',
-			},
+			'doc-type'  : 'CI',
+			'doc-number': '478963214',
 			'phones':
 			[
 				{
@@ -59,11 +53,8 @@ var clientFixtures =
 		{
 			'id': 3,
 			'name': 'Pedro Picapiedra',
-			'doc' : 
-			{
-				'type'  : 'Pasaporte',
-				'number': '001',
-			},
+			'doc-type'  : 'CI',
+			'doc-number': '65478912342',
 			'phones':
 			[
 				{
@@ -95,6 +86,15 @@ var clients = new App.Collections.Clients(clientFixtures);
 
 app.template = HBS.app_template;
 
+// Configure Ajax to use CSRF
+app.addInitializer(function(){
+	$.ajaxSetup({
+    headers: {
+      'X-CSRF-Token': csrf
+    }
+  });
+});
+
 // Build Nav
 app.addInitializer(function(options){
 	app.nav = new App.Views.NavView();
@@ -118,7 +118,6 @@ app.addInitializer(function(){
 	app.Renderer   = new App.Views.Renderer();
 	app.MainRouter = new App.Routers.MainRouter();
 	Backbone.history.start();
-	console.log("Backbone Giraffe App is up and running");
 });
 
 $(document).ready(function(){

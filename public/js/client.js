@@ -74,20 +74,21 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
-	urlRoot: '/clients',
+	urlRoot: '/api/clients',
 
 	defaults: function(){
 		return {
-			'id'       : null,
-			'name'     : '',
-			'email'    : '',
-			'doc'      : new App.Models.Doc(),
-			'phones'   : new App.Collections.Phones(),
-			'addresses': new App.Collections.Addresses(),
-			'createdAt': new Date(),
-			'updatedAt': new Date(),
-			'createdBy': 'Guzmán Monné',
-			'updatedBy': 'Guzmán Monné'
+			'id'        : null,
+			'name'      : '',
+			'email'     : '',
+			'doc-type'  : '',
+			'doc-number': '',
+			'phones'    : new App.Collections.Phones(),
+			'addresses' : new App.Collections.Addresses(),
+			'createdAt' : new Date(),
+			'updatedAt' : new Date(),
+			'createdBy' : 'Guzmán Monné',
+			'updatedBy' : 'Guzmán Monné'
 		};
 	},
 
@@ -98,28 +99,14 @@ App.Models.Client = App.Models.BaseModel.extend({
 	},
 
 	parseAttributes: function(attributes){
-		if(attributes.phones !== undefined && attributes.phones !== null){
+		if(App.defined(attributes.phones)){
 			if(_.isArray(attributes.phones)){
 				this.set('phones', new App.Collections.Phones(attributes.phones));
 			}
 		}
-		if(attributes.addresses !== undefined && attributes.addresses !== null){
+		if(App.defined(attributes.addresses)){
 			if(_.isArray(attributes.addresses)){
 				this.set('addresses', new App.Collections.Addresses(attributes.addresses));
-			}
-		}
-		if(attributes.doc.type !== undefined && attributes.doc.type !== null){
-			if (this.get('doc') instanceof(App.Models.BaseModel)){
-				this.get('doc').set('type', attributes.doc.type);
-			} else {
-				this.set('doc', new App.Models.Doc({type: attributes.doc.type}));
-			}
-		}
-		if(attributes.doc.number !== undefined && attributes.doc.number !== null){
-			if (this.get('doc') instanceof(App.Models.BaseModel)){
-				this.get("doc").set('number', attributes.doc.number);
-			} else {
-				this.set('doc', new App.Models.Doc({type: attributes.doc.number}));
 			}
 		}
 	},
@@ -132,19 +119,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 		if(attributes.addresses instanceof(Giraffe.Collection)){
 			attributes.addresses = attributes.addresses.toJSON();
 		}
-		if(attributes.doc instanceof(Giraffe.Model)){
-			attributes.doc = attributes.doc.toJSON();
-		}
 		return attributes;
-	},
-});
-
-App.Models.Doc = App.Models.BaseModel.extend({
-	defaults: function(){
-		return {
-			type  : '',
-			number: '',
-		};
 	},
 });
 
@@ -166,6 +141,7 @@ App.Models.Address = App.Models.BaseModel.extend({
 	},
 });
 App.Collections.Clients = Giraffe.Collection.extend({
+	url  : '/api/clients',
 	model: App.Models.Client,
 });
 
@@ -424,8 +400,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	setModel: function(){
 		this.model.set('name', this.$('[name=name]').val());
-		this.model.get('doc').set('type', this.$('[name=doc-type]').val());
-		this.model.get('doc').set('number', this.$('[name=doc-number]').val());
+		this.model.set('doc-type', this.$('[name=doc-type]').val());
+		this.model.set('doc-number', this.$('[name=doc-number]').val());
 		this.model.set('email', this.$('[name=email]').val());
 		var phone  = this.$('[name=phone]').val();
 		var street = this.$('[name=street]').val();
@@ -441,7 +417,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.set('id', this.model.cid);
+		this.model.save();
 		if (App.defined(app.ClientIndexView)){
 			this.app.ClientIndexView.view.collection.add(this.model);
 		}
@@ -860,14 +836,11 @@ App.Views.GoToTopView = App.Views.BaseView.extend({
 var clientFixtures = 
 	[
 		{
-			'id': 1,
-			'name': 'Guzmán Monné',
-			'doc' : 
-			{
-				'type'  : 'CI',
-				'number': '41234567',
-			},
-			'phones':
+			'id'        : 1,
+			'name'      : 'Guzmán Monné',
+			'doc-type'  : 'CI',
+			'doc-number': '41234567',
+			'phones'    :
 			[
 				{
 					'number': '099123456'
@@ -894,11 +867,8 @@ var clientFixtures =
 		{
 			'id': 2,
 			'name': 'Juan Perez',
-			'doc' : 
-			{
-				'type'  : 'CI',
-				'number': '3456789',
-			},
+			'doc-type'  : 'CI',
+			'doc-number': '478963214',
 			'phones':
 			[
 				{
@@ -918,11 +888,8 @@ var clientFixtures =
 		{
 			'id': 3,
 			'name': 'Pedro Picapiedra',
-			'doc' : 
-			{
-				'type'  : 'Pasaporte',
-				'number': '001',
-			},
+			'doc-type'  : 'CI',
+			'doc-number': '65478912342',
 			'phones':
 			[
 				{
@@ -954,6 +921,15 @@ var clients = new App.Collections.Clients(clientFixtures);
 
 app.template = HBS.app_template;
 
+// Configure Ajax to use CSRF
+app.addInitializer(function(){
+	$.ajaxSetup({
+    headers: {
+      'X-CSRF-Token': csrf
+    }
+  });
+});
+
 // Build Nav
 app.addInitializer(function(options){
 	app.nav = new App.Views.NavView();
@@ -977,7 +953,6 @@ app.addInitializer(function(){
 	app.Renderer   = new App.Views.Renderer();
 	app.MainRouter = new App.Routers.MainRouter();
 	Backbone.history.start();
-	console.log("Backbone Giraffe App is up and running");
 });
 
 $(document).ready(function(){
