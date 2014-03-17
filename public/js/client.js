@@ -431,10 +431,9 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	handleSuccess: function(response){
-		console.log(this);
-		this.model.set(response);
+		var model = new App.Models.Client(response);
 		if (App.defined(app.ClientIndexView) && App.defined(app.ClientIndexView.view)){
-			app.ClientIndexView.view.collection.add(this.model);
+			app.ClientIndexView.view.collection.add(model);
 		}
 		this.displayPortletMessage({
 			viewCid: this.parent.cid,
