@@ -62,13 +62,11 @@ ClientModel.prototype.findAll = function(callback){
 // Create Client
 // -------------
 ClientModel.prototype.create = function(params, callback){
-	console.log(params);
 	var client = new Client({
-		name        : params['name'],
-		email       : params['email'],
+		'name'      : params['name'],
+		'email'     : params['email'],
 		'doc-type'  : params['doc-type'],
 		'doc-number': params['doc-number'],
-		email       : params['email'],
 	});
 	for (var i = 0; i < params['phones'].length; i++){
 		client.phones.push(params['phones'][i]);
@@ -76,8 +74,8 @@ ClientModel.prototype.create = function(params, callback){
 	for (var i = 0; i < params['addresses'].length; i++){
 		client.addresses.push(params['addresses'][i]);
 	}
-	client.save(function(err){
-		callback();
+	client.save(function(err, client){
+		callback(null, client);
 	});
 };
 // =======

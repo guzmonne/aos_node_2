@@ -11,10 +11,10 @@ exports.index = function(req, res){
 };
 
 exports.create = function(req, res){
-	Client.create(req.body, function(error){
+	Client.create(req.body, function(error, client){
 		if (error){
 			return res.send(400, {err: error});
 		}
-		res.send(200, {msg: 'Client creation successful'});
+		res.send(200, client);
 	});
 };

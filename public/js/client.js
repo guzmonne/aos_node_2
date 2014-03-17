@@ -420,23 +420,26 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	submitForm: function(e){
 		e.preventDefault();
+		var self = this;
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.save({
-			success: this.handleSuccess(),
+		this.model.save({}, {
+			success: function(model, response, options){
+				self.handleSuccess(self ,model, response, options);
+			},
 		});
 		this.model = new App.Models.Client();
 		this.render();
 		this.$('[name=name]').focus();
 	},
 
-	handleSuccess: function(response){
-		var model = new App.Models.Client(response);
+	handleSuccess: function(context, model, response, options){
+		var attrs = new App.Models.Client(response);
 		if (App.defined(app.ClientIndexView) && App.defined(app.ClientIndexView.view)){
-			app.ClientIndexView.view.collection.add(model);
+			app.ClientIndexView.view.collection.add(attrs);
 		}
-		this.displayPortletMessage({
-			viewCid: this.parent.cid,
+		context.displayPortletMessage({
+			viewCid: context.parent.cid,
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
 			class  : 'success',
