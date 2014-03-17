@@ -26,6 +26,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		if(this.activated){
 			this.activate();
 		}
+		app.trigger('client:row:rendered');
 	},
 
 	serialize: function(){
@@ -41,8 +42,9 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		this.$el.addClass('selected');
 	},
 
-	activateRenderedViews: function(cid){
-		if(this.model.cid === cid){
+	activateRenderedViews: function(id){
+		if(this.model.id === id){
+			console.log('I should be active');
 			this.activate();
 		}
 	},
@@ -63,7 +65,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		_.each(app.children, function(portletView){
 			if (App.defined(portletView.view) && 
 					App.defined(portletView.view.model) && 
-					portletView.view.model.cid === self.model.cid
+					portletView.view.model.id === self.model.id
 			){
 				exists = true;
 				view   = portletView;
@@ -78,9 +80,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 			});
 			app.addChild(clientShowView);
 			app.attach(clientShowView, {el: app.ClientIndexView.el, method: 'before'});
-			this.activate();
 		} else {
-			console.log(view);
 			App.scrollTo(view.el);
 		}
 	},

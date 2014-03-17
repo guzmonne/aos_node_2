@@ -98,19 +98,26 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.save();
-		if (App.defined(app.ClientIndexView)){
-			this.app.ClientIndexView.view.collection.add(this.model);
-		}
+		this.model.save({
+			success: this.handleSuccess(),
+		});
 		this.model = new App.Models.Client();
+		this.render();
+		this.$('[name=name]').focus();
+	},
+
+	handleSuccess: function(response){
+		console.log(this);
+		this.model.set(response);
+		if (App.defined(app.ClientIndexView) && App.defined(app.ClientIndexView.view)){
+			app.ClientIndexView.view.collection.add(this.model);
+		}
 		this.displayPortletMessage({
 			viewCid: this.parent.cid,
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
 			class  : 'success',
 		});
-		this.render();
-		this.$('[name=name]').focus();
 	},
 
 	updateForm: function(e){

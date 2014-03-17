@@ -5,7 +5,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	name    : null,
 
 	appEvents: {
-		"client:index:render": 'announce',
+		"client:row:rendered": 'announce',
 	},
 
 	initialize: function(){
@@ -42,7 +42,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	announce: function(){
-		app.trigger('client:show:active', this.model.cid);
+		app.trigger('client:show:active', this.model.id);
 	},
 
 	beforeDispose: function(){

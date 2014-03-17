@@ -18,7 +18,8 @@
 						"sNext"    : "Sig"
 	        },
 	    		"sInfo": "Mostrando filas _START_ a _END_ de _TOTAL_",
-	    		"sInfoEmpty": "No hay datos" 
+	    		"sInfoEmpty": "",
+	    		"sEmptyTable": "No se han encontrado datos para esta tabla", 
 	    }
 	} );
 

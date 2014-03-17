@@ -3,15 +3,12 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'id'        : null,
 			'name'      : '',
 			'email'     : '',
 			'doc-type'  : '',
 			'doc-number': '',
 			'phones'    : new App.Collections.Phones(),
 			'addresses' : new App.Collections.Addresses(),
-			'createdAt' : new Date(),
-			'updatedAt' : new Date(),
 			'createdBy' : 'Guzmán Monné',
 			'updatedBy' : 'Guzmán Monné'
 		};
@@ -33,6 +30,12 @@ App.Models.Client = App.Models.BaseModel.extend({
 			if(_.isArray(attributes.addresses)){
 				this.set('addresses', new App.Collections.Addresses(attributes.addresses));
 			}
+		}
+		if(App.defined(attributes.createdAt)){
+			this.set('createdAt', new Date(attributes.createdAt));
+		}
+		if(App.defined(attributes.updatedAt)){
+			this.set('updatedAt', new Date(attributes.updatedAt));
 		}
 	},
 

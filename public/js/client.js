@@ -67,6 +67,8 @@ window.App = {
 	},
 };
 App.Models.BaseModel = Giraffe.Model.extend({
+	idAttribute: '_id',
+	
 	dateDDMMYYYY: function(date){
 		return date.getDate() +
 			"/" + date.getMonth() + 
@@ -78,15 +80,12 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'id'        : null,
 			'name'      : '',
 			'email'     : '',
 			'doc-type'  : '',
 			'doc-number': '',
 			'phones'    : new App.Collections.Phones(),
 			'addresses' : new App.Collections.Addresses(),
-			'createdAt' : new Date(),
-			'updatedAt' : new Date(),
 			'createdBy' : 'Guzmán Monné',
 			'updatedBy' : 'Guzmán Monné'
 		};
@@ -108,6 +107,12 @@ App.Models.Client = App.Models.BaseModel.extend({
 			if(_.isArray(attributes.addresses)){
 				this.set('addresses', new App.Collections.Addresses(attributes.addresses));
 			}
+		}
+		if(App.defined(attributes.createdAt)){
+			this.set('createdAt', new Date(attributes.createdAt));
+		}
+		if(App.defined(attributes.updatedAt)){
+			this.set('updatedAt', new Date(attributes.updatedAt));
 		}
 	},
 
@@ -258,6 +263,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		if(this.activated){
 			this.activate();
 		}
+		app.trigger('client:row:rendered');
 	},
 
 	serialize: function(){
@@ -273,8 +279,9 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		this.$el.addClass('selected');
 	},
 
-	activateRenderedViews: function(cid){
-		if(this.model.cid === cid){
+	activateRenderedViews: function(id){
+		if(this.model.id === id){
+			console.log('I should be active');
 			this.activate();
 		}
 	},
@@ -295,7 +302,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		_.each(app.children, function(portletView){
 			if (App.defined(portletView.view) && 
 					App.defined(portletView.view.model) && 
-					portletView.view.model.cid === self.model.cid
+					portletView.view.model.id === self.model.id
 			){
 				exists = true;
 				view   = portletView;
@@ -310,9 +317,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 			});
 			app.addChild(clientShowView);
 			app.attach(clientShowView, {el: app.ClientIndexView.el, method: 'before'});
-			this.activate();
 		} else {
-			console.log(view);
 			App.scrollTo(view.el);
 		}
 	},
@@ -417,19 +422,26 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.save();
-		if (App.defined(app.ClientIndexView)){
-			this.app.ClientIndexView.view.collection.add(this.model);
-		}
+		this.model.save({
+			success: this.handleSuccess(),
+		});
 		this.model = new App.Models.Client();
+		this.render();
+		this.$('[name=name]').focus();
+	},
+
+	handleSuccess: function(response){
+		console.log(this);
+		this.model.set(response);
+		if (App.defined(app.ClientIndexView) && App.defined(app.ClientIndexView.view)){
+			app.ClientIndexView.view.collection.add(this.model);
+		}
 		this.displayPortletMessage({
 			viewCid: this.parent.cid,
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
 			class  : 'success',
 		});
-		this.render();
-		this.$('[name=name]').focus();
 	},
 
 	updateForm: function(e){
@@ -453,7 +465,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		}
 	},
 });
-App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
+App.Views.ClientIndexView = App.Views.BaseView.extend({
 	name       : "Clientes",
 	template   : HBS.client_index_template,
 	modelView  : App.Views.ClientRowView,
@@ -464,21 +476,17 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 	oTable: null,
 
 	initialize: function(){
-		if (this.collection === undefined || this.collection === null || this.collection.length === 0){
-			this.collection = clients;
-			this.render();
-		}
+		this.collection = new App.Collections.Clients();
+		this.listenTo(this.collection, 'add', this.attach);
 	},
 
 	afterRender: function(){
-		if (this.oTable === null){
-			this.oTable = this.$('#clients-table').dataTable();
-		}
-		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
-		app.trigger('client:index:render');
+		this.oTable = this.$('#clients-table').dataTable();
+		this.collection.fetch();
 	},
 
-	attach: function(view, options){
+	attach: function(model){
+		var view = new this.modelView({model: model});
 		this.addChild(view);
 		this.oTable.fnAddTr(view.render().el);
 	},
@@ -504,7 +512,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	name    : null,
 
 	appEvents: {
-		"client:index:render": 'announce',
+		"client:row:rendered": 'announce',
 	},
 
 	initialize: function(){
@@ -541,7 +549,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	announce: function(){
-		app.trigger('client:show:active', this.model.cid);
+		app.trigger('client:show:active', this.model.id);
 	},
 
 	beforeDispose: function(){

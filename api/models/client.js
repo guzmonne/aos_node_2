@@ -1,7 +1,14 @@
-var mongoose = require('mongoose');
+// ===================
+// MODULE DEPENDENCIES
+// ===================
+var mongoose   = require('mongoose');
+var ShortId    = require('mongoose-shortid');
+var timestamps = require('mongoose-timestamp');
 
+// =======
+// SCHEMAS
+// =======
 var Schema   = mongoose.Schema;
-var ObjectId = Schema.ObjectId;
 
 var Addresses = new Schema({
 	street    : String,
@@ -14,6 +21,12 @@ var Phones = new Schema({
 });
 
 var Client = new Schema({
+	_id: {
+		type   : ShortId,
+		len    : 6,
+		base   : 10,
+		retries: 10
+	}, 
 	name        : String,
 	'doc-type'  : String,
 	'doc-number': String,
@@ -22,19 +35,32 @@ var Client = new Schema({
 	email       : String,
 });
 
+// =======
+// PLUGINS
+// =======
+Client.plugin(timestamps);
+
+// =====
+// MODEL
+// =====
 mongoose.model('Client', Client);
 var Client = mongoose.model('Client');
 
+// ==================
+// EXPORT CONSTRUCTOR
+// ==================
 ClientModel = function(){};
-
+// FUNCTIONS
+// ---------
 // Find all clients
+// ----------------
 ClientModel.prototype.findAll = function(callback){
 	Client.find({}, function(err, clients){
 		callback(null, clients);
 	});
 };
-
 // Create Client
+// -------------
 ClientModel.prototype.create = function(params, callback){
 	console.log(params);
 	var client = new Client({
@@ -54,7 +80,6 @@ ClientModel.prototype.create = function(params, callback){
 		callback();
 	});
 };
-
 // =======
 // EXPORTS
 // =======

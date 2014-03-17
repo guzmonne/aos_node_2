@@ -1,27 +1,27 @@
 <ul id="client-tabs" class="nav nav-tabs">
   <li class="active">
-  	<a href="#client-details-{{id}}" data-toggle="tab">
+  	<a href="#client-details-{{_id}}" data-toggle="tab">
   		Datos
   	</a>
   </li>
   <li>
-  	<a href="#client-service-orders-{{id}}" data-toggle="tab">
+  	<a href="#client-service-orders-{{_id}}" data-toggle="tab">
   		Ordenes de Servicio
   	</a>
   </li>
   <li>
-  	<a href="#client-apparatus-{{id}}" data-toggle="tab">
+  	<a href="#client-apparatus-{{_id}}" data-toggle="tab">
   		Equipos
   	</a>
   </li>
   <li>
-  	<a href="#client-edit-{{id}}" data-toggle="tab">
+  	<a href="#client-edit-{{_id}}" data-toggle="tab">
   		Editar Datos
   	</a>
   </li>
 </ul>
 <div id="client-tab-content" class="tab-content">
-  <div class="tab-pane fade in active" id="client-details-{{id}}">
+  <div class="tab-pane fade in active" id="client-details-{{_id}}">
     <div class="row">
       <div class="col-lg-9 col-md-8">
         <h1>{{name}}</h1>
@@ -70,14 +70,14 @@
       </div>
     </div>
   </div>
-  <div class="tab-pane fade in" id="client-service-orders-{{id}}">
+  <div class="tab-pane fade in" id="client-service-orders-{{_id}}">
   	<h3>Ordenes de Servicio</h3>
   </div>
-  <div class="tab-pane fade in" id="client-apparatus-{{id}}">
+  <div class="tab-pane fade in" id="client-apparatus-{{_id}}">
   	<h3>Equipos</h3>
   </div>
-  <div class="tab-pane fade in" id="client-edit-{{id}}">
+  <div class="tab-pane fade in" id="client-edit-{{_id}}">
   	<h3>Editar Datos de Cliente</h3>
-  	<div id="client-form-{{id}}" class="row"></div>
+  	<div id="client-form-{{_id}}" class="row"></div>
   </div>
 </div>

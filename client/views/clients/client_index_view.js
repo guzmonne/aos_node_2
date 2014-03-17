@@ -1,4 +1,4 @@
-App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
+App.Views.ClientIndexView = App.Views.BaseView.extend({
 	name       : "Clientes",
 	template   : HBS.client_index_template,
 	modelView  : App.Views.ClientRowView,
@@ -9,21 +9,17 @@ App.Views.ClientIndexView = Giraffe.Contrib.CollectionView.extend({
 	oTable: null,
 
 	initialize: function(){
-		if (this.collection === undefined || this.collection === null || this.collection.length === 0){
-			this.collection = clients;
-			this.render();
-		}
+		this.collection = new App.Collections.Clients();
+		this.listenTo(this.collection, 'add', this.attach);
 	},
 
 	afterRender: function(){
-		if (this.oTable === null){
-			this.oTable = this.$('#clients-table').dataTable();
-		}
-		Giraffe.Contrib.CollectionView.prototype.afterRender.apply(this);
-		app.trigger('client:index:render');
+		this.oTable = this.$('#clients-table').dataTable();
+		this.collection.fetch();
 	},
 
-	attach: function(view, options){
+	attach: function(model){
+		var view = new this.modelView({model: model});
 		this.addChild(view);
 		this.oTable.fnAddTr(view.render().el);
 	},
