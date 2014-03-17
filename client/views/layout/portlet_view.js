@@ -33,7 +33,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	displayFlash: function(){
 		if (App.defined(this.flash)){
 			this.showMessage(this.flash);
-			console.log(this.flash);
 			this.flash = null;
 		}
 	},

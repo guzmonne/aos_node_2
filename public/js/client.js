@@ -70,9 +70,15 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	idAttribute: '_id',
 	
 	dateDDMMYYYY: function(date){
-		return date.getDate() +
-			"/" + date.getMonth() + 
-			"/" + date.getFullYear();
+		var parsedDate;
+		if (date instanceof Date){
+			parsedDate = date;
+		} else {
+			parsedDate = new Date(date);
+		}
+		return parsedDate.getDate() +
+			"/" + parsedDate.getMonth() + 
+			"/" + parsedDate.getFullYear();
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
@@ -281,13 +287,12 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	activateRenderedViews: function(id){
 		if(this.model.id === id){
-			console.log('I should be active');
 			this.activate();
 		}
 	},
 
-	deactivate: function(cid){
-		if(cid === this.model.cid && this.$el.hasClass('selected')){
+	deactivate: function(id){
+		if(id === this.model.id && this.$el.hasClass('selected')){
 			this.activated = false;
 			this.$('#show-client>i').removeClass('fa-spin');
 			this.$el.removeClass('selected');
@@ -355,6 +360,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	delPhoneNumber:function(e){
 		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
+		console.log(this.model);
 		var phones = this.model.get('phones');
 		var model  = phones.models[index];
 		phones.remove(model);
@@ -448,8 +454,13 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	updateForm: function(e){
 		e.preventDefault();
+		var self = this;
 		this.setModel();
-		this.model.trigger('updated');
+		this.model.save({}, {
+			success: function(model, response, options){
+				self.model.trigger('updated');
+			},
+		});
 	},
 
 	reRender: function(elToFocus){
@@ -555,7 +566,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	beforeDispose: function(){
-		app.trigger('client:show:close', this.model.cid);
+		app.trigger('client:show:close', this.model.id);
 	},
 });
 App.Views.BreadCrumbsView = Giraffe.View.extend({
@@ -671,7 +682,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	displayFlash: function(){
 		if (App.defined(this.flash)){
 			this.showMessage(this.flash);
-			console.log(this.flash);
 			this.flash = null;
 		}
 	},

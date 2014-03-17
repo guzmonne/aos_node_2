@@ -46,6 +46,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	beforeDispose: function(){
-		app.trigger('client:show:close', this.model.cid);
+		app.trigger('client:show:close', this.model.id);
 	},
 });

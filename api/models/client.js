@@ -75,7 +75,31 @@ ClientModel.prototype.create = function(params, callback){
 		client.addresses.push(params['addresses'][i]);
 	}
 	client.save(function(err, client){
+		if (err){return callback(err);}
 		callback(null, client);
+	});
+};
+// Update Client
+// -------------
+ClientModel.prototype.update = function(id, params, callback){
+	Client.findOne({"_id": id}, function(err, client){
+		if (err){return callback(err);}
+		client['name']       = params['name'];
+		client['email']      = params['email'];
+		client['doc-type']   = params['doc-type'];
+		client['doc-number'] = params['doc-number'];
+		client.phones = [];
+		client.addresses = [];
+		for (var i = 0; i < params['phones'].length; i++){
+			client.phones.push(params['phones'][i]);
+		}
+		for (var i = 0; i < params['addresses'].length; i++){
+			client.addresses.push(params['addresses'][i]);
+		}
+		client.save(function(err, client){
+			if (err){return callback(err);}
+			callback(null, client);
+		})
 	});
 };
 // =======

@@ -31,6 +31,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	delPhoneNumber:function(e){
 		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
+		console.log(this.model);
 		var phones = this.model.get('phones');
 		var model  = phones.models[index];
 		phones.remove(model);
@@ -124,8 +125,13 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	updateForm: function(e){
 		e.preventDefault();
+		var self = this;
 		this.setModel();
-		this.model.trigger('updated');
+		this.model.save({}, {
+			success: function(model, response, options){
+				self.model.trigger('updated');
+			},
+		});
 	},
 
 	reRender: function(elToFocus){

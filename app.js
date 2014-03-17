@@ -103,6 +103,7 @@ app.get('/', function(req, res){
 // ------
 app.get('/api/clients', client.index);
 app.post('/api/clients', client.create);
+app.put('/api/clients/:id', client.update);
 
 // =============
 // DEFAULT ROUTE

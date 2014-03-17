@@ -44,13 +44,12 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	activateRenderedViews: function(id){
 		if(this.model.id === id){
-			console.log('I should be active');
 			this.activate();
 		}
 	},
 
-	deactivate: function(cid){
-		if(cid === this.model.cid && this.$el.hasClass('selected')){
+	deactivate: function(id){
+		if(id === this.model.id && this.$el.hasClass('selected')){
 			this.activated = false;
 			this.$('#show-client>i').removeClass('fa-spin');
 			this.$el.removeClass('selected');
