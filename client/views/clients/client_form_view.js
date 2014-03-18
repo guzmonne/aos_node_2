@@ -5,6 +5,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	className: 'col-lg-12',
 
+	cloneModel: null,
+
 	events: {
 		'click #add-phone-number'        : 'reRender',
 		'click button.del-phone-number'  : 'delPhoneNumber',
@@ -18,8 +20,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		this.model.set('phonesLength', this.model.get('phones').length);
-		this.model.set('addressesLength', this.model.get('addresses').length);
+		//this.model.set('phonesLength', this.model.get('phones').length);
+		//this.model.set('addressesLength', this.model.get('addresses').length);
 		return this.model.serialize();
 	},
 
@@ -31,7 +33,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	delPhoneNumber:function(e){
 		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		console.log(this.model);
 		var phones = this.model.get('phones');
 		var model  = phones.models[index];
 		phones.remove(model);
@@ -129,6 +130,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.setModel();
 		this.model.save({}, {
 			success: function(model, response, options){
+				self.model.parseAttributes(self.model.attributes);
 				self.model.trigger('updated');
 			},
 		});

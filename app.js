@@ -102,6 +102,7 @@ app.get('/', function(req, res){
 // Client
 // ------
 app.get('/api/clients', client.index);
+app.get('/api/clients/:id', client.show);
 app.post('/api/clients', client.create);
 app.put('/api/clients/:id', client.update);
 

@@ -28,3 +28,13 @@ exports.update = function(req, res){
 		res.send(200, client);
 	});
 };
+
+exports.show = function(req, res){
+	if (!req.params.id){return res.send(400, {err: {
+		msg: 'No ID was passed'
+	}});}
+	Client.show(req.params.id, function(error, client){
+		if (error) {return res.send(400, {err: error});}
+		res.send(200, client);
+	});
+};

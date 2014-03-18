@@ -102,6 +102,14 @@ ClientModel.prototype.update = function(id, params, callback){
 		})
 	});
 };
+// Show Client
+// -----------
+ClientModel.prototype.show = function(id, callback){
+	Client.findOne({"_id": id}, function(err, client){
+		if (err){return callback(err);}
+		callback(null, client);
+	});
+};
 // =======
 // EXPORTS
 // =======

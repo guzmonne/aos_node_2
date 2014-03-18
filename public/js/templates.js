@@ -136,14 +136,14 @@ function program17(depth0,data) {
   buffer += escapeExpression(stack2)
     + "\">\n		</div>\n	</div>\n	<div class=\"form-group\" id=\"phone-numbers\">\n		<label for=\"phone\" class=\"col-sm-2 control-label\">\n			";
   options = {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data};
-  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, (depth0 && depth0.phonesLength), ">", 1, options) : helperMissing.call(depth0, "is", (depth0 && depth0.phonesLength), ">", 1, options));
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, ((stack1 = (depth0 && depth0.phones)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options) : helperMissing.call(depth0, "is", ((stack1 = (depth0 && depth0.phones)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
   buffer += "\n		</label>\n		<div class=\"col-sm-8\">\n			<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"099123456; 25019898\" data-type=\"phone-number\">\n		</div>\n		<div class=\"col-sm-2\">\n			<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" data-for=\"phone\" tabindex = \"-1\">\n				<i class=\"fa fa-plus\"></i>\n			</button>\n		</div>\n		";
   stack2 = helpers.each.call(depth0, (depth0 && depth0.phones), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
   buffer += "\n	</div>\n	<div class=\"form-group\" id=\"addresses\">\n		<div class=\"row\" style=\"margin: 0\">\n			<label for=\"address\" class=\"col-sm-2 control-label\">\n				";
   options = {hash:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),data:data};
-  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, (depth0 && depth0.addressesLength), ">", 1, options) : helperMissing.call(depth0, "is", (depth0 && depth0.addressesLength), ">", 1, options));
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, ((stack1 = (depth0 && depth0.address)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options) : helperMissing.call(depth0, "is", ((stack1 = (depth0 && depth0.address)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
   buffer += "\n			</label>\n			<div class=\"col-sm-8\">\n				<input type=\"text\" class=\"form-control\" name=\"street\" placeholder=\"Av. 18 de Julio 123\">\n			</div>\n			<label for=\"street\" class=\"col-sm-2 control-label text-muted\" style=\"text-align: left; margin-bottom: 7px\">\n				Calle\n			</label>\n\n			<div class=\"col-sm-2 form-control-under\">\n				<button type=\"button\" class=\"btn btn-success pull-right\" id=\"add-address\" tabindex = \"-1\" data-for=\"street\">\n					<i class=\"fa fa-plus\"></i>\n				</button>\n			</div>\n			\n			<div class=\"col-sm-8\">\n				<input type=\"text\" class=\"form-control form-control-under\" name=\"city\" placeholder=\"Las Piedras\">\n			</div>\n			<label for=\"city\" class=\"col-sm-2 text-muted control-label-under\">\n				Ciudad\n			</label>\n			<div class=\"col-sm-8 col-sm-offset-2\">\n				<input type=\"text\" class=\"form-control form-control-under\" name=\"department\" placeholder=\"Artigas\">\n			</div>\n			<label for=\"department\" class=\"col-sm-2 text-muted control-label-under\">\n				Dep.\n			</label>\n		</div>\n		";
   stack2 = helpers.each.call(depth0, (depth0 && depth0.addresses), {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data});
@@ -398,8 +398,18 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["HBS"] = this["HBS"] || {};this["HBS"]["bs_callout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n";
+  if (stack1 = helpers.htmlMsg) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.htmlMsg); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n";
+  return buffer;
+  }
 
   buffer += "<button type=\"button\" class=\"close\" aria-hidden=\"true\">&times;</button>\n<h4>";
   if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -409,7 +419,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.message) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.message); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</p>";
+    + "</p>\n";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.htmlMsg), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["go_to_top_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -442,11 +454,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class=\"col-lg-12\">\n	<div id=\"portlet-frame\" class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4 id=\"portlet-title-header\"></h4>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Colapsar\">\n				<a href=\"#view-";
+  buffer += "<div class=\"col-lg-12\">\n	<div id=\"portlet-frame\" class=\"portlet portlet-default\">\n		<div class=\"portlet-heading\">\n			<div class=\"portlet-title\">\n				<h4 id=\"portlet-title-header\"></h4>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"close\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Cerrar\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Colapsar\">\n				<a href=\"#view-";
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-down\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"client-close\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Cerrar\">\n					<i class=\"fa fa-times\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"view-";
+    + "\" id=\"collapse\" data-toggle=\"collapse\" data-parent=\"#accordion\">\n					<i class=\"fa fa-chevron-up\"></i>\n				</a>\n			</div>\n			<div class=\"portlet-widgets\">\n				<a href=\"#\" id=\"sync\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Sincronizar\">\n					<i class=\"fa fa-undo\"></i>\n				</a>\n			</div>\n			<div class=\"clearfix\"></div>\n		</div>\n		<div id=\"view-";
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)

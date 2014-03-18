@@ -9,12 +9,27 @@ App.Views.ClientIndexView = App.Views.BaseView.extend({
 	oTable: null,
 
 	initialize: function(){
-		this.collection = new App.Collections.Clients();
+		var self = this;
+		if (!App.defined(app.clients)){
+			app.clients = new App.Collections.Clients();
+		}
+		this.collection = app.clients;
 		this.listenTo(this.collection, 'add', this.attach);
+		this.listenTo(this.collection, 'sync', this.afterSync);
 	},
 
 	afterRender: function(){
+		var self = this;
 		this.oTable = this.$('#clients-table').dataTable();
+		if(this.collection.length > 0){
+			_.each(this.collection.models, function(model){
+				self.attach(model);
+			});
+		}
+		this.collection.fetch({remove: false});
+	},
+
+	onSync: function(){
 		this.collection.fetch();
 	},
 

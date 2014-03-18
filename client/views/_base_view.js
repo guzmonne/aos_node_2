@@ -1,4 +1,17 @@
 App.Views.BaseView = Giraffe.View.extend({
+	canSync: function(){
+		if (App.defined(this.onSync)){
+			this.onSync();
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	afterSync: function(){
+		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
+	},
+
 	pluralize: function(value, target, singular, plural){
 		var el = $(target);
 		if (value > 1){

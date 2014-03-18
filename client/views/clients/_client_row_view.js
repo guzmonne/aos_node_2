@@ -20,6 +20,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
+		this.listenTo(this.model, 'change', this.render);
 	},
 
 	afterRender: function(){

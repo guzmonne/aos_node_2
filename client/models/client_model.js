@@ -23,19 +23,24 @@ App.Models.Client = App.Models.BaseModel.extend({
 	parseAttributes: function(attributes){
 		if(App.defined(attributes.phones)){
 			if(_.isArray(attributes.phones)){
-				this.set('phones', new App.Collections.Phones(attributes.phones));
+				this.set('phones', new App.Collections.Phones(attributes.phones), {silent: true});
+				delete attributes.phones;
 			}
 		}
 		if(App.defined(attributes.addresses)){
 			if(_.isArray(attributes.addresses)){
-				this.set('addresses', new App.Collections.Addresses(attributes.addresses));
+				this.set('addresses', new App.Collections.Addresses(attributes.addresses), {silent: true});
+				delete attributes.addresses;
 			}
 		}
-		if(App.defined(attributes.createdAt)){
-			this.set('createdAt', new Date(attributes.createdAt));
-		}
-		if(App.defined(attributes.updatedAt)){
-			this.set('updatedAt', new Date(attributes.updatedAt));
+		return attributes;
+	},
+
+	parse: function(response){
+		if (this.id === undefined){
+			return response;
+		} else {
+			return this.parseAttributes(response);
 		}
 	},
 

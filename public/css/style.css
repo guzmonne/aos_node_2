@@ -548,7 +548,7 @@ input, select {
 
 .portlet .portlet-heading .portlet-widgets {
   float: right;
-  margin: 8px 0 0 5px;
+  margin: 8px 0 0 10px;
 }
 
 .portlet .portlet-heading .portlet-widgets a{
@@ -837,4 +837,18 @@ td.center-vh{
 
 .bs-callout-success h4 {
   color: #317931;
+}
+
+.bs-callout-warning {
+  background-color: #fcf8f2;
+  border-color: #F1A334;
+}
+
+.bs-callout-warning:hover {
+  background-color: #F7EEDF;
+  border-color: #f0ad4e;
+}
+
+.bs-callout-warning h4 {
+  color: #f0ad4e;
 }

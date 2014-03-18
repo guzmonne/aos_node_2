@@ -106,19 +106,24 @@ App.Models.Client = App.Models.BaseModel.extend({
 	parseAttributes: function(attributes){
 		if(App.defined(attributes.phones)){
 			if(_.isArray(attributes.phones)){
-				this.set('phones', new App.Collections.Phones(attributes.phones));
+				this.set('phones', new App.Collections.Phones(attributes.phones), {silent: true});
+				delete attributes.phones;
 			}
 		}
 		if(App.defined(attributes.addresses)){
 			if(_.isArray(attributes.addresses)){
-				this.set('addresses', new App.Collections.Addresses(attributes.addresses));
+				this.set('addresses', new App.Collections.Addresses(attributes.addresses), {silent: true});
+				delete attributes.addresses;
 			}
 		}
-		if(App.defined(attributes.createdAt)){
-			this.set('createdAt', new Date(attributes.createdAt));
-		}
-		if(App.defined(attributes.updatedAt)){
-			this.set('updatedAt', new Date(attributes.updatedAt));
+		return attributes;
+	},
+
+	parse: function(response){
+		if (this.id === undefined){
+			return response;
+		} else {
+			return this.parseAttributes(response);
 		}
 	},
 
@@ -164,6 +169,19 @@ App.Collections.Addresses = Giraffe.Collection.extend({
 	model: App.Models.Address,
 });
 App.Views.BaseView = Giraffe.View.extend({
+	canSync: function(){
+		if (App.defined(this.onSync)){
+			this.onSync();
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	afterSync: function(){
+		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
+	},
+
 	pluralize: function(value, target, singular, plural){
 		var el = $(target);
 		if (value > 1){
@@ -263,6 +281,7 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
+		this.listenTo(this.model, 'change', this.render);
 	},
 
 	afterRender: function(){
@@ -334,6 +353,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	className: 'col-lg-12',
 
+	cloneModel: null,
+
 	events: {
 		'click #add-phone-number'        : 'reRender',
 		'click button.del-phone-number'  : 'delPhoneNumber',
@@ -347,8 +368,8 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		this.model.set('phonesLength', this.model.get('phones').length);
-		this.model.set('addressesLength', this.model.get('addresses').length);
+		//this.model.set('phonesLength', this.model.get('phones').length);
+		//this.model.set('addressesLength', this.model.get('addresses').length);
 		return this.model.serialize();
 	},
 
@@ -360,7 +381,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	delPhoneNumber:function(e){
 		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		console.log(this.model);
 		var phones = this.model.get('phones');
 		var model  = phones.models[index];
 		phones.remove(model);
@@ -458,6 +478,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.setModel();
 		this.model.save({}, {
 			success: function(model, response, options){
+				self.model.parseAttributes(self.model.attributes);
 				self.model.trigger('updated');
 			},
 		});
@@ -489,12 +510,27 @@ App.Views.ClientIndexView = App.Views.BaseView.extend({
 	oTable: null,
 
 	initialize: function(){
-		this.collection = new App.Collections.Clients();
+		var self = this;
+		if (!App.defined(app.clients)){
+			app.clients = new App.Collections.Clients();
+		}
+		this.collection = app.clients;
 		this.listenTo(this.collection, 'add', this.attach);
+		this.listenTo(this.collection, 'sync', this.afterSync);
 	},
 
 	afterRender: function(){
+		var self = this;
 		this.oTable = this.$('#clients-table').dataTable();
+		if(this.collection.length > 0){
+			_.each(this.collection.models, function(model){
+				self.attach(model);
+			});
+		}
+		this.collection.fetch({remove: false});
+	},
+
+	onSync: function(){
 		this.collection.fetch();
 	},
 
@@ -531,12 +567,29 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	initialize: function(){
 		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
 		this.listenTo(this.model, 'updated', this.update);
+		this.listenTo(this.model, 'change', this.synchronize);
+		this.listenTo(this.app, 'sync:client:' + this.model.id, this.update);
+		this.synchronize = _.debounce(this.synchronize, 100);
 	},
 
 	afterRender: function(){
 		App.scrollTo(this.parent.el);
 		this.announce();
 		this.renderForm();
+	},
+
+	onSync: function(){
+		var self = this;
+		this.model.fetch({
+			success: function(){
+				self.afterSync();
+				self.update();
+			},
+		});
+	},
+
+	afterSync: function(){
+		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
 	},
 
 	update: function(){
@@ -548,11 +601,23 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.parent.render();
 	},
 
+	synchronize: function(){
+		this.parent.flash = {
+			title   : 'Cliente Desincronizado',
+			message : 'Se han realizado cambios en este cliente que no se ven reflejados actualmente. Desea actualizar esta información?',
+			htmlMsg : '<p><button type="button" class="btn btn-warning" data-event="sync:client:'+this.model.id+'">Actualizar</button></p>',
+			class   : 'warning',
+			lifetime: 0,
+			method  : 'html',
+		};
+		this.parent.displayFlash();
+	},
+
 	serialize: function(){
 		var createdAt = this.model.get('createdAt');
 		var updatedAt = this.model.get('updatedAt');
-		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt));
-		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt));
+		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt), {silent: true});
+		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt), {silent: true});
 		return this.model.serialize();
 	},
 
@@ -583,24 +648,37 @@ App.Views.BSCalloutView = App.Views.BaseView.extend({
 
 	className: "bs-callout",
 
-	lifetime: 3000,
+	lifetime: 4000,
 
 	events: {
-		'click .close': 'closeView',
+		'click .close': 'closeCallout',
+		'click button': 'triggerEvent',
+	},
+
+	triggerEvent: function(e){
+		var event = e.currentTarget.dataset.event;
+		app.trigger(event);
 	},
 
 	afterRender: function(){
-		var self = this;
+		var self      = this;
 		var className = this.model.get('class');
 		if(App.defined(className)){
 			this.$el.addClass('bs-callout-' + className);
 		}
 		if(this.lifetime > 0){
 			this.timer = setTimeout(function(){
-				self.closeView();
+				self.dispose();
 			}, this.lifetime);
 		}
 		App.animate(this.$el, 'fadeInDown');
+	},
+
+	closeCallout: function(){
+		if(App.defined(this.timer)){
+			clearTimeout(this.timer);
+		}
+		this.dispose();
 	},
 });
 App.Views.MessagesLayoutView = Giraffe.View.extend({
@@ -664,7 +742,9 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	events: {
-		'click #client-close' : 'closeView',
+		'click #close'   : 'closeView',
+		'click #sync'    : 'syncView',
+		'click #collapse': 'collapseView',
 	},
 
 	initialize: function(options){
@@ -677,6 +757,39 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		this.setMainChildView();
 		this.startTools();
 		this.displayFlash();
+	},
+
+	collapseView: function(){
+		this.$('#collapse i').toggleClass('fa-chevron-uo').toggleClass('fa-chevron-down');
+	},
+
+	syncView: function(e){
+		e.preventDefault();
+		if (App.defined(this.view)){
+			if(this.view.canSync()){
+				this.$('#sync i').removeClass('fa-undo').addClass('fa-spinner fa-spin');
+			} else {
+				this.flash = {
+					title  : 'Atención',
+					message: 'Esta ventana no se puede sincronizar',
+					class  : 'warning',
+					method : 'html' 
+				};
+				this.displayFlash();
+			}
+		}
+	},
+
+	stopSpin: function(){
+		if (this.$('#sync i').hasClass('fa-spinner')) {
+			this.$('#sync i').removeClass('fa-spinner fa-spin').addClass('fa-undo');
+			this.flash = {
+				title  : 'Datos Actualizados',
+				message: 'Los datos se han actualizado correctamente',
+				class  : 'success',
+			};
+			this.displayFlash();
+		}
 	},
 
 	displayFlash: function(){
@@ -700,6 +813,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			}
 			this.setHeader();
 			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
+			this.listenTo(this.app, 'portlet:view: '+ this.view.cid +':sync:spin:stop', this.stopSpin);
 		}
 	},
 
@@ -727,13 +841,18 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	showMessage: function(data){
 		var options = {};
+		var method  = 'prepend';
 		if(App.defined(data.lifetime)){
 			options.lifetime = data.lifetime;
 			delete data.lifetime;
 		}
+		if(App.defined(data.method)){
+			method = data.method;
+			delete data.method;
+		}
 		options.model = new Backbone.Model(data);
-		var callout = new App.Views.BSCalloutView(options);
-		this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
+		var callout   = new App.Views.BSCalloutView(options);
+		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
 	},
 });
 App.Views.SearchView = App.Views.BaseView.extend({

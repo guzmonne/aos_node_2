@@ -21,7 +21,7 @@
 	</div>
 	<div class="form-group" id="phone-numbers">
 		<label for="phone" class="col-sm-2 control-label">
-			{{#is phonesLength ">" 1}}
+			{{#is phones.length ">" 1}}
 				Telefonos
 			{{else}}
 				Telefono
@@ -51,7 +51,7 @@
 	<div class="form-group" id="addresses">
 		<div class="row" style="margin: 0">
 			<label for="address" class="col-sm-2 control-label">
-				{{#is addressesLength ">" 1}}
+				{{#is address.length ">" 1}}
 					Direcciones
 				{{else}}
 					Dirección

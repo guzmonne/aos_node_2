@@ -15,7 +15,9 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	events: {
-		'click #client-close' : 'closeView',
+		'click #close'   : 'closeView',
+		'click #sync'    : 'syncView',
+		'click #collapse': 'collapseView',
 	},
 
 	initialize: function(options){
@@ -28,6 +30,39 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		this.setMainChildView();
 		this.startTools();
 		this.displayFlash();
+	},
+
+	collapseView: function(){
+		this.$('#collapse i').toggleClass('fa-chevron-uo').toggleClass('fa-chevron-down');
+	},
+
+	syncView: function(e){
+		e.preventDefault();
+		if (App.defined(this.view)){
+			if(this.view.canSync()){
+				this.$('#sync i').removeClass('fa-undo').addClass('fa-spinner fa-spin');
+			} else {
+				this.flash = {
+					title  : 'Atención',
+					message: 'Esta ventana no se puede sincronizar',
+					class  : 'warning',
+					method : 'html' 
+				};
+				this.displayFlash();
+			}
+		}
+	},
+
+	stopSpin: function(){
+		if (this.$('#sync i').hasClass('fa-spinner')) {
+			this.$('#sync i').removeClass('fa-spinner fa-spin').addClass('fa-undo');
+			this.flash = {
+				title  : 'Datos Actualizados',
+				message: 'Los datos se han actualizado correctamente',
+				class  : 'success',
+			};
+			this.displayFlash();
+		}
 	},
 
 	displayFlash: function(){
@@ -51,6 +86,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			}
 			this.setHeader();
 			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
+			this.listenTo(this.app, 'portlet:view: '+ this.view.cid +':sync:spin:stop', this.stopSpin);
 		}
 	},
 
@@ -78,12 +114,17 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	showMessage: function(data){
 		var options = {};
+		var method  = 'prepend';
 		if(App.defined(data.lifetime)){
 			options.lifetime = data.lifetime;
 			delete data.lifetime;
 		}
+		if(App.defined(data.method)){
+			method = data.method;
+			delete data.method;
+		}
 		options.model = new Backbone.Model(data);
-		var callout = new App.Views.BSCalloutView(options);
-		this.attach(callout, {el: this.$('#portlet-messages'), method: 'prepend'});
+		var callout   = new App.Views.BSCalloutView(options);
+		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
 	},
 });
