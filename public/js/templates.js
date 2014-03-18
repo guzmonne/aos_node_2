@@ -237,7 +237,11 @@ function program3(depth0,data) {
   if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td class=\"center-vh\">\n	<button id=\"show-client\" class=\"btn btn-green\">\n		<i class=\"fa fa-cog fa-2x\"></i>\n	</button>\n</td>";
+    + "</td>\n<td class=\"center-vh\">\n	<a href=\"#render/client/show/";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" id=\"show-client\" class=\"btn btn-green\">\n		<i class=\"fa fa-cog fa-2x\"></i>\n	</a>\n</td>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -335,7 +339,11 @@ function program3(depth0,data) {
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n  	<h3>Ordenes de Servicio</h3>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"client-apparatus-";
+    + "\">\n  	<h3>Ordenes de Servicio</h3>\n    <div id=\"client-service_requests-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"row\"></div>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"client-apparatus-";
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -496,4 +504,47 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
   return "<a data-toggle=\"dropdown\" href=\"#\" class=\"dropdown-toggle\">\n  <i class=\"fa fa-user da-fw\">\n  </i>\n  <i class=\"fa fa-caret-down\">\n  </i>\n</a>\n<ul class=\"dropdown-menu dropdown-user\">\n  <li>\n    <a href=\"#\">\n      <i class=\"fa fa-user fa-fw\">\n      </i>\n      User Profile\n    </a>\n  </li>\n  <li>\n    <a href=\"#\">\n      <i class=\"fa fa-gear fa-fw\">\n      </i>\n      Settings\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\">\n      <i class=\"fa fa-sign-out fa-fw\">\n      </i>\n      Logout\n    </a>\n  </li>\n</ul>";
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  
+  return "\n			<div class=\"col-sm-offset-2 col-sm-8\">\n				<button type=\"submit\" class=\"btn btn-dark-blue\">Crear</button>\n			</div>\n		";
+  }
+
+function program3(depth0,data) {
+  
+  
+  return "\n			<div class=\"col-sm-offset-2 col-sm-8\">\n				<button id=\"update-form\" class=\"btn btn-warning\">Actualizar</button>\n			</div>\n		";
+  }
+
+  buffer += "<form class=\"form-horizontal\">\n	<div class=\"form-group\">\n		<label for=\"name\" class=\"col-sm-2 control-label\">Nombre</label>\n		<div class=\"col-sm-10\">\n			<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"Juan Perez\" value=\"";
+  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n		</div>\n	</div>\n	<div class=\"form-group\">\n		";
+  stack1 = helpers.unless.call(depth0, (depth0 && depth0._id), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	</div>\n</form>";
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_index_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"row air-b\">\n	<div class=\"col-lg-12\">\n		<button class=\"btn btn-success\" id=\"new-service-request\">\n			<i class=\"fa fa-plus\"></i> Nueva Orden de Servicio\n		</button>\n	</div>\n</div>\n<div class=\"row\">\n	<div class=\"col-lg-12\">\n		<table id=\"service_requests-table\" class=\"table table-striped table-bordered table-hover table-office table-office-green dataTable\" aria-describedby=\"service_requests-table-info\">\n			<thead>\n				<tr>\n					<th>ID</th>\n					<th>Cliente</th>\n					<th>Cant. de Equipos</th>\n					<th>Estado</th>\n					<th>Creado</th>\n					<th>Finalizado</th>\n				</tr>\n			</thead>\n			<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n			</tbody>\n		</table>\n	</div>\n</div>\n			";
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "";
+
+
+  return buffer;
   });

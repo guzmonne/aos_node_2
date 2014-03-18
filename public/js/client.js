@@ -156,6 +156,22 @@ App.Models.Address = App.Models.BaseModel.extend({
 		};
 	},
 });
+App.Models.ServiceRequest = App.Models.BaseModel.extend({
+	urlRoot: '/api/service_requests',
+
+	defaults: function(){
+		return {
+			'client_name': null,
+			'client_id': null,
+			'apparatus_qty': 0,
+			'status': null,
+			'createdAt': null,
+			'updatedAt': null,
+			'createdBy': 'Guzmán Monné',
+			'updatedBy': 'Guzmán Monné',
+		};
+	},
+});
 App.Collections.Clients = Giraffe.Collection.extend({
 	url  : '/api/clients',
 	model: App.Models.Client,
@@ -167,6 +183,10 @@ App.Collections.Phones = Giraffe.Collection.extend({
 
 App.Collections.Addresses = Giraffe.Collection.extend({
 	model: App.Models.Address,
+});
+App.Collections.ServiceRequests = Giraffe.Collection.extend({
+	url  : '/api/service_requests',
+	model: App.Models.Client,
 });
 App.Views.BaseView = Giraffe.View.extend({
 	canSync: function(){
@@ -221,42 +241,163 @@ App.Views.BaseView = Giraffe.View.extend({
 		app.trigger('portlet:message', opts);
 	},
 });
+App.Views.TableView = App.Views.BaseView.extend({
+	oTable   : null,
+
+	initialize: function(){
+		var self = this;
+		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
+			this.beforeInitialize();
+		}
+		if(!App.defined(this.tableCollection)){
+			return new Error('Attribute tableCollection must be set.');
+		}
+		if(!App.defined(App.Collections[this.tableCollection])){
+			return new Error('This tableCollection is not defined.');
+		}
+		if (!App.defined(this.collection)){
+			if(App.defined(this.setCollection)){
+				this.collection = this.setCollection();
+			} else {
+				this.collection = new App.Collections[this.tableCollection]();
+			}
+		}
+		this.listenTo(this.collection, 'add', this.append);
+		this.listenTo(this.collection, 'sync', this.afterSync);
+	},
+
+	afterRender: function(){
+		if(!App.defined(this.tableEl)){
+			return new Error('Attribute tableEl must be set.');
+		}
+		this.oTable = this.$(this.tableEl).dataTable();	
+		if(this.collection.length > 0){
+			this.appendCollection(this.collection);
+		} else {
+			this.collection.fetch();
+		}
+	},
+
+	appendCollection: function(collection){
+		var self = this;
+		_.each(collection.models, function(model){
+			self.append(model);
+		});
+	},	
+
+	append: function(model){
+		if (App.defined(this.modelView)){
+			var view = new this.modelView({model: model});
+			this.addChild(view);
+			this.oTable.fnAddTr(view.render().el);
+		}
+	},
+});
 App.Views.Renderer = App.Views.BaseView.extend({
 	
 	appEvents: {
-		'render:route': 'openView',
+		'render:doc'           : 'docView',
+		'render:show'          : 'showView',
 	},
 
-	openView: function(doc, type){
-		var docName  = this.capitaliseFirstLetter(doc);
+	showView: function(doc, id){
+		var docName  = this.getDocName(doc);
+		var viewName = docName + 'ShowView';
+		var params   = {
+			viewModelId: id
+		};
+		this.checkViewName(viewName, doc + '/show/' + id, params);
+	},
+
+	docView: function(doc, type){
+		var docName  = this.getDocName(doc);
 		var typeName = this.capitaliseFirstLetter(type);
 		var viewName = docName + typeName + 'View';
+		this.checkViewName(viewName, doc + '/' + type);
+	},
+
+	getParamsArray: function(params){
+		var paramsArray = {};
+		var pairs       = params.split('?');
+		for(var i = 0; i < pairs.length; i++){
+			var pair = pairs[i].split('=');
+			paramsArray[pair[0]] = pair[1];
+		}
+		return paramsArray;
+	},
+
+	checkViewName: function(viewName, route, params){
 		if(App.defined(App.Views[viewName])){
-			Backbone.history.navigate(doc + '/' + type);
-			this.showOrGoTo(viewName);
+			Backbone.history.navigate(route);
+			this.showOrGoTo(viewName, params);
 		} else {
 			return;
 		}
 	},
 
-	showOrGoTo: function(viewName){
-		var rendered, viewRef;
-		if(!App.defined(App.Views[viewName])){return;}
-		_.each(app.children, function(view){
-			if (view instanceof(App.Views.PortletView) && 
-					App.defined(view.viewName) && 
-					view.viewName === viewName){
-				rendered = true;
-				viewRef  = view; 
+	getDocName: function(doc){
+		var docName = '';
+		if (doc.indexOf('_') !== -1){
+			docName = this.capitaliseFirstLetter(doc);
+		} else {
+			var nameArray = doc.split('_');
+			for(var i = 0; i < nameArray.length; i++){
+				docName = docName + this.capitaliseFirstLetter(nameArray[i]); 
 			}
-		});
+		}
+		return docName;
+	},
+
+	showOrGoTo: function(viewName, params){
+		var rendered, viewRef, portletFrameClass;
+		if(!App.defined(App.Views[viewName])){return;}
+			if (viewName.indexOf('Show') === -1){
+				_.each(app.children, function(view){
+					if (view instanceof(App.Views.PortletView) && 
+							App.defined(view.viewName) && 
+							view.viewName === viewName
+					){
+						rendered = true;
+						viewRef  = view; 
+					}
+				});
+			} else {
+				if(!App.defined(params.viewModelId)){return;}
+				_.each(app.children, function(pView){
+					if (pView instanceof(App.Views.PortletView) &&
+							App.defined(pView.view) &&
+							App.defined(pView.view.model) &&
+							pView.view.model.id === params.viewModelId
+					){
+						rendered = true;
+						viewRef  = pView; 
+					}
+				});
+				portletFrameClass = 'green';
+			}
 		if(rendered){
 			App.scrollTo(viewRef.el);
 		} else {
-			app[viewName] = new App.Views.PortletView({viewName: viewName});
+			var options = (params) ? params : {};
+			if (portletFrameClass){
+				options.portletFrameClass = portletFrameClass;
+			}
+			options.viewName = viewName;
+			app[viewName] = new App.Views.PortletView(options);
 			app[viewName].attachTo('#content-el', {method: 'prepend'});
 			App.scrollTo(app[viewName].el);
 		}
+	},
+
+	viewIsRendered: function(comparator, context){
+		var self = (context) ? context : this;
+		var result = null;
+		_.each(app.children, function(view){
+			if(comparator.apply(self, [view])){
+				result = view;
+			}
+		});
+		return result;
 	},
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
@@ -273,10 +414,6 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 	appEvents: {
 		'client:show:close' : 'deactivate',
 		'client:show:active': 'activateRenderedViews', 
-	},
-
-	events: {
-		'click #show-client': 'showClient',
 	},
 
 	initialize: function(){
@@ -318,33 +455,6 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 			this.className = '';
 		}
 	},
-
-	showClient: function(){
-		var exists = false;
-		var self   = this;
-		var view;
-		_.each(app.children, function(portletView){
-			if (App.defined(portletView.view) && 
-					App.defined(portletView.view.model) && 
-					portletView.view.model.id === self.model.id
-			){
-				exists = true;
-				view   = portletView;
-			}
-		});
-		if (exists === false) {
-			var clientShowView = new App.Views.PortletView({
-				viewName         : 'ClientShowView', 
-				viewModel        : this.model,
-				portletFrameClass: 'green',
-				entrance         : 'fadeInUp',
-			});
-			app.addChild(clientShowView);
-			app.attach(clientShowView, {el: app.ClientIndexView.el, method: 'before'});
-		} else {
-			App.scrollTo(view.el);
-		}
-	},
 });
 App.Views.ClientFormView = App.Views.BaseView.extend({
 	template            : HBS.client_form_template,
@@ -368,8 +478,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		//this.model.set('phonesLength', this.model.get('phones').length);
-		//this.model.set('addressesLength', this.model.get('addresses').length);
 		return this.model.serialize();
 	},
 
@@ -499,45 +607,24 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		}
 	},
 });
-App.Views.ClientIndexView = App.Views.BaseView.extend({
-	name       : "Clientes",
-	template   : HBS.client_index_template,
-	modelView  : App.Views.ClientRowView,
-	modelViewEl: '#clients',
-
+App.Views.ClientIndexView = App.Views.TableView.extend({
+	template : HBS.client_index_template,
 	className: "table-responisve",
-
-	oTable: null,
-
-	initialize: function(){
-		var self = this;
-		if (!App.defined(app.clients)){
-			app.clients = new App.Collections.Clients();
-		}
-		this.collection = app.clients;
-		this.listenTo(this.collection, 'add', this.attach);
-		this.listenTo(this.collection, 'sync', this.afterSync);
-	},
-
-	afterRender: function(){
-		var self = this;
-		this.oTable = this.$('#clients-table').dataTable();
-		if(this.collection.length > 0){
-			_.each(this.collection.models, function(model){
-				self.attach(model);
-			});
-		}
-		this.collection.fetch({remove: false});
-	},
-
+	name     : "Clientes",
+	
+	tableEl        : '#clients-table',
+	tableCollection: 'Clients',
+	modelView      : App.Views.ClientRowView,
+	
 	onSync: function(){
 		this.collection.fetch();
 	},
 
-	attach: function(model){
-		var view = new this.modelView({model: model});
-		this.addChild(view);
-		this.oTable.fnAddTr(view.render().el);
+	setCollection: function(){
+		if(!App.defined(app.clients)){
+			app.clients = new App.Collections.Clients();
+		}
+		return app.clients;
 	},
 });
 App.Views.ClientNewView = App.Views.BaseView.extend({	
@@ -559,23 +646,51 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	form    : HBS.client_form_template,
 
 	name    : null,
+	modelId : null,
 
 	appEvents: {
 		"client:row:rendered": 'announce',
 	},
 
 	initialize: function(){
-		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
+		this.update      = _.throttle(this.update, 500);
+		this.synchronize = _.throttle(this.synchronize, 500);
+		var self = this;
+		if(App.defined(this.model)){
+			this.bindEvents();
+		} else {
+			if (App.defined(this.modelId)){
+				this.model    = new App.Models.Client();
+				this.model.set('_id', this.modelId);
+				this.model.id = this.modelId;
+				this.model.fetch({
+					success: function(){
+						self.render();
+						self.bindEvents();
+					},
+				});
+			}
+		}
+	},
+
+	afterRender: function(){
+		App.scrollTo(this.parent.el);
+		this.announce();
+		this.setName();
+		this.parent.setHeader();
+		this.renderForm();
+		this.renderServiceRequests();
+	},
+
+	bindEvents: function(){
 		this.listenTo(this.model, 'updated', this.update);
 		this.listenTo(this.model, 'change', this.synchronize);
 		this.listenTo(this.app, 'sync:client:' + this.model.id, this.update);
 		this.synchronize = _.debounce(this.synchronize, 100);
 	},
 
-	afterRender: function(){
-		App.scrollTo(this.parent.el);
-		this.announce();
-		this.renderForm();
+	setName: function(){
+		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
 	},
 
 	onSync: function(){
@@ -624,6 +739,12 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	renderForm: function(){
 		this.clientForm = new App.Views.ClientFormView({model: this.model});
 		this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+	},
+
+	renderServiceRequests: function(){
+		var id = this.model.id;
+		this.serviceRequests = new App.Views.ServiceRequestIndexView();
+		this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
 	},
 
 	announce: function(){
@@ -733,6 +854,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	view             : null,
 	viewName         : null,
 	viewModel        : null,
+	viewModelId      : null,
 	portletFrameClass: null,
 	flash            : null,
 	entrance         : 'fadeInLeft',
@@ -806,8 +928,10 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	setMainChildView: function(){
 		if(App.defined(this.viewName)){
-			if(this.viewModel !== null){
+			if(App.defined(this.viewModel)){
 				this.view = new App.Views[this.viewName]({model: this.viewModel});
+			} else if (App.defined(this.viewModelId)) {
+				this.view = new App.Views[this.viewName]({modelId: this.viewModelId});
 			} else {
 				this.view = new App.Views[this.viewName]();
 			}
@@ -917,10 +1041,90 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	tagName: 'li', 
 	className: 'dropdown',
 });
+App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
+	template: HBS.service_request_form_template,
+
+	
+});
+App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
+	template : HBS.service_request_index_template,
+	className: "col-lg-12",
+	name     : "Ordenes de Servicio",
+	
+	tableEl        : '#service_requests-table',
+	tableCollection: 'ServiceRequests',
+	modelView      : App.Views.ServiceRequestRowView,
+
+	events:{
+		'click button#new-service-request': 'newServiceRequest',
+	},
+
+	onSync: function(){
+		this.collection.fetch();
+	},
+
+	comparator: function(view){
+		return (
+				view instanceof App.Views.PortletView &&
+				view.viewName === "ServiceRequestNewView" &&
+				App.defined(view.view) &&
+				App.defined(view.view.model) &&
+				view.view.model.get('client_id') === this.parent.model.id
+			);
+	},
+
+	newServiceRequest: function(){
+		var targetView = app.Renderer.viewIsRendered(this.comparator, this);
+		if (targetView){
+			return App.scrollTo(targetView.el);
+		}
+		var parentModel = this.parent.model;
+		var object = {
+			client_name: parentModel.get('name'),
+			client_id  : parentModel.id,
+		};
+		var model = new App.Models.ServiceRequest(object);
+		var portletView = new App.Views.PortletView({
+			viewName: 'ServiceRequestNewView',
+			viewModel: model,
+		});
+		app.attach(portletView, {el: '#content-el', method: 'prepend'});
+	},
+});
+App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
+	name: "Nueva Orden de Servicio",
+
+	className: "row",
+
+	afterRender: function(){
+		this.renderForm();
+		var clientName = this.model.get('client_name');
+		var clientID   = this.model.get('client_id');
+		if(App.defined(clientName) && App.defined(clientID)){
+			this.name = "Nueva Orden de Servicio para " + clientName + " #" + clientID;
+			this.parent.setHeader();
+		}
+	},
+
+	renderForm: function(){
+		var model;
+		if(App.defined(this.model)){
+			model = this.model;
+		} else {
+			model = new App.Models.ServiceRequest();
+		}
+		this.serviceRequestForm = new App.Views.ServiceRequestFormView({
+			model: model
+		});
+		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
+	},
+});
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {
-		'render/:doc/:type': 'render:route',
-		':doc/:type'       : 'render:route',
+		'render/:doc/show/:id'                     : 'render:show',
+		'render/:doc/:type'                        : 'render:doc',
+		':doc/show/:id'                            : 'render:show',
+		':doc/:type'                               : 'render:doc',
 	},
 });
 App.Views.GoToTopView = App.Views.BaseView.extend({

@@ -6,6 +6,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	view             : null,
 	viewName         : null,
 	viewModel        : null,
+	viewModelId      : null,
 	portletFrameClass: null,
 	flash            : null,
 	entrance         : 'fadeInLeft',
@@ -79,8 +80,10 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	setMainChildView: function(){
 		if(App.defined(this.viewName)){
-			if(this.viewModel !== null){
+			if(App.defined(this.viewModel)){
 				this.view = new App.Views[this.viewName]({model: this.viewModel});
+			} else if (App.defined(this.viewModelId)) {
+				this.view = new App.Views[this.viewName]({modelId: this.viewModelId});
 			} else {
 				this.view = new App.Views[this.viewName]();
 			}

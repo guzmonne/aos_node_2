@@ -20,8 +20,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		//this.model.set('phonesLength', this.model.get('phones').length);
-		//this.model.set('addressesLength', this.model.get('addresses').length);
 		return this.model.serialize();
 	},
 
