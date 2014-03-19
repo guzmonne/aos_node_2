@@ -30,14 +30,21 @@ window.App = {
 
 	scrollTo: function(position){
 		var pos;
+		var $viewport = $('html, body');
 		if (_.isNumber(position)){
 			pos = position;
 		} else {
 			pos = this.elPosition(position);
 		}
-		$('html, body').animate({
+		$viewport.animate({
 			scrollTop: pos
 		}, 500);
+		$viewport.bind("scroll mousedown DOMMouseScroll mousewheel keyup", function(e){
+    	if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
+    		// This identifies the scroll as a user action, stops the animation, then unbinds the event straight after (optional)
+        $viewport.stop().unbind('scroll mousedown DOMMouseScroll mousewheel keyup'); 
+    	}
+		});  
 	},
 
 	elPosition: function(el){
@@ -79,6 +86,36 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		return parsedDate.getDate() +
 			"/" + parsedDate.getMonth() + 
 			"/" + parsedDate.getFullYear();
+	},
+});
+App.Models.Appliance = App.Models.BaseModel.extend({
+	urlRoot: '/api/appliances',
+
+	defaults: function(){
+		return {
+			'model'          : null,
+			'brand'          : null,
+			'serial'         : null,
+			'category'       : null,
+			'subcategory'    : null,
+			'accesories'     : [],
+			'state'          : null,
+			'client_name'    : null,
+			'client_id'      : null,
+			'repairmentType' : 'Garantía',
+			'disperfect'     : null,
+			'observations'   : null,
+			'status'         : 'Abierto',
+			'solution'       : null,
+			'replacements'   : null,
+			'inStock'        : true,
+			'departuredAt'   : null,
+			'repairedAt'     : null,
+			'technician_name': null,
+			'technician_id'  : null,
+			'createdBy'      : 'Guzman Monne',
+			'updatedBy'      : 'Guzman Monne',
+		};
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
@@ -161,16 +198,21 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'client_name': null,
-			'client_id': null,
-			'apparatus_qty': 0,
-			'status': null,
-			'createdAt': null,
-			'updatedAt': null,
-			'createdBy': 'Guzmán Monné',
-			'updatedBy': 'Guzmán Monné',
+			'client_name'  : null,
+			'client_id'    : null,
+			'status'       : null,
+			'createdAt'    : null,
+			'updatedAt'    : null,
+			'invoiceNumber': null,
+			'appliances'   : new App.Collections.Appliances(),
+			'createdBy'    : 'Guzmán Monné',
+			'updatedBy'    : 'Guzmán Monné',
 		};
 	},
+});
+App.Collections.Appliances = Giraffe.Collection.extend({
+	url: '/api/appliances',
+	model: App.Models.Appliance,
 });
 App.Collections.Clients = Giraffe.Collection.extend({
 	url  : '/api/clients',
@@ -398,6 +440,49 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			}
 		});
 		return result;
+	},
+
+	appendToContent: function(view){
+		app.attach(view, {el: '#content-el', method: 'prepend'});
+	},
+});
+App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
+	template: HBS.appliance_single_form_template,
+
+	className: 'col-lg-12',
+
+	events: {
+		'focus .bootstrap-tagsinput input'   : 'activateTags',
+		'focusout .bootstrap-tagsinput input': 'deactivateTags',
+	},
+
+	initialize: function(){
+		if (App.defined(this.model.collection)){
+			this.listenTo(this.model.collection, 'appliance:deleted', this.saveAndDispose)
+		}
+	},
+
+	afterRender: function(){
+		this.$('[name=accesories]').tagsinput();
+		App.scrollTo(this.$el);
+	},
+
+	activateTags: function(){
+		this.$('.bootstrap-tagsinput').addClass('active');
+	},
+
+	deactivateTags: function(){
+		this.$('.bootstrap-tagsinput').removeClass('active');
+	},
+
+	saveAndDispose: function(){
+		this.model.set('brand', this.$('[name=brand]').val());
+		this.model.set('model', this.$('[name=model]').val());
+		this.model.set('serial', this.$('[name=serial]').val());
+		this.model.set('category', this.$('[name=category]').val());
+		this.model.set('subcategory', this.$('[name=subcategory]').val());
+		this.model.set('accesories', this.$('[name=accesories]').tagsinput('items'));
+		this.dispose();
 	},
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
@@ -1042,9 +1127,53 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	className: 'dropdown',
 });
 App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
-	template: HBS.service_request_form_template,
-
+	template     : HBS.service_request_form_template,
+	formContainer: HBS.appliance_form_container,
 	
+	className: 'col-lg-12',
+
+	events: {
+		'click button#single-appliance': 'singleApplianceForm',
+		'click button.appliance-delete': 'deleteAppliance',
+	},
+
+	deleteAppliance: function(e){
+		e.preventDefault();
+		var self = this;
+		var index = e.currentTarget.dataset.index;
+		var appliances = this.model.get('appliances');
+		var appliance = appliances.at(index);
+		appliances.trigger('appliance:deleted');
+		appliances.remove(appliance);
+		this.$('#appliance-views').empty();
+		_.each(appliances.models, function(model){
+			self.appendApplianceForm(model);
+		});
+	},
+
+	singleApplianceForm: function(e){
+		e.preventDefault();
+		var appliances = this.model.get('appliances');
+		var model = new App.Models.Appliance({
+			client_name: this.model.get('client_name'),
+			client_id  : this.model.get('client_id'),
+		});
+		appliances.add(model);
+		this.appendApplianceForm(model);
+	},
+
+	appendApplianceForm: function(model){
+		var appliances = this.model.get('appliances');
+		var view       = new App.Views.ApplianceSingleFormView({model: model});
+		var index      = appliances.indexOf(model);
+		var style      = '';
+		if ((index % 2) === 1){style = 'background-color: #E6E6E6';}
+		this.$('#appliance-views').append(this.formContainer({
+			index: index,
+			style: style
+		}));
+		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
+	},
 });
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	template : HBS.service_request_index_template,
@@ -1088,7 +1217,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			viewName: 'ServiceRequestNewView',
 			viewModel: model,
 		});
-		app.attach(portletView, {el: '#content-el', method: 'prepend'});
+		app.Renderer.appendToContent(portletView);
 	},
 });
 App.Views.ServiceRequestNewView = App.Views.BaseView.extend({

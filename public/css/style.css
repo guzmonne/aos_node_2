@@ -497,6 +497,22 @@ input, select {
   transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
+.control-label-inline {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.form-control-inline {
+  padding-left: 8px;
+  padding-right: 0;
+}
+
+.form-horizontal .control-label {
+  text-align: left;
+}
+
+/* PORTLET */
+
 .portlet {
   border: 1px solid;
 }
@@ -852,3 +868,6 @@ td.center-vh{
 .bs-callout-warning h4 {
   color: #f0ad4e;
 }
+
+/* HR */
+

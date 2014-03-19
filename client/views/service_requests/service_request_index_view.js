@@ -40,6 +40,6 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			viewName: 'ServiceRequestNewView',
 			viewModel: model,
 		});
-		app.attach(portletView, {el: '#content-el', method: 'prepend'});
+		app.Renderer.appendToContent(portletView);
 	},
 });

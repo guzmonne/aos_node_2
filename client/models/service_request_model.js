@@ -3,14 +3,15 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'client_name': null,
-			'client_id': null,
-			'apparatus_qty': 0,
-			'status': null,
-			'createdAt': null,
-			'updatedAt': null,
-			'createdBy': 'Guzmán Monné',
-			'updatedBy': 'Guzmán Monné',
+			'client_name'  : null,
+			'client_id'    : null,
+			'status'       : null,
+			'createdAt'    : null,
+			'updatedAt'    : null,
+			'invoiceNumber': null,
+			'appliances'   : new App.Collections.Appliances(),
+			'createdBy'    : 'Guzmán Monné',
+			'updatedBy'    : 'Guzmán Monné',
 		};
 	},
 });

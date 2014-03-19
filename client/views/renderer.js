@@ -104,4 +104,8 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		});
 		return result;
 	},
+
+	appendToContent: function(view){
+		app.attach(view, {el: '#content-el', method: 'prepend'});
+	},
 });

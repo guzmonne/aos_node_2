@@ -104,6 +104,15 @@
         ));
     });
 
+    Handlebars.registerHelper('sum', function() {
+      var sum = 0, v;
+      for (var i=0; i<arguments.length; i++) {
+        v = parseFloat(arguments[i]);
+        if (!isNaN(v)) sum += v;
+      }
+      return sum;
+    });
+
     return eR;
 
 }));
