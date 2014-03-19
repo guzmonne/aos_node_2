@@ -40,11 +40,11 @@ window.App = {
 			scrollTop: pos
 		}, 500);
 		$viewport.bind("scroll mousedown DOMMouseScroll mousewheel keyup", function(e){
-    	if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
-    		// This identifies the scroll as a user action, stops the animation, then unbinds the event straight after (optional)
-        $viewport.stop().unbind('scroll mousedown DOMMouseScroll mousewheel keyup'); 
-    	}
-		});  
+			if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
+				// This identifies the scroll as a user action, stops the animation, then unbinds the event straight after (optional)
+				$viewport.stop().unbind('scroll mousedown DOMMouseScroll mousewheel keyup'); 
+			}
+		});	
 	},
 
 	elPosition: function(el){
@@ -99,16 +99,17 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 			'category'       : null,
 			'subcategory'    : null,
 			'accesories'     : [],
-			'state'          : null,
 			'client_name'    : null,
 			'client_id'      : null,
 			'repairmentType' : 'Garantía',
-			'disperfect'     : null,
+			'defect'         : null,
 			'observations'   : null,
 			'status'         : 'Abierto',
+			'cost'           : 0,
 			'solution'       : null,
+			'diagnose'       : null,
 			'replacements'   : null,
-			'inStock'        : true,
+			'inStock'        : null,
 			'departuredAt'   : null,
 			'repairedAt'     : null,
 			'technician_name': null,
@@ -200,7 +201,7 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		return {
 			'client_name'  : null,
 			'client_id'    : null,
-			'status'       : null,
+			'status'       : 'Pendiente',
 			'createdAt'    : null,
 			'updatedAt'    : null,
 			'invoiceNumber': null,
@@ -208,6 +209,14 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 			'createdBy'    : 'Guzmán Monné',
 			'updatedBy'    : 'Guzmán Monné',
 		};
+	},
+
+	serialize: function(){
+		var attributes = this.toJSON();
+		if(attributes.appliances instanceof(Giraffe.Collection)){
+			attributes.appliances = attributes.appliances.toJSON();
+		}
+		return attributes;
 	},
 });
 App.Collections.Appliances = Giraffe.Collection.extend({
@@ -451,6 +460,8 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 
 	className: 'col-lg-12',
 
+	firstRender: true,
+
 	events: {
 		'focus .bootstrap-tagsinput input'   : 'activateTags',
 		'focusout .bootstrap-tagsinput input': 'deactivateTags',
@@ -458,13 +469,17 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		if (App.defined(this.model.collection)){
-			this.listenTo(this.model.collection, 'appliance:deleted', this.saveAndDispose)
+			this.listenTo(this.model.collection, 'appliance:deleted', this.saveAndDispose);
 		}
 	},
 
 	afterRender: function(){
+		App.animate(this.$el, 'fadeInDown');
 		this.$('[name=accesories]').tagsinput();
-		App.scrollTo(this.$el);
+		if(this.firstRender){
+			App.scrollTo(this.$el);
+			this.firstRender = false;
+		}
 	},
 
 	activateTags: function(){
@@ -472,17 +487,30 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	deactivateTags: function(){
+		var input = this.$('.bootstrap-tagsinput input');
+		var value = input.val();
+		if (value !== ''){
+			this.$('[name=accesories]').tagsinput('add', value);
+			input.val('');
+		}
 		this.$('.bootstrap-tagsinput').removeClass('active');
 	},
 
 	saveAndDispose: function(){
+		this.saveModel();
+		this.dispose();
+	},
+
+	saveModel: function(){
 		this.model.set('brand', this.$('[name=brand]').val());
 		this.model.set('model', this.$('[name=model]').val());
 		this.model.set('serial', this.$('[name=serial]').val());
 		this.model.set('category', this.$('[name=category]').val());
 		this.model.set('subcategory', this.$('[name=subcategory]').val());
+		this.model.set('observations', this.$('[name=observations]').val());
+		this.model.set('repairementType', this.$('[name=repairementType]').val());
+		this.model.set('defect', this.$('[name=defect]').val());
 		this.model.set('accesories', this.$('[name=accesories]').tagsinput('items'));
-		this.dispose();
 	},
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
@@ -1135,6 +1163,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	events: {
 		'click button#single-appliance': 'singleApplianceForm',
 		'click button.appliance-delete': 'deleteAppliance',
+		'click button[type=submit]'    : 'createServiceRequest',
 	},
 
 	deleteAppliance: function(e){
@@ -1147,7 +1176,10 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		appliances.remove(appliance);
 		this.$('#appliance-views').empty();
 		_.each(appliances.models, function(model){
-			self.appendApplianceForm(model);
+			self.appendApplianceForm({
+				model      : model,
+				firstRender: false,
+			});
 		});
 	},
 
@@ -1159,13 +1191,14 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			client_id  : this.model.get('client_id'),
 		});
 		appliances.add(model);
-		this.appendApplianceForm(model);
+		this.appendApplianceForm({model: model});
 	},
 
-	appendApplianceForm: function(model){
+	appendApplianceForm: function(options){
+		if(!App.defined(options.model)){return new Error('No model was passed in the options.');}
 		var appliances = this.model.get('appliances');
-		var view       = new App.Views.ApplianceSingleFormView({model: model});
-		var index      = appliances.indexOf(model);
+		var view       = new App.Views.ApplianceSingleFormView(options);
+		var index      = appliances.indexOf(options.model);
 		var style      = '';
 		if ((index % 2) === 1){style = 'background-color: #E6E6E6';}
 		this.$('#appliance-views').append(this.formContainer({
@@ -1174,6 +1207,32 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		}));
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
 	},
+
+	createServiceRequest: function(e){
+		e.preventDefault();
+		var grandpa = this.parent.parent;
+		if (this.model.get('appliances').length === 0 && App.defined(grandpa)){
+			grandpa.flash = {
+				title  : 'Atención',
+				message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
+				class  : 'warning',
+				method : 'html' 
+			};
+			grandpa.displayFlash();
+		}
+		this.saveModel();
+		_.each(this.children, function(child){
+			child.saveModel();
+		});
+		console.log(this.model.serialize());
+		return false;
+	},
+
+	saveModel: function(){
+		this.model.set('client_id', this.$('[name=client_id]').val());
+		this.model.set('client_name', this.$('[name=client_name]').val());
+		this.model.set('invoiceNumber', this.$('[name=invoiceNumber]').val());
+	}
 });
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	template : HBS.service_request_index_template,

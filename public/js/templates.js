@@ -57,7 +57,7 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  buffer += "<form class=\"form-horizontal\">\n	\n	";
+  buffer += "<div id=\"appliance-form\" class=\"form-horizontal\">\n	\n	";
   stack1 = helpers.unless.call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Datos del Equipo</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"brand\" class=\"col-sm-3 control-label\">Marca</label>\n				<div class=\"col-sm-9\">\n					<input type=\"text\" class=\"form-control\" name=\"brand\" placeholder=\"e.j: Punktal\" value=\"";
@@ -83,11 +83,15 @@ function program3(depth0,data) {
     + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-12\">\n					<button class=\"btn btn-info pull-left\" tabindex=\"-1\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Detalles Adicionales</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accesories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accesories\" data-role=\"tagsinput\" multiple>\n						";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.accesories), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "	\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"state\" class=\"col-sm-2 control-label\">Estado</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"state\">";
-  if (stack1 = helpers.state) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.state); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += "	\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"observations\" class=\"col-sm-2 control-label\">Observaciones</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"observations\">";
+  if (stack1 = helpers.observations) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.observations); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</textarea>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n</form>";
+    + "</textarea>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Datos de Reparación</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accesoriesrepairementType\" class=\"col-sm-2 control-label\">Tipo de Rep.</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"repairementType\" data-role=\"tagsinput\">\n						<option value=\"Garantía\">Garantía</option>\n						<option value=\"Presupuesto\">Presupuesto</option>\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"defect\" class=\"col-sm-2 control-label\">Defecto</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"defect\">";
+  if (stack1 = helpers.defect) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.defect); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</textarea>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["address_field_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -626,7 +630,7 @@ function program7(depth0,data) {
   return "\n			<div class=\"col-sm-offset-10 col-sm-2\">\n				<button id=\"update-form\" class=\"btn btn-warning pull-right\">Actualizar</button>\n			</div>\n		";
   }
 
-  buffer += "<form class=\"form-horizontal\">\n	<div class=\"row\">\n		<div class=\"col-lg-8 col-md-8 col-xs-8\">\n			<div class=\"form-group\">\n				<label for=\"client_name\" class=\"col-sm-2 control-label\">Cliente</label>\n				<div class=\"col-sm-8\">\n					<input type=\"text\" class=\"form-control\" name=\"client_name\" placeholder=\"Juan Perez\" value=\"";
+  buffer += "<div class=\"form-horizontal\">\n	<div class=\"row\">\n		<div class=\"col-lg-8 col-md-8 col-xs-8\">\n			<div class=\"form-group\">\n				<label for=\"client_name\" class=\"col-sm-2 control-label\">Cliente</label>\n				<div class=\"col-sm-8\">\n					<input type=\"text\" class=\"form-control\" name=\"client_name\" placeholder=\"Juan Perez\" value=\"";
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -653,7 +657,7 @@ function program7(depth0,data) {
   buffer += ">\n				</div>\n			</div>\n		</div>\n	</div>\n	<hr style=\"margin-top: 0\">\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"row\" id=\"appliance-views\"></div>\n		</div>\n		<div class=\"col-lg-12\">\n			<button class=\"btn btn-success\" id=\"single-appliance\">\n				<i class=\"fa fa-plus\"></i> Nuevo Equipo\n			</button>\n			<button class=\"btn btn-success\" id=\"multiple-appliance\">\n				<i class=\"fa fa-table\"></i> Carga Masiva\n			</button>\n			<hr style=\"margin-bottom: 0;\">\n		</div>\n	</div>\n	<div class=\"form-group\" style=\"margin-top: 10px;\">\n		";
   stack1 = helpers.unless.call(depth0, (depth0 && depth0._id), {hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n	</div>\n</form>";
+  buffer += "\n	</div>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_index_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

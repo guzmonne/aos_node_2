@@ -5,7 +5,7 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		return {
 			'client_name'  : null,
 			'client_id'    : null,
-			'status'       : null,
+			'status'       : 'Pendiente',
 			'createdAt'    : null,
 			'updatedAt'    : null,
 			'invoiceNumber': null,
@@ -13,5 +13,13 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 			'createdBy'    : 'Guzmán Monné',
 			'updatedBy'    : 'Guzmán Monné',
 		};
+	},
+
+	serialize: function(){
+		var attributes = this.toJSON();
+		if(attributes.appliances instanceof(Giraffe.Collection)){
+			attributes.appliances = attributes.appliances.toJSON();
+		}
+		return attributes;
 	},
 });

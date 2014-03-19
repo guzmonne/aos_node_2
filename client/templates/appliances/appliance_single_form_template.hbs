@@ -1,4 +1,4 @@
-<form class="form-horizontal">
+<div id="appliance-form" class="form-horizontal">
 	{{! FORMULARIO PARA NUEVO EQUIPO }}
 	{{#unless client_id}}
 		{{! DATOS DEL CLIENTE }}
@@ -115,9 +115,40 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="state" class="col-sm-2 control-label">Estado</label>
+				<label for="observations" class="col-sm-2 control-label">Observaciones</label>
 				<div class="col-sm-10">
-					<textarea class="form-control" name="state">{{state}}</textarea>
+					<textarea class="form-control" name="observations">{{observations}}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{! // }}
+	<div class="row">
+		<div class="col-lg-12">
+			<hr style="margin: 0;">
+		</div>
+	</div>
+	{{! DATOS DE REPARACION }}
+	<div class="row">
+		<div class="col-lg-12">
+			<h5>Datos de Reparación</h5>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="form-group">
+				<label for="accesoriesrepairementType" class="col-sm-2 control-label">Tipo de Rep.</label>
+				<div class="col-sm-10">
+					<select class="form-control" name="repairementType" data-role="tagsinput">
+						<option value="Garantía">Garantía</option>
+						<option value="Presupuesto">Presupuesto</option>
+					</select>	
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="defect" class="col-sm-2 control-label">Defecto</label>
+				<div class="col-sm-10">
+					<textarea class="form-control" name="defect">{{defect}}</textarea>
 				</div>
 			</div>
 		</div>
@@ -129,4 +160,4 @@
 		</div>
 	</div>
 	{{! // }}
-</form>
+</div>

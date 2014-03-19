@@ -40,11 +40,11 @@ window.App = {
 			scrollTop: pos
 		}, 500);
 		$viewport.bind("scroll mousedown DOMMouseScroll mousewheel keyup", function(e){
-    	if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
-    		// This identifies the scroll as a user action, stops the animation, then unbinds the event straight after (optional)
-        $viewport.stop().unbind('scroll mousedown DOMMouseScroll mousewheel keyup'); 
-    	}
-		});  
+			if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
+				// This identifies the scroll as a user action, stops the animation, then unbinds the event straight after (optional)
+				$viewport.stop().unbind('scroll mousedown DOMMouseScroll mousewheel keyup'); 
+			}
+		});	
 	},
 
 	elPosition: function(el){
