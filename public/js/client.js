@@ -301,8 +301,12 @@ App.Views.BaseView = Giraffe.View.extend({
 			e.preventDefault();
 		}
 		var self = this;
-		this.dispose();
-		//App.animate(this.$el, 'fadeOut', function(){
+		//this.dispose();
+		this.$el.addClass('closing');
+		setTimeout(function(){
+			self.dispose();
+		}, 500)
+		//App.animate(this.$el, 'slideOutUp', function(){
 		//	self.dispose();
 		//});
 	},
@@ -656,6 +660,20 @@ App.Views.ClientRowView = App.Views.BaseView.extend({
 		}
 	},
 });
+App.Views.ClientDetailsView = App.Views.BaseView.extend({
+	template: HBS.client_details_template,
+
+	className: 'row',
+
+	serialize: function(){
+		var result = (App.defined(this.model)) ? this.model.serialize() : {};
+		var createdAt  = this.model.get('createdAt');
+		var updatedAt  = this.model.get('updatedAt');
+		result.createdAtShort = this.model.dateDDMMYYYY(createdAt);
+		result.updatedAtShort = this.model.dateDDMMYYYY(updatedAt);
+		return result;
+	},
+});
 App.Views.ClientFormView = App.Views.BaseView.extend({
 	template            : HBS.client_form_template,
 	phoneFieldTemplate  : HBS.phone_field_template,
@@ -858,31 +876,31 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
-		this.update      = _.throttle(this.update, 500);
-		this.synchronize = _.throttle(this.synchronize, 500);
-		var self = this;
 		if(App.defined(this.model)){
 			this.bindEvents();
 		} else {
-			if (App.defined(this.modelId)){
-				this.model = new App.Models.Client();
-				this.model.set('_id', this.modelId);
-				this.model.id = this.modelId;
-				this.model.fetch({
-					success: function(){
-						self.render();
-						self.bindEvents();
-					},
-				});
-			}
+			this.model = new App.Models.Client();
 		}
+		this.timestamp = new Date().getTime();
 	},
 
 	afterRender: function(){
-		App.scrollTo(this.parent.el);
-		this.announce();
-		this.setName();
-		this.parent.setHeader();
+		var self = this;
+		if(this.model.isNew() && App.defined(this.modelId)){
+			this.model.set('_id', this.modelId);
+			this.model.fetch({
+				success: function(){
+					self.render();
+					self.bindEvents();
+				},
+			});
+		}	else {
+			this.renderDetails();
+			this.announce();
+			this.setName();
+			this.parent.setHeader();
+			App.scrollTo(this.parent.el);
+		}
 	},
 
 	bindEvents: function(){
@@ -932,23 +950,30 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		var createdAt = this.model.get('createdAt');
-		var updatedAt = this.model.get('updatedAt');
-		this.model.set('createdAtShort', this.model.dateDDMMYYYY(createdAt), {silent: true});
-		this.model.set('updatedAtShort', this.model.dateDDMMYYYY(updatedAt), {silent: true});
-		return this.model.serialize();
+		var result = (App.defined(this.model)) ? this.model.serialize() : {};
+		result.timestamp = this.timestamp;
+		return result;
 	},
 
 	renderForm: function(){
 		if (!App.defined(this.clientForm)){
+			var id = this.timestamp;
 			this.clientForm = new App.Views.ClientFormView({model: this.model});
-			this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+			this.clientForm.attachTo(this.$('#client-form-'+id), {method: 'html'});
+		}
+	},
+
+	renderDetails: function(){
+		if (!App.defined(this.clientDetails)){
+			var id = this.timestamp;
+			this.clientDetails = new App.Views.ClientDetailsView({model: this.model});
+			this.clientDetails.attachTo(this.$('#client-details-'+id), {method: 'html'});
 		}
 	},
 
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){
-			var id = this.model.id;
+			var id = this.timestamp;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
 				collection: new App.Collections.ServiceRequests()
 			});

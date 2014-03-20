@@ -506,11 +506,11 @@ input, select {
   padding-left: 8px;
   padding-right: 0;
 }
-
+/*
 .form-horizontal .control-label {
   text-align: left;
 }
-
+*/
 /* PORTLET */
 
 .portlet {
@@ -869,5 +869,12 @@ td.center-vh{
   color: #f0ad4e;
 }
 
-/* HR */
+/* ROW CLOSING*/
+.row{
+  transition:All 0.5s ease-in-out;
+}
 
+.row.closing {
+  transform: translate(500px);
+  opacity: 0;
+}

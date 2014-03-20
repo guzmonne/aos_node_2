@@ -1,84 +1,36 @@
 <ul id="client-tabs" class="nav nav-tabs">
   <li class="active">
-  	<a href="#client-details-{{_id}}" data-toggle="tab">
-  		Datos
+  	<a href="#client-details-{{timestamp}}" data-toggle="tab">
+  		Detalle
   	</a>
   </li>
   <li>
-  	<a href="#client-service-orders-{{_id}}" data-toggle="tab" id="client-service-requests">
+  	<a href="#client-service-orders-{{timestamp}}" data-toggle="tab" id="client-service-requests">
   		Ordenes de Servicio
   	</a>
   </li>
   <li>
-  	<a href="#client-apparatus-{{_id}}" data-toggle="tab">
+  	<a href="#client-apparatus-{{timestamp}}" data-toggle="tab">
   		Equipos
   	</a>
   </li>
   <li>
-  	<a href="#client-edit-{{_id}}" data-toggle="tab" id="client-edit">
+  	<a href="#client-edit-{{timestamp}}" data-toggle="tab" id="client-edit">
   		Editar Datos
   	</a>
   </li>
 </ul>
 <div id="client-tab-content" class="tab-content">
-  <div class="tab-pane fade in active" id="client-details-{{_id}}">
-    <div class="row">
-      <div class="col-lg-9 col-md-8">
-        <h1>{{name}}</h1>
-        <ul class="list-inline">
-          <li><i class="fa fa-calendar fa-muted"></i> Ingresado: {{createdAtShort}}</li>
-          <li><i class="fa fa-calendar fa-muted"></i> Modificado: {{updatedAtShort}}</li>
-          <li><i class="fa fa-user fa-muted"></i> Creado por: {{createdBy}}</li>
-          <li><i class="fa fa-user fa-muted"></i> Actualizado por: {{updatedBy}}</li>
-        </ul>
-        <h3>Ultimos Equipos en Taller</h3>
-        <div class="table-responsive">
-          <table class="table table-hover table-bordered table-striped table-office table-office-green">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Marca</th>
-                    <th>Modelo</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        	</table>
-    		</div>
-      </div>
-      <div class="col-lg-3 col-md-4">
-        <h3>Detalles de Contacto</h3>
-        {{#phones}}
-        	<p>
-        		<i class="fa fa-phone fa-muted fa-fw"></i> 
-        		{{number}}
-        	</p>
-        {{/phones}}
-        {{#addresses}}
-          <p>
-          	<i class="fa fa-building-o fa-muted fa-fw"></i> 
-          	{{street}}.<br>
-          	{{city}}, {{department}}
-          </p>
-        {{/addresses}}
-        <p>
-        	<i class="fa fa-envelope-o fa-muted fa-fw"></i>  
-        	<a href="#">
-        		{{email}}
-        	</a>
-        </p>
-      </div>
-    </div>
-  </div>
-  <div class="tab-pane fade in" id="client-service-orders-{{_id}}">
+  <div class="tab-pane fade in active" id="client-details-{{timestamp}}"></div>
+  <div class="tab-pane fade in" id="client-service-orders-{{timestamp}}">
   	<h3>Ordenes de Servicio</h3>
-    <div id="client-service_requests-{{_id}}" class="row"></div>
+    <div id="client-service_requests-{{timestamp}}" class="row"></div>
   </div>
-  <div class="tab-pane fade in" id="client-apparatus-{{_id}}">
+  <div class="tab-pane fade in" id="client-appliances-{{timestamp}}">
   	<h3>Equipos</h3>
   </div>
-  <div class="tab-pane fade in" id="client-edit-{{_id}}">
+  <div class="tab-pane fade in" id="client-edit-{{timestamp}}">
   	<h3>Editar Datos de Cliente</h3>
-  	<div id="client-form-{{_id}}" class="row"></div>
+  	<div id="client-form-{{timestamp}}" class="row"></div>
   </div>
 </div>
