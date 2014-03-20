@@ -753,7 +753,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n                <tr>\n                  <td>";
+  buffer += "\n                <tr>\n                  <td class=\"text-center\">";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -769,14 +769,14 @@ function program1(depth0,data) {
   if (stack1 = helpers.serial) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.serial); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                  <td>\n                    <ul class=\"list-unstyled\">\n                      ";
+    + "</td>\n                  <td>\n                    <ul>\n                      ";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n                    </ul>\n                  </td>\n                  <td>";
   if (stack1 = helpers.status) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.status); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                  <td class=\"center-vh\">\n                    <button class=\"btn btn-green btn-xs\">\n                      <i class=\"fa fa-cog fa-lg\"></i>\n                    </button>\n                  </td>\n                </tr>\n              ";
+    + "</td>\n                  <td class=\"center-vh\">\n                    <button class=\"btn btn-green\">\n                      <i class=\"fa fa-cog fa-lg\"></i>\n                    </button>\n                  </td>\n                </tr>\n              ";
   return buffer;
   }
 function program2(depth0,data) {
@@ -820,7 +820,7 @@ function program2(depth0,data) {
   if (stack1 = helpers.updatedBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.updatedBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</li>\n        </ul>\n        <h3>Equipos</h3>\n        <div id=\"service-request-appliances\"></div>\n        <div class=\"table-responsive\">\n          <table class=\"table table-hover table-bordered table-striped table-office table-office-green\">\n            <thead>\n                <tr>\n                  <th>ID</th>\n                  <th>Marca</th>\n                  <th>Modelo</th>\n                  <th>Estado</th>\n                  <th>Serie</th>\n                  <th>Accesorios</th>\n                  <th>Controles</th>\n                </tr>\n            </thead>\n            <tbody>\n              ";
+    + "</li>\n        </ul>\n        <h3>Equipos</h3>\n        <div id=\"service-request-appliances\"></div>\n        <div class=\"table-responsive\">\n          <table class=\"table table-hover table-bordered table-striped table-office table-office-green\">\n            <thead>\n                <tr>\n                  <th class=\"text-center\">ID</th>\n                  <th>Marca</th>\n                  <th>Modelo</th>\n                  <th>Estado</th>\n                  <th>Serie</th>\n                  <th>Accesorios</th>\n                  <th>Controles</th>\n                </tr>\n            </thead>\n            <tbody>\n              ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
   if (stack1 = helpers.appliances) { stack1 = stack1.call(depth0, options); }
   else { stack1 = (depth0 && depth0.appliances); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }

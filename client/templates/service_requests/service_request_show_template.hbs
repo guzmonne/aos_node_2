@@ -27,7 +27,7 @@
           <table class="table table-hover table-bordered table-striped table-office table-office-green">
             <thead>
                 <tr>
-                  <th>ID</th>
+                  <th class="text-center">ID</th>
                   <th>Marca</th>
                   <th>Modelo</th>
                   <th>Estado</th>
@@ -39,12 +39,12 @@
             <tbody>
               {{#appliances}}
                 <tr>
-                  <td>{{id}}</td>
+                  <td class="text-center">{{id}}</td>
                   <td>{{brand}}</td>
                   <td>{{model}}</td>
                   <td>{{serial}}</td>
                   <td>
-                    <ul class="list-unstyled">
+                    <ul>
                       {{#each accessories}}
                         <li>{{this}}</li>
                       {{/each}}
@@ -52,7 +52,7 @@
                   </td>
                   <td>{{status}}</td>
                   <td class="center-vh">
-                    <button class="btn btn-green btn-xs">
+                    <button class="btn btn-green">
                       <i class="fa fa-cog fa-lg"></i>
                     </button>
                   </td>

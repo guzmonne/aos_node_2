@@ -41,6 +41,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			viewModel: model,
 		});
 		app.Renderer.appendToContent(portletView);
+		App.scrollTo(portletView.el);
 	},
 
 	checkModel: function(model){
