@@ -305,7 +305,7 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$el.addClass('closing');
 		setTimeout(function(){
 			self.dispose();
-		}, 500)
+		}, 500);
 		//App.animate(this.$el, 'slideOutUp', function(){
 		//	self.dispose();
 		//});
@@ -1407,7 +1407,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 });
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	template : HBS.service_request_index_template,
-	className: "col-lg-12",
+	className: "table-responsive",
 	name     : "Ordenes de Servicio",
 	
 	tableEl        : '#service_requests-table',
@@ -1696,7 +1696,8 @@ var clientFixtures =
 var app     = new Giraffe.App();
 var clients = new App.Collections.Clients(clientFixtures);
 
-app.template = HBS.app_template;
+app.template  = HBS.app_template;
+app.className = "row";
 
 // Configure Ajax to use CSRF
 app.addInitializer(function(){

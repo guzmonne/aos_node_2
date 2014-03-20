@@ -24,7 +24,7 @@
     #page-wrapper {
         margin: 0;
         position: inherit;
-        padding: 0 30px;
+        padding: 0 20px;
         min-height: 1300px;
         border-left: 1px solid #e7e7e7;
         transition: margin 1s cubic-bezier(.74,0,.34,1);

@@ -84,7 +84,8 @@ var clientFixtures =
 var app     = new Giraffe.App();
 var clients = new App.Collections.Clients(clientFixtures);
 
-app.template = HBS.app_template;
+app.template  = HBS.app_template;
+app.className = "row";
 
 // Configure Ajax to use CSRF
 app.addInitializer(function(){

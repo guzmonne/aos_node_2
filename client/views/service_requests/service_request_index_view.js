@@ -1,6 +1,6 @@
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	template : HBS.service_request_index_template,
-	className: "col-lg-12",
+	className: "table-responsive",
 	name     : "Ordenes de Servicio",
 	
 	tableEl        : '#service_requests-table',
