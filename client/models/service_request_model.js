@@ -1,10 +1,13 @@
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
+	appliances: null,
+
 	initialize: function(attributes, options){
-		if (App.defined(attributes)){
-			this.parseAttributes(attributes);
-		}
+		this.appliances = new App.Collections.Appliances();
+		if(App.defined(attributes) && App.defined(attributes.appliances)){
+			this.appliances.reset(attributes.appliances);
+		} 
 	},
 
 	defaults: function(){
@@ -15,7 +18,6 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 			'createdAt'     : null,
 			'updatedAt'     : null,
 			'invoiceNumber' : null,
-			'appliances'    : new App.Collections.Appliances(),
 			'createdBy'     : 'Guzmán Monné',
 			'updatedBy'     : 'Guzmán Monné',
 			'closedAt'			: null,
@@ -23,35 +25,26 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	},
 
 	parse: function(response){
-		if (this.id){
-			if (App.defined(response.appliances)){
-				this.setAppliances(response.appliances);
-			}
-			return response; 
-		} else {
-			return response;
+		if(!App.defined(this.appliances)){
+			this.appliances = new App.Collections.Appliances();
 		}
-	},
-
-	parseAttributes: function(response){
-		this.setAppliances(response.appliances);
+		if (App.defined(response.appliances)){
+			this.setAppliances(response.appliances);
+		}
 		return response;
 	},
 
 	setAppliances: function(array){
-		if(!App.defined(array)){
-			array = this.get('appliances');
-		}
-		if (_.isArray(array)){
-			this.set('appliances', new App.Collections.Appliances(array), {silent: true});
+		if (App.defined(array) && _.isArray(array)){
+			this.appliances.reset(array);
 		}
 		return this;
 	},
 
 	serialize: function(){
 		var attributes = this.toJSON();
-		if(attributes.appliances instanceof(Giraffe.Collection)){
-			attributes.appliances = attributes.appliances.toJSON();
+		if(App.defined(this.appliances)){
+			attributes.appliances = this.appliances.toJSON();
 		}
 		return attributes;
 	},

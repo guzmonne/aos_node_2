@@ -10,11 +10,28 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button[type=submit]'    : 'createServiceRequest',
 	},
 
+	serviceRequestSuccessFlash: function(id){
+		return {
+			title   : 'Orden de Servicio Creada',
+			message : 'La Orden de Servicio se ha creado con exito!.',
+			class   : 'success',
+			method  : 'html',
+			lifetime: 0 
+		};
+	},
+
+	zeroAppliancesFlash: {
+		title  : 'Atención',
+		message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
+		class  : 'warning',
+		method : 'html' 
+	},
+
 	deleteAppliance: function(e){
 		e.preventDefault();
 		var self = this;
 		var index = e.currentTarget.dataset.index;
-		var appliances = this.model.get('appliances');
+		var appliances = this.model.appliances;
 		var appliance = appliances.at(index);
 		appliances.trigger('appliance:deleted');
 		appliances.remove(appliance);
@@ -29,7 +46,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	singleApplianceForm: function(e){
 		e.preventDefault();
-		var appliances = this.model.get('appliances');
+		var appliances = this.model.appliances;
 		var model = new App.Models.Appliance({
 			client_name: this.model.get('client_name'),
 			client_id  : this.model.get('client_id'),
@@ -40,7 +57,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	appendApplianceForm: function(options){
 		if(!App.defined(options.model)){return new Error('No model was passed in the options.');}
-		var appliances = this.model.get('appliances');
+		var appliances = this.model.appliances;
 		var view       = new App.Views.ApplianceSingleFormView(options);
 		var index      = appliances.indexOf(options.model);
 		var style      = '';
@@ -56,40 +73,25 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		var self = this;
 		var grandpa = this.parent.parent;
-		if (this.model.get('appliances').length === 0 && App.defined(grandpa)){
-			grandpa.flash = {
-				title  : 'Atención',
-				message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
-				class  : 'warning',
-				method : 'html' 
-			};
+		if (this.model.appliances.length === 0 && App.defined(grandpa)){
+			grandpa.flash = this.zeroAppliancesFlash;
 			grandpa.displayFlash();
 		}
 		this.saveModel();
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		this.model.save({}, {
+		this.model.save(this.model.serialize(), {
+			wait: true,
 			success: function(model, response, options){
-				model.setAppliances();
 				app.trigger('service_request:create:success', model);
-				grandpa.flash = {
-					title   : 'Orden de Servicio Creada',
-					message : 'La Orden de Servicio se ha creado con exito!.',
-					class   : 'success',
-					method  : 'html',
-					htmlMsg : '<p><a type="button" class="btn btn-info" href="#render/service_request/show/'+ model.id +'">' + 
-										'<i class="fa fa-eye"></i> Abrir Orden de Servicio' + 
-										'</a></p>',
-					lifetime: 0 
-				};
-				self.model = new App.Models.ServiceRequest({
-					client_name: model.get('client_name'),
-					client_id: model.get('client_id'),
+				app.Renderer.show({
+					viewName         : 'ServiceRequestShowView',
+					viewModel        : model,
+					portletFrameClass: 'green',
+					flash            : self.serviceRequestSuccessFlash(model.id)
 				});
-				self.render();
-				grandpa.displayFlash();
-				App.scrollTo(grandpa.el);
+				grandpa.dispose();
 			},
 		});
 	},

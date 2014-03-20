@@ -44,7 +44,6 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	},
 
 	checkModel: function(model){
-		console.log(model);
 		if (App.defined(model)){
 			var client_id = model.get('client_id');
 			if (client_id && client_id === this.parent.model.id){

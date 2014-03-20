@@ -11,10 +11,10 @@ App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
 		var object = {};
 		if (App.defined(this.model)){
 			object = this.model.toJSON();
-			var appliances = this.model.get('appliances');
+			var appliances = this.model.appliances;
 			var createdAt = this.model.get('createdAt');
 			if (App.defined(appliances)){
-				object.appliances_length = this.model.get('appliances').length;	
+				object.appliances_length = appliances.length;	
 			}
 			if (App.defined(createdAt)){
 				object.createdAt = this.model.dateDDMMYYYY(createdAt);

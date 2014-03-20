@@ -66,6 +66,7 @@ ServiceRequestModel.prototype.create = function(params, callback){
 	});
 	service_request.save(function(err, service_request){
 		if (err){return callback(err);}
+		if (!params['appliances']){return callback(null, service_request);}
 		async.each(params['appliances'], function(applianceParams, cb){
 			applianceParams['service_request_id'] = service_request['_id'];
 			Appliance.create(applianceParams, function(err, appliance){

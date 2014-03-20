@@ -26,6 +26,19 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 
 	},
 
+	serialize: function(){
+		var result;
+		if(!App.defined(this.model)){return {};}
+		result = this.model.toJSON();
+		if(result.createdAt){
+			result.createdAt = this.model.dateDDMMYYYY(result.createdAt);
+		}
+		if(result.updatedAt){
+			result.updatedAt = this.model.dateDDMMYYYY(result.updatedAt);
+		}
+		return result;
+	},
+
 	afterRender: function(){
 		App.scrollTo(this.parent.el);
 		this.announce();

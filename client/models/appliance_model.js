@@ -14,7 +14,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 			'repairment_type'   : 'Garantía',
 			'defect'            : null,
 			'observations'      : null,
-			'status'            : 'Abierto',
+			'status'            : 'Pendiente',
 			'cost'              : 0,
 			'solution'          : null,
 			'diagnose'          : null,

@@ -104,7 +104,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 			'repairment_type'   : 'Garantía',
 			'defect'            : null,
 			'observations'      : null,
-			'status'            : 'Abierto',
+			'status'            : 'Pendiente',
 			'cost'              : 0,
 			'solution'          : null,
 			'diagnose'          : null,
@@ -198,10 +198,13 @@ App.Models.Address = App.Models.BaseModel.extend({
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
+	appliances: null,
+
 	initialize: function(attributes, options){
-		if (App.defined(attributes)){
-			this.parseAttributes(attributes);
-		}
+		this.appliances = new App.Collections.Appliances();
+		if(App.defined(attributes) && App.defined(attributes.appliances)){
+			this.appliances.reset(attributes.appliances);
+		} 
 	},
 
 	defaults: function(){
@@ -212,7 +215,6 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 			'createdAt'     : null,
 			'updatedAt'     : null,
 			'invoiceNumber' : null,
-			'appliances'    : new App.Collections.Appliances(),
 			'createdBy'     : 'Guzmán Monné',
 			'updatedBy'     : 'Guzmán Monné',
 			'closedAt'			: null,
@@ -220,35 +222,26 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	},
 
 	parse: function(response){
-		if (this.id){
-			if (App.defined(response.appliances)){
-				this.setAppliances(response.appliances);
-			}
-			return response; 
-		} else {
-			return response;
+		if(!App.defined(this.appliances)){
+			this.appliances = new App.Collections.Appliances();
 		}
-	},
-
-	parseAttributes: function(response){
-		this.setAppliances(response.appliances);
+		if (App.defined(response.appliances)){
+			this.setAppliances(response.appliances);
+		}
 		return response;
 	},
 
 	setAppliances: function(array){
-		if(!App.defined(array)){
-			array = this.get('appliances');
-		}
-		if (_.isArray(array)){
-			this.set('appliances', new App.Collections.Appliances(array), {silent: true});
+		if (App.defined(array) && _.isArray(array)){
+			this.appliances.reset(array);
 		}
 		return this;
 	},
 
 	serialize: function(){
 		var attributes = this.toJSON();
-		if(attributes.appliances instanceof(Giraffe.Collection)){
-			attributes.appliances = attributes.appliances.toJSON();
+		if(App.defined(this.appliances)){
+			attributes.appliances = this.appliances.toJSON();
 		}
 		return attributes;
 	},
@@ -399,41 +392,41 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	showView: function(doc, id){
-		var docName  = this.getDocName(doc);
+		var docName  = this.titelize(doc);
 		var viewName = docName + 'ShowView';
 		var params   = {
-			viewModelId: id
+			viewModelId      : id,
+			viewName         : viewName,
+			portletFrameClass: 'green',
 		};
-		this.checkViewName(viewName, doc + '/show/' + id, params);
+		this.checkViewName(params, doc + '/show/' + id, this.showComparator);
+		//this.checkViewName(viewName, doc + '/show/' + id, params);
 	},
 
 	docView: function(doc, type){
-		var docName  = this.getDocName(doc);
+		var docName  = this.titelize(doc);
 		var typeName = this.capitaliseFirstLetter(type);
 		var viewName = docName + typeName + 'View';
-		this.checkViewName(viewName, doc + '/' + type);
+		var params   = {
+			viewName: viewName,
+		};
+		this.checkViewName(params, doc + '/' + type);
 	},
 
-	getParamsArray: function(params){
-		var paramsArray = {};
-		var pairs       = params.split('?');
-		for(var i = 0; i < pairs.length; i++){
-			var pair = pairs[i].split('=');
-			paramsArray[pair[0]] = pair[1];
-		}
-		return paramsArray;
-	},
-
-	checkViewName: function(viewName, route, params){
-		if(App.defined(App.Views[viewName])){
+	checkViewName: function(params, route, comparator){
+		if(
+			App.defined(params)						&&
+			App.defined(params.viewName)	&&
+			App.defined(App.Views[params.viewName])
+		){
 			Backbone.history.navigate(route);
-			this.showOrGoTo(viewName, params);
+			this.showOrGoTo(params, comparator);
 		} else {
 			return;
 		}
 	},
 
-	getDocName: function(doc){
+	titelize: function(doc){
 		var docName = '';
 		if (doc.indexOf('_') === -1){
 			docName = this.capitaliseFirstLetter(doc);
@@ -446,45 +439,87 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		return docName;
 	},
 
-	showOrGoTo: function(viewName, params){
+	showOrGoToOld: function(viewName, params){
 		var rendered, viewRef, portletFrameClass;
+		params = (params) ? params : {};
 		if(!App.defined(App.Views[viewName])){return;}
-			if (viewName.indexOf('Show') === -1){
-				_.each(app.children, function(view){
-					if (view instanceof(App.Views.PortletView) && 
-							App.defined(view.viewName) && 
-							view.viewName === viewName
-					){
-						rendered = true;
-						viewRef  = view; 
-					}
-				});
-			} else {
-				if(!App.defined(params.viewModelId)){return;}
-				_.each(app.children, function(pView){
-					if (pView instanceof(App.Views.PortletView) &&
-							App.defined(pView.view) &&
-							App.defined(pView.view.model) &&
-							pView.view.model.id === params.viewModelId
-					){
-						rendered = true;
-						viewRef  = pView; 
-					}
-				});
-				portletFrameClass = 'green';
-			}
+		if (viewName.indexOf('Show') === -1){
+			_.each(app.children, function(view){
+				if (view instanceof(App.Views.PortletView) && 
+						App.defined(view.viewName) && 
+						view.viewName === viewName
+				){
+					rendered = true;
+					viewRef  = view; 
+				}
+			});
+		} else {
+			if(!App.defined(params.viewModelId)){return;}
+			_.each(app.children, function(pView){
+				if (pView instanceof(App.Views.PortletView) &&
+						App.defined(pView.view) &&
+						App.defined(pView.view.model) &&
+						pView.view.model.id === params.viewModelId
+				){
+					rendered = true;
+					viewRef  = pView; 
+				}
+			});
+			portletFrameClass = 'green';
+		}
 		if(rendered){
 			App.scrollTo(viewRef.el);
 		} else {
-			var options = (params) ? params : {};
-			if (portletFrameClass){
-				options.portletFrameClass = portletFrameClass;
-			}
-			options.viewName = viewName;
-			app[viewName] = new App.Views.PortletView(options);
-			app[viewName].attachTo('#content-el', {method: 'prepend'});
-			App.scrollTo(app[viewName].el);
+			params.portletFrameClass = portletFrameClass;
+			params.viewName          = viewName;
+			this.show(params);
 		}
+	},
+
+	defaultComparator: function(view){
+		return (
+			view instanceof(App.Views.PortletView)	&& 
+			App.defined(view.viewName)							&& 
+			view.viewName === this.viewName
+		);
+	},
+
+	showComparator: function(view){
+		return (
+			view instanceof(App.Views.PortletView)	&&
+			App.defined(view.view)									&&
+			App.defined(view.view.model)						&&
+			view.view.model.id === this.viewModelId
+		);
+	},
+
+	showOrGoTo: function(params, comparator){
+		if(	!App.defined(params)										|| 
+				!App.defined(params.viewName)						|| 
+				!App.defined(App.Views[params.viewName])
+		){
+			return;
+		}
+		var viewRef;
+		params     = (params) ? params : {};
+		comparator = (comparator) ? comparator : this.defaultComparator;
+		viewRef    = this.viewIsRendered(comparator, params);
+		if (viewRef){
+			App.scrollTo(viewRef.el);
+		} else {
+			this.show(params);
+		}
+	},
+
+	show: function(params){
+		var options = (params) ? params : {};
+		if (!options.portletFrameClass){
+			delete options.portletFrameClass;
+		}
+		if(!options.viewName){return new Error('The viewName option must be set');}
+		var view = new App.Views.PortletView(options);
+		this.appendToContent(view);
+		App.scrollTo(view.el);
 	},
 
 	viewIsRendered: function(comparator, context){
@@ -1229,10 +1264,10 @@ App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
 		var object = {};
 		if (App.defined(this.model)){
 			object = this.model.toJSON();
-			var appliances = this.model.get('appliances');
+			var appliances = this.model.appliances;
 			var createdAt = this.model.get('createdAt');
 			if (App.defined(appliances)){
-				object.appliances_length = this.model.get('appliances').length;	
+				object.appliances_length = appliances.length;	
 			}
 			if (App.defined(createdAt)){
 				object.createdAt = this.model.dateDDMMYYYY(createdAt);
@@ -1253,11 +1288,28 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button[type=submit]'    : 'createServiceRequest',
 	},
 
+	serviceRequestSuccessFlash: function(id){
+		return {
+			title   : 'Orden de Servicio Creada',
+			message : 'La Orden de Servicio se ha creado con exito!.',
+			class   : 'success',
+			method  : 'html',
+			lifetime: 0 
+		};
+	},
+
+	zeroAppliancesFlash: {
+		title  : 'Atención',
+		message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
+		class  : 'warning',
+		method : 'html' 
+	},
+
 	deleteAppliance: function(e){
 		e.preventDefault();
 		var self = this;
 		var index = e.currentTarget.dataset.index;
-		var appliances = this.model.get('appliances');
+		var appliances = this.model.appliances;
 		var appliance = appliances.at(index);
 		appliances.trigger('appliance:deleted');
 		appliances.remove(appliance);
@@ -1272,7 +1324,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	singleApplianceForm: function(e){
 		e.preventDefault();
-		var appliances = this.model.get('appliances');
+		var appliances = this.model.appliances;
 		var model = new App.Models.Appliance({
 			client_name: this.model.get('client_name'),
 			client_id  : this.model.get('client_id'),
@@ -1283,7 +1335,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	appendApplianceForm: function(options){
 		if(!App.defined(options.model)){return new Error('No model was passed in the options.');}
-		var appliances = this.model.get('appliances');
+		var appliances = this.model.appliances;
 		var view       = new App.Views.ApplianceSingleFormView(options);
 		var index      = appliances.indexOf(options.model);
 		var style      = '';
@@ -1299,40 +1351,25 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		var self = this;
 		var grandpa = this.parent.parent;
-		if (this.model.get('appliances').length === 0 && App.defined(grandpa)){
-			grandpa.flash = {
-				title  : 'Atención',
-				message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
-				class  : 'warning',
-				method : 'html' 
-			};
+		if (this.model.appliances.length === 0 && App.defined(grandpa)){
+			grandpa.flash = this.zeroAppliancesFlash;
 			grandpa.displayFlash();
 		}
 		this.saveModel();
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		this.model.save({}, {
+		this.model.save(this.model.serialize(), {
+			wait: true,
 			success: function(model, response, options){
-				model.setAppliances();
 				app.trigger('service_request:create:success', model);
-				grandpa.flash = {
-					title   : 'Orden de Servicio Creada',
-					message : 'La Orden de Servicio se ha creado con exito!.',
-					class   : 'success',
-					method  : 'html',
-					htmlMsg : '<p><a type="button" class="btn btn-info" href="#render/service_request/show/'+ model.id +'">' + 
-										'<i class="fa fa-eye"></i> Abrir Orden de Servicio' + 
-										'</a></p>',
-					lifetime: 0 
-				};
-				self.model = new App.Models.ServiceRequest({
-					client_name: model.get('client_name'),
-					client_id: model.get('client_id'),
+				app.Renderer.show({
+					viewName         : 'ServiceRequestShowView',
+					viewModel        : model,
+					portletFrameClass: 'green',
+					flash            : self.serviceRequestSuccessFlash(model.id)
 				});
-				self.render();
-				grandpa.displayFlash();
-				App.scrollTo(grandpa.el);
+				grandpa.dispose();
 			},
 		});
 	},
@@ -1389,7 +1426,6 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	},
 
 	checkModel: function(model){
-		console.log(model);
 		if (App.defined(model)){
 			var client_id = model.get('client_id');
 			if (client_id && client_id === this.parent.model.id){
@@ -1402,6 +1438,12 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	name: "Nueva Orden de Servicio",
 
 	className: "row",
+
+	initialize: function(){
+		if (!App.defined(this.model)){
+			this.model = new App.Models.ServiceRequest();
+		}
+	},
 
 	afterRender: function(){
 		this.renderForm();
@@ -1452,6 +1494,19 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 
 	bindEvents: function(){
 
+	},
+
+	serialize: function(){
+		var result;
+		if(!App.defined(this.model)){return {};}
+		result = this.model.toJSON();
+		if(result.createdAt){
+			result.createdAt = this.model.dateDDMMYYYY(result.createdAt);
+		}
+		if(result.updatedAt){
+			result.updatedAt = this.model.dateDDMMYYYY(result.updatedAt);
+		}
+		return result;
 	},
 
 	afterRender: function(){

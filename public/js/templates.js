@@ -583,7 +583,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"sidebar-collapse\">\n	<ul id=\"side-menu\" class=\"nav\">\n		<li class=\"text-center\">\n			<img src=\"http://placehold.it/150x150\" alr=\"User Image\" class=\"img-circle air-t-b\">\n			<p class=\"text-muted\">\n				<i class=\"fa fa-key\"></i> Guzmán <strong>Monné</strong>\n			</p>\n		</li>\n		<li class=\"sidebar-search\"></li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-dashboard fa-fw\"></i> Dashboard\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-users fa-fw\"></i> Clientes \n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#render/client/index\">\n						<i class=\"fa fa-list-alt fa-fw\"></i> Lista de Clientes\n					</a>\n				</li>\n				<li>				\n					<a href=\"#render/client/new\">\n						<i class=\"fa fa-plus fa-fw\"></i> Nuevo Cliente\n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-table fa-fw\"></i> Tables\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-edit fa-fw\"></i> Forms\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-wrench fa-fw\"></i> UI Elements\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Panels and Wells\n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Buttons\n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Notifications \n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-sitemap fa-fw\"></i> Multe-Level Dropdown\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\" class=\"third-level\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Third Level\n						<span class=\"fa arrow\"></span>\n					</a>\n					<ul class=\"nav nav-third-level\">\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n					</ul>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-files-o fa-fw\"></i> Sample Pages\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Blank Page\n					</a>\n				</li>\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Login Page\n					</a>\n				</li>\n			</ul>\n		</li>\n	</ul>\n</div>";
+  return "<div class=\"sidebar-collapse\">\n	<ul id=\"side-menu\" class=\"nav\">\n		<li class=\"text-center\">\n			<img src=\"http://placehold.it/150x150\" alr=\"User Image\" class=\"img-circle air-t-b\">\n			<p class=\"text-muted\">\n				<i class=\"fa fa-key\"></i> Guzmán <strong>Monné</strong>\n			</p>\n		</li>\n		<li class=\"sidebar-search\"></li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-dashboard fa-fw\"></i> Dashboard\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-users fa-fw\"></i> Clientes \n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#render/client/index\">\n						<i class=\"fa fa-list-alt fa-fw\"></i> Lista\n					</a>\n				</li>\n				<li>				\n					<a href=\"#render/client/new\">\n						<i class=\"fa fa-plus fa-fw\"></i> Nuevo\n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-clipboard fa-fw\"></i> Ordenes de Servicio\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>\n					<a href=\"#render/service_request/index\">\n						<i class=\"fa fa-list-alt fa-fw\"></i> Lista\n					</a>\n				</li>\n				<li>\n					<a href=\"#render/service_request/new\">\n						<i class=\"fa fa-plus fa-fw\"></i> Nuevo\n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-sitemap fa-fw\"></i> Multe-Level Dropdown\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\" class=\"third-level\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Third Level\n						<span class=\"fa arrow\"></span>\n					</a>\n					<ul class=\"nav nav-third-level\">\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n					</ul>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-files-o fa-fw\"></i> Sample Pages\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Blank Page\n					</a>\n				</li>\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Login Page\n					</a>\n				</li>\n			</ul>\n		</li>\n	</ul>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["tasks_layout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -710,7 +710,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" id=\"show-service-request\" class=\"btn btn-green btn-sm\">\n		<i class=\"fa fa-cog fa-lg\"></i>\n	</a>\n</td>";
+    + "\" id=\"show-service-request\" class=\"btn btn-green btn-xs\">\n		<i class=\"fa fa-cog fa-lg\"></i>\n	</a>\n</td>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -734,10 +734,25 @@ function program1(depth0,data) {
   else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "</td>\n                  <td>";
+  if (stack1 = helpers.serial) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.serial); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                  <td>\n                    <ul class=\"list-unstyled\">\n                      ";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(2, program2, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n                    </ul>\n                  </td>\n                  <td>";
   if (stack1 = helpers.status) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.status); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n                  <td class=\"center-vh\">\n                    <button class=\"btn btn-green btn-sm\">\n                      <i class=\"fa fa-cog fa-lg\"></i>\n                    </button>\n                  </td>\n                </tr>\n              ";
+    + "</td>\n                  <td class=\"center-vh\">\n                    <button class=\"btn btn-green btn-xs\">\n                      <i class=\"fa fa-cog fa-lg\"></i>\n                    </button>\n                  </td>\n                </tr>\n              ";
+  return buffer;
+  }
+function program2(depth0,data) {
+  
+  var buffer = "";
+  buffer += "\n                        <li>"
+    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + "</li>\n                      ";
   return buffer;
   }
 
@@ -753,11 +768,7 @@ function program1(depth0,data) {
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <h1>Cliente #";
-  if (stack1 = helpers.client_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.client_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + ": ";
+    + "\">\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <h1>Cliente: ";
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -777,7 +788,7 @@ function program1(depth0,data) {
   if (stack1 = helpers.updatedBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.updatedBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</li>\n        </ul>\n        <h3>Equipos</h3>\n        <div id=\"service-request-appliances\"></div>\n        <div class=\"table-responsive\">\n          <table class=\"table table-hover table-bordered table-striped table-office table-office-green\">\n            <thead>\n                <tr>\n                  <th>ID</th>\n                  <th>Marca</th>\n                  <th>Modelo</th>\n                  <th>Estado</th>\n                  <th>Controles</th>\n                </tr>\n            </thead>\n            <tbody>\n              ";
+    + "</li>\n        </ul>\n        <h3>Equipos</h3>\n        <div id=\"service-request-appliances\"></div>\n        <div class=\"table-responsive\">\n          <table class=\"table table-hover table-bordered table-striped table-office table-office-green\">\n            <thead>\n                <tr>\n                  <th>ID</th>\n                  <th>Marca</th>\n                  <th>Modelo</th>\n                  <th>Estado</th>\n                  <th>Serie</th>\n                  <th>Accesorios</th>\n                  <th>Controles</th>\n                </tr>\n            </thead>\n            <tbody>\n              ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
   if (stack1 = helpers.appliances) { stack1 = stack1.call(depth0, options); }
   else { stack1 = (depth0 && depth0.appliances); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }

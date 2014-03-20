@@ -3,6 +3,12 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 
 	className: "row",
 
+	initialize: function(){
+		if (!App.defined(this.model)){
+			this.model = new App.Models.ServiceRequest();
+		}
+	},
+
 	afterRender: function(){
 		this.renderForm();
 		var clientName = this.model.get('client_name');
