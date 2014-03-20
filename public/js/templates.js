@@ -154,7 +154,7 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  buffer += "<div class=\"col-lg-12\">\n  <h1>\n    ";
+  buffer += "<div class=\"col-md-12 col-lg-offset-1 col-lg-10\">\n  <h1>\n    ";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -166,7 +166,7 @@ function program3(depth0,data) {
   if (stack1 = helpers['doc-number']) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0['doc-number']); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\n    </small>\n  </h1>\n  </h1>\n  <hr>\n  <div class=\"row\">\n    <div class=\"col-xs-8\">\n      <ul class=\"list-unstyled\">\n        ";
+    + "\n    </small>\n  </h1>\n  </h1>\n  <hr>\n  <div class=\"row\">\n    <div class=\"col-xs-4\">\n      <ul class=\"list-unstyled\">\n        ";
   options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
   if (stack1 = helpers.phones) { stack1 = stack1.call(depth0, options); }
   else { stack1 = (depth0 && depth0.phones); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
@@ -182,7 +182,7 @@ function program3(depth0,data) {
   if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\n        </a>\n      </p>\n    </div>\n    <div class=\"col-xs-4\">\n      <div class=\"table-responsive\">\n        <table class=\"table table-striped table-hover table-office table-office-green table-condensed\">\n          <thead>\n            <tr>\n              <th>Descripción</th>\n              <th>Cantidad</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              \n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el ";
+    + "\n        </a>\n      </p>\n    </div>\n    <div class=\"col-xs-8\">\n      <div class=\"table-responsive\">\n        <table class=\"table table-striped table-hover table-office table-office-green table-condensed table-bordered\">\n          <thead>\n            <tr>\n              <th>Descripción</th>\n              <th class=\"text-center\">Cantidad</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              <td>Equipos en Stock</td>\n              <td class=\"text-center\">5</td>\n            </tr>\n            <tr>\n              <td>Equipos Reparados</td>\n              <td class=\"text-center\">4</td>\n            </tr>\n            <tr>\n              <td>Equipos Pendientes</td>\n              <td class=\"text-center\">9</td>\n            </tr>\n            <tr>\n              <td>Equipos Terminados</td>\n              <td class=\"text-center\">4</td>\n            </tr>\n          </tbody>\n        </table>\n      </div>\n    </div>\n  </div>\n  <hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el ";
   if (stack1 = helpers.createdAtShort) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.createdAtShort); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -448,23 +448,23 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\"></div>\n  <div class=\"tab-pane fade in\" id=\"client-service-orders-";
+    + "\"></div>\n  <div class=\"tab-pane fade in air-t\" id=\"client-service-orders-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n  	<h3>Ordenes de Servicio</h3>\n    <div id=\"client-service_requests-";
+    + "\">\n    <div id=\"client-service_requests-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"row\"></div>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"client-appliances-";
+    + "\"></div>\n  </div>\n  <div class=\"tab-pane fade in air-t\" id=\"client-appliances-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n  	<h3>Equipos</h3>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"client-edit-";
+    + "\">\n  	<h3>Equipos</h3>\n  </div>\n  <div class=\"tab-pane fade in air-t\" id=\"client-edit-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n  	<h3>Editar Datos de Cliente</h3>\n  	<div id=\"client-form-";
+    + "\">\n  	<div id=\"client-form-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -698,7 +698,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"row air-b\">\n	<div class=\"col-lg-12\">\n		<button class=\"btn btn-success\" id=\"new-service-request\">\n			<i class=\"fa fa-plus\"></i> Nueva Orden de Servicio\n		</button>\n	</div>\n</div>\n<div class=\"row\">\n	<div class=\"col-lg-12\">\n		<table id=\"service_requests-table\" class=\"table table-striped table-bordered table-hover table-office table-office-green dataTable\" aria-describedby=\"service_requests-table-info\">\n			<thead>\n				<tr>\n					<th>ID</th>\n					<th>Cliente</th>\n					<th>Cant. de Equipos</th>\n					<th>Estado</th>\n					<th>Creado</th>\n					<th>Finalizado</th>\n					<th>Controles</th>\n				</tr>\n			</thead>\n			<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n			</tbody>\n		</table>\n	</div>\n</div>\n			";
+  return "<div class=\"row air-b\">\n	<div class=\"col-lg-12\">\n		<button class=\"btn btn-success\" id=\"new-service-request\">\n			<i class=\"fa fa-plus\"></i> Nueva Orden de Servicio\n		</button>\n	</div>\n</div>\n<div class=\"row\">\n	<div class=\"col-lg-12\">\n		<div class=\"table-responsive\">\n			<table id=\"service_requests-table\" class=\"table table-striped table-bordered table-hover table-office table-office-green dataTable\" aria-describedby=\"service_requests-table-info\">\n				<thead>\n					<tr>\n						<th>ID</th>\n						<th>Cliente</th>\n						<th>Cant. de Equipos</th>\n						<th>Estado</th>\n						<th>Creado</th>\n						<th>Finalizado</th>\n						<th>Controles</th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n				</tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];

@@ -679,7 +679,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	phoneFieldTemplate  : HBS.phone_field_template,
 	addressFieldTemplate: HBS.address_field_template,
 
-	className: 'col-lg-12',
+	className: 'col-md-12 col-lg-offset-1 col-lg-9',
 
 	cloneModel: null,
 
