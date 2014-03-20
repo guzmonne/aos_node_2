@@ -26,9 +26,10 @@ App.Views.BaseView = Giraffe.View.extend({
 			e.preventDefault();
 		}
 		var self = this;
-		App.animate(this.$el, 'fadeOut', function(){
-			self.dispose();
-		});
+		this.dispose();
+		//App.animate(this.$el, 'fadeOut', function(){
+		//	self.dispose();
+		//});
 	},
 
 	serialize: function(){

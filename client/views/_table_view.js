@@ -1,5 +1,7 @@
 App.Views.TableView = App.Views.BaseView.extend({
-	oTable   : null,
+	oTable     : null,
+	
+	firstRender: true,
 
 	initialize: function(){
 		var self = this;
@@ -28,10 +30,13 @@ App.Views.TableView = App.Views.BaseView.extend({
 			return new Error('Attribute tableEl must be set.');
 		}
 		this.oTable = this.$(this.tableEl).dataTable();	
-		if(this.collection.length > 0){
-			this.appendCollection(this.collection);
-		} else {
-			this.collection.fetch();
+		if (this.firstRender){
+			if(this.collection.length > 0){
+				this.appendCollection(this.collection);
+			} else {
+				this.collection.fetch();
+			}
+			this.firstRender = false;
 		}
 	},
 

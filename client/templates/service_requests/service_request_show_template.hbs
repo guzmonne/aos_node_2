@@ -1,0 +1,61 @@
+<ul id="service-request-tabs" class="nav nav-tabs">
+  <li class="active">
+  	<a href="#service-request-details-{{_id}}" data-toggle="tab">
+  		Datos
+  	</a>
+  </li>
+  <li>
+  	<a href="#service-request-edit-{{_id}}" data-toggle="tab" id="service-request-edit">
+  		Editar Datos
+  	</a>
+  </li>
+</ul>
+<div id="client-tab-content" class="tab-content">
+  <div class="tab-pane fade in active" id="client-details-{{_id}}">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1>Cliente #{{client_id}}: {{client_name}}</h1>
+        <ul class="list-inline">
+          <li><i class="fa fa-calendar fa-muted"></i> Ingresado: {{createdAt}}</li>
+          <li><i class="fa fa-calendar fa-muted"></i> Modificado: {{updatedAt}}</li>
+          <li><i class="fa fa-user fa-muted"></i> Creado por: {{createdBy}}</li>
+          <li><i class="fa fa-user fa-muted"></i> Actualizado por: {{updatedBy}}</li>
+        </ul>
+        <h3>Equipos</h3>
+        <div id="service-request-appliances"></div>
+        <div class="table-responsive">
+          <table class="table table-hover table-bordered table-striped table-office table-office-green">
+            <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Estado</th>
+                  <th>Controles</th>
+                </tr>
+            </thead>
+            <tbody>
+              {{#appliances}}
+                <tr>
+                  <td>{{id}}</td>
+                  <td>{{brand}}</td>
+                  <td>{{model}}</td>
+                  <td>{{status}}</td>
+                  <td class="center-vh">
+                    <button class="btn btn-green btn-sm">
+                      <i class="fa fa-cog fa-lg"></i>
+                    </button>
+                  </td>
+                </tr>
+              {{/appliances}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tab-pane fade in" id="client-edit-{{_id}}">
+    <h3>Editar Datos de Cliente</h3>
+    <div id="client-form-{{_id}}" class="row"></div>
+  </div>
+</div>

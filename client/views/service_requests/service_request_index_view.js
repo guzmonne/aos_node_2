@@ -7,12 +7,12 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	tableCollection: 'ServiceRequests',
 	modelView      : App.Views.ServiceRequestRowView,
 
-	events:{
-		'click button#new-service-request': 'newServiceRequest',
+	appEvents: {
+		'service_request:create:success': 'checkModel',
 	},
 
-	onSync: function(){
-		this.collection.fetch();
+	events:{
+		'click button#new-service-request': 'newServiceRequest',
 	},
 
 	comparator: function(view){
@@ -41,5 +41,15 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			viewModel: model,
 		});
 		app.Renderer.appendToContent(portletView);
+	},
+
+	checkModel: function(model){
+		console.log(model);
+		if (App.defined(model)){
+			var client_id = model.get('client_id');
+			if (client_id && client_id === this.parent.model.id){
+				this.collection.add(model);
+			}
+		}
 	},
 });

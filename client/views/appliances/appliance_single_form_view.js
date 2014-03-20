@@ -11,14 +11,19 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
-		if (App.defined(this.model.collection)){
-			this.listenTo(this.model.collection, 'appliance:deleted', this.saveAndDispose);
+		if (!App.defined(this.model)){
+			this.model = new App.Models.Appliance();
+		}
+		var col = this.model.collection;
+		if (App.defined(col)){
+			this.listenTo(col, 'appliance:deleted', this.saveAndDispose);
+			this.listenTo(col, 'service_request:create:success', this.dispose);
 		}
 	},
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInDown');
-		this.$('[name=accesories]').tagsinput();
+		this.$('[name=accessories]').tagsinput();
 		if(this.firstRender){
 			App.scrollTo(this.$el);
 			this.firstRender = false;
@@ -33,7 +38,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		var input = this.$('.bootstrap-tagsinput input');
 		var value = input.val();
 		if (value !== ''){
-			this.$('[name=accesories]').tagsinput('add', value);
+			this.$('[name=accessories]').tagsinput('add', value);
 			input.val('');
 		}
 		this.$('.bootstrap-tagsinput').removeClass('active');
@@ -51,8 +56,8 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		this.model.set('category', this.$('[name=category]').val());
 		this.model.set('subcategory', this.$('[name=subcategory]').val());
 		this.model.set('observations', this.$('[name=observations]').val());
-		this.model.set('repairementType', this.$('[name=repairementType]').val());
+		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
 		this.model.set('defect', this.$('[name=defect]').val());
-		this.model.set('accesories', this.$('[name=accesories]').tagsinput('items'));
-	},
+		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
+	}, 
 });

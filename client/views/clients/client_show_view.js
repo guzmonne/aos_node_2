@@ -9,6 +9,11 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		"client:row:rendered": 'announce',
 	},
 
+	events:{
+		'click #client-edit'            : 'renderForm',
+		'click #client-service-requests': 'renderServiceRequests',
+	},
+
 	initialize: function(){
 		this.update      = _.throttle(this.update, 500);
 		this.synchronize = _.throttle(this.synchronize, 500);
@@ -17,7 +22,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 			this.bindEvents();
 		} else {
 			if (App.defined(this.modelId)){
-				this.model    = new App.Models.Client();
+				this.model = new App.Models.Client();
 				this.model.set('_id', this.modelId);
 				this.model.id = this.modelId;
 				this.model.fetch({
@@ -35,8 +40,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.announce();
 		this.setName();
 		this.parent.setHeader();
-		this.renderForm();
-		this.renderServiceRequests();
 	},
 
 	bindEvents: function(){
@@ -94,14 +97,21 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	renderForm: function(){
-		this.clientForm = new App.Views.ClientFormView({model: this.model});
-		this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+		if (!App.defined(this.clientForm)){
+			this.clientForm = new App.Views.ClientFormView({model: this.model});
+			this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+		}
 	},
 
 	renderServiceRequests: function(){
-		var id = this.model.id;
-		this.serviceRequests = new App.Views.ServiceRequestIndexView();
-		this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
+		if (!App.defined(this.serviceRequests)){
+			var id = this.model.id;
+			this.serviceRequests = new App.Views.ServiceRequestIndexView({
+				collection: new App.Collections.ServiceRequests()
+			});
+			this.serviceRequests.collection.client_id = this.model.id;
+			this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
+		}
 	},
 
 	announce: function(){

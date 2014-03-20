@@ -42,7 +42,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 
 	getDocName: function(doc){
 		var docName = '';
-		if (doc.indexOf('_') !== -1){
+		if (doc.indexOf('_') === -1){
 			docName = this.capitaliseFirstLetter(doc);
 		} else {
 			var nameArray = doc.split('_');

@@ -1,14 +1,15 @@
 // ===================
 // MODULE DEPENDENCIES
 // ===================
-var express    = require('express');
-var fs         = require('fs');
-var http       = require('http');
-var path       = require('path');
-var toobusy    = require('toobusy');
-var config     = require('./siteConf.js');
-var RedisStore = require('connect-redis')(express);
-var mongoose   = require('mongoose');
+var express       = require('express');
+var fs            = require('fs');
+var http          = require('http');
+var path          = require('path');
+var toobusy       = require('toobusy');
+var config        = require('./siteConf.js');
+var RedisStore    = require('connect-redis')(express);
+var mongoose      = require('mongoose');
+var autoIncrement = require('mongoose-auto-increment');
 
 // ==================
 // MONGODB & MONGOOSE
@@ -16,10 +17,15 @@ var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost/aos2');
 var db = mongoose.connection;
 // Error
+// -----
 db.on('error', console.error.bind(console, 'connection error'));
+// Open
+// ----
 db.once('open', function callback(){
 	console.log('Connection to mongoDB successful');
 });
+// Pure Auto Increment
+autoIncrement.initialize(db);
 
 // =======
 // EXPRESS
@@ -87,7 +93,8 @@ app.use(function(req, res, next){
 // ==========
 // CONTROLERS
 // ==========
-var client = require('./api/controllers/client'); 
+var client          = require('./api/controllers/client'); 
+var service_request = require('./api/controllers/service_request'); 
 
 // ======
 // ROUTES
@@ -105,6 +112,12 @@ app.get('/api/clients', client.index);
 app.get('/api/clients/:id', client.show);
 app.post('/api/clients', client.create);
 app.put('/api/clients/:id', client.update);
+// Service Requests
+// ----------------
+app.get('/api/service_requests/client/:id', service_request.index);
+app.get('/api/service_requests', service_request.index);
+app.get('/api/service_requests/:id', service_request.show);
+app.post('/api/service_requests', service_request.create);
 
 // =============
 // DEFAULT ROUTE

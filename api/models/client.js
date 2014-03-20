@@ -10,13 +10,13 @@ var timestamps = require('mongoose-timestamp');
 // =======
 var Schema   = mongoose.Schema;
 
-var Addresses = new Schema({
+var Address = new Schema({
 	street    : String,
 	city      : String,
 	department: String,
 });
 
-var Phones = new Schema({
+var Phone = new Schema({
 	number: String,
 });
 
@@ -30,9 +30,12 @@ var Client = new Schema({
 	name        : String,
 	'doc-type'  : String,
 	'doc-number': String,
-	phones      : [Phones],
-	addresses   : [Addresses],
-	email       : String,
+	phones      : [Phone],
+	addresses   : [Address],
+	email       : {
+		type: String,
+		lowecase: true,
+	},
 });
 
 // =======

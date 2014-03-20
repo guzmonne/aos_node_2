@@ -54,6 +54,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	createServiceRequest: function(e){
 		e.preventDefault();
+		var self = this;
 		var grandpa = this.parent.parent;
 		if (this.model.get('appliances').length === 0 && App.defined(grandpa)){
 			grandpa.flash = {
@@ -68,8 +69,29 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		console.log(this.model.serialize());
-		return false;
+		this.model.save({}, {
+			success: function(model, response, options){
+				model.setAppliances();
+				app.trigger('service_request:create:success', model);
+				grandpa.flash = {
+					title   : 'Orden de Servicio Creada',
+					message : 'La Orden de Servicio se ha creado con exito!.',
+					class   : 'success',
+					method  : 'html',
+					htmlMsg : '<p><a type="button" class="btn btn-info" href="#render/service_request/show/'+ model.id +'">' + 
+										'<i class="fa fa-eye"></i> Abrir Orden de Servicio' + 
+										'</a></p>',
+					lifetime: 0 
+				};
+				self.model = new App.Models.ServiceRequest({
+					client_name: model.get('client_name'),
+					client_id: model.get('client_id'),
+				});
+				self.render();
+				grandpa.displayFlash();
+				App.scrollTo(grandpa.el);
+			},
+		});
 	},
 
 	saveModel: function(){

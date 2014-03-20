@@ -80,14 +80,14 @@ function program3(depth0,data) {
   if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-12\">\n					<button class=\"btn btn-info pull-left\" tabindex=\"-1\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Detalles Adicionales</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accesories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accesories\" data-role=\"tagsinput\" multiple>\n						";
-  stack1 = helpers.each.call(depth0, (depth0 && depth0.accesories), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-12\">\n					<button class=\"btn btn-info pull-left\" tabindex=\"-1\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Detalles Adicionales</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n						";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "	\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"observations\" class=\"col-sm-2 control-label\">Observaciones</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"observations\">";
   if (stack1 = helpers.observations) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.observations); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</textarea>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Datos de Reparación</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accesoriesrepairementType\" class=\"col-sm-2 control-label\">Tipo de Rep.</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"repairementType\" data-role=\"tagsinput\">\n						<option value=\"Garantía\">Garantía</option>\n						<option value=\"Presupuesto\">Presupuesto</option>\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"defect\" class=\"col-sm-2 control-label\">Defecto</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"defect\">";
+    + "</textarea>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Datos de Reparación</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"repairement_type\" class=\"col-sm-2 control-label\">Tipo de Rep.</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"repairement_type\">\n						<option value=\"Garantía\">Garantía</option>\n						<option value=\"Presupuesto\">Presupuesto</option>\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"defect\" class=\"col-sm-2 control-label\">Defecto</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"defect\">";
   if (stack1 = helpers.defect) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.defect); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -383,7 +383,7 @@ function program3(depth0,data) {
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" data-toggle=\"tab\">\n  		Ordenes de Servicio\n  	</a>\n  </li>\n  <li>\n  	<a href=\"#client-apparatus-";
+    + "\" data-toggle=\"tab\" id=\"client-service-requests\">\n  		Ordenes de Servicio\n  	</a>\n  </li>\n  <li>\n  	<a href=\"#client-apparatus-";
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -391,7 +391,7 @@ function program3(depth0,data) {
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" data-toggle=\"tab\">\n  		Editar Datos\n  	</a>\n  </li>\n</ul>\n<div id=\"client-tab-content\" class=\"tab-content\">\n  <div class=\"tab-pane fade in active\" id=\"client-details-";
+    + "\" data-toggle=\"tab\" id=\"client-edit\">\n  		Editar Datos\n  	</a>\n  </li>\n</ul>\n<div id=\"client-tab-content\" class=\"tab-content\">\n  <div class=\"tab-pane fade in active\" id=\"client-details-";
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -583,7 +583,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"sidebar-collapse\">\n	<ul id=\"side-menu\" class=\"nav\">\n		<li class=\"text-center\">\n			<img src=\"http://placehold.it/150x150\" alr=\"User Image\" class=\"img-circle air-t-b\">\n			<p class=\"text-muted\">\n				<i class=\"fa fa-key\"></i> Guzmán <strong>Monné</strong>\n			</p>\n		</li>\n		<li class=\"sidebar-search\"></li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-dashboard fa-fw\"></i> Dashboard\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-users fa-fw\"></i> Clientes \n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#render/client/index\">\n						<i class=\"fa fa-list-alt fa-fw\"></i> Lista de Clientes\n					</a>\n				</li>\n				<li>				\n					<a href=\"#render/client/new\">\n						<i class=\"fa fa-plus fa-fw\"></i> Nuevo Cliente\n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-table fa-fw\"></i> Tables\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-edit fa-fw\"></i> Forms\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-wrench fa-fw\"></i> UI Elements\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Panels and Wells\n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Buttons\n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Notifications \n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-sitemap fa-fw\"></i> Multe-Level Dropdown\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\" class=\"third-level\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Third Level\n						<span class=\"fa arrow\"></span>\n					</a>\n					<ul class=\"nav nav-third-level\">\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n					</ul>\n				</li>\n			</ul>\n		</li>\n		<li class=\"active\">\n			<a href=\"#\" class=\"active\">\n				<i class=\"fa fa-files-o fa-fw\"></i> Sample Pages\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>\n					<a href=\"#\" class=\"second-level-active\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Blank Page\n					</a>\n				</li>\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Login Page\n					</a>\n				</li>\n			</ul>\n		</li>\n	</ul>\n</div>";
+  return "<div class=\"sidebar-collapse\">\n	<ul id=\"side-menu\" class=\"nav\">\n		<li class=\"text-center\">\n			<img src=\"http://placehold.it/150x150\" alr=\"User Image\" class=\"img-circle air-t-b\">\n			<p class=\"text-muted\">\n				<i class=\"fa fa-key\"></i> Guzmán <strong>Monné</strong>\n			</p>\n		</li>\n		<li class=\"sidebar-search\"></li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-dashboard fa-fw\"></i> Dashboard\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-users fa-fw\"></i> Clientes \n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#render/client/index\">\n						<i class=\"fa fa-list-alt fa-fw\"></i> Lista de Clientes\n					</a>\n				</li>\n				<li>				\n					<a href=\"#render/client/new\">\n						<i class=\"fa fa-plus fa-fw\"></i> Nuevo Cliente\n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-table fa-fw\"></i> Tables\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-edit fa-fw\"></i> Forms\n			</a>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-wrench fa-fw\"></i> UI Elements\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Panels and Wells\n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Buttons\n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Notifications \n					</a>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-sitemap fa-fw\"></i> Multe-Level Dropdown\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Second Level Item \n					</a>\n				</li>\n				<li>				\n					<a href=\"#\" class=\"third-level\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Third Level\n						<span class=\"fa arrow\"></span>\n					</a>\n					<ul class=\"nav nav-third-level\">\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n						<li>				\n							<a href=\"#\">\n								<i class=\"fa fa-angle-double-right fa-fw\"></i> Third Level Item \n							</a>\n						</li>\n					</ul>\n				</li>\n			</ul>\n		</li>\n		<li>\n			<a href=\"#\">\n				<i class=\"fa fa-files-o fa-fw\"></i> Sample Pages\n				<span class=\"fa arrow\"></span>\n			</a>\n			<ul class=\"nav nav-second-level\">\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Blank Page\n					</a>\n				</li>\n				<li>\n					<a href=\"#\">\n						<i class=\"fa fa-angle-right fa-fw\"></i> Login Page\n					</a>\n				</li>\n			</ul>\n		</li>\n	</ul>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["tasks_layout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -666,7 +666,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div class=\"row air-b\">\n	<div class=\"col-lg-12\">\n		<button class=\"btn btn-success\" id=\"new-service-request\">\n			<i class=\"fa fa-plus\"></i> Nueva Orden de Servicio\n		</button>\n	</div>\n</div>\n<div class=\"row\">\n	<div class=\"col-lg-12\">\n		<table id=\"service_requests-table\" class=\"table table-striped table-bordered table-hover table-office table-office-green dataTable\" aria-describedby=\"service_requests-table-info\">\n			<thead>\n				<tr>\n					<th>ID</th>\n					<th>Cliente</th>\n					<th>Cant. de Equipos</th>\n					<th>Estado</th>\n					<th>Creado</th>\n					<th>Finalizado</th>\n				</tr>\n			</thead>\n			<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n			</tbody>\n		</table>\n	</div>\n</div>\n			";
+  return "<div class=\"row air-b\">\n	<div class=\"col-lg-12\">\n		<button class=\"btn btn-success\" id=\"new-service-request\">\n			<i class=\"fa fa-plus\"></i> Nueva Orden de Servicio\n		</button>\n	</div>\n</div>\n<div class=\"row\">\n	<div class=\"col-lg-12\">\n		<table id=\"service_requests-table\" class=\"table table-striped table-bordered table-hover table-office table-office-green dataTable\" aria-describedby=\"service_requests-table-info\">\n			<thead>\n				<tr>\n					<th>ID</th>\n					<th>Cliente</th>\n					<th>Cant. de Equipos</th>\n					<th>Estado</th>\n					<th>Creado</th>\n					<th>Finalizado</th>\n					<th>Controles</th>\n				</tr>\n			</thead>\n			<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n			</tbody>\n		</table>\n	</div>\n</div>\n			";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -674,5 +674,123 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "";
 
 
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<td>";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td>";
+  if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td class=\"text-center\">";
+  if (stack1 = helpers.appliances_length) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.appliances_length); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td>";
+  if (stack1 = helpers.status) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.status); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td>";
+  if (stack1 = helpers.createdAt) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.createdAt); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td>";
+  if (stack1 = helpers.closedAt) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.closedAt); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n<td class=\"center-vh\">\n	<a href=\"#render/service_request/show/";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" id=\"show-service-request\" class=\"btn btn-green btn-sm\">\n		<i class=\"fa fa-cog fa-lg\"></i>\n	</a>\n</td>";
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, options, functionType="function", escapeExpression=this.escapeExpression, self=this, blockHelperMissing=helpers.blockHelperMissing;
+
+function program1(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n                <tr>\n                  <td>";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                  <td>";
+  if (stack1 = helpers.brand) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.brand); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                  <td>";
+  if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                  <td>";
+  if (stack1 = helpers.status) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.status); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n                  <td class=\"center-vh\">\n                    <button class=\"btn btn-green btn-sm\">\n                      <i class=\"fa fa-cog fa-lg\"></i>\n                    </button>\n                  </td>\n                </tr>\n              ";
+  return buffer;
+  }
+
+  buffer += "<ul id=\"service-request-tabs\" class=\"nav nav-tabs\">\n  <li class=\"active\">\n  	<a href=\"#service-request-details-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\">\n  		Datos\n  	</a>\n  </li>\n  <li>\n  	<a href=\"#service-request-edit-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\" id=\"service-request-edit\">\n  		Editar Datos\n  	</a>\n  </li>\n</ul>\n<div id=\"client-tab-content\" class=\"tab-content\">\n  <div class=\"tab-pane fade in active\" id=\"client-details-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n    <div class=\"row\">\n      <div class=\"col-lg-12\">\n        <h1>Cliente #";
+  if (stack1 = helpers.client_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.client_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ": ";
+  if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h1>\n        <ul class=\"list-inline\">\n          <li><i class=\"fa fa-calendar fa-muted\"></i> Ingresado: ";
+  if (stack1 = helpers.createdAt) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.createdAt); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n          <li><i class=\"fa fa-calendar fa-muted\"></i> Modificado: ";
+  if (stack1 = helpers.updatedAt) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.updatedAt); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n          <li><i class=\"fa fa-user fa-muted\"></i> Creado por: ";
+  if (stack1 = helpers.createdBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.createdBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n          <li><i class=\"fa fa-user fa-muted\"></i> Actualizado por: ";
+  if (stack1 = helpers.updatedBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.updatedBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n        </ul>\n        <h3>Equipos</h3>\n        <div id=\"service-request-appliances\"></div>\n        <div class=\"table-responsive\">\n          <table class=\"table table-hover table-bordered table-striped table-office table-office-green\">\n            <thead>\n                <tr>\n                  <th>ID</th>\n                  <th>Marca</th>\n                  <th>Modelo</th>\n                  <th>Estado</th>\n                  <th>Controles</th>\n                </tr>\n            </thead>\n            <tbody>\n              ";
+  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
+  if (stack1 = helpers.appliances) { stack1 = stack1.call(depth0, options); }
+  else { stack1 = (depth0 && depth0.appliances); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
+  if (!helpers.appliances) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"client-edit-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n    <h3>Editar Datos de Cliente</h3>\n    <div id=\"client-form-";
+  if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" class=\"row\"></div>\n  </div>\n</div>";
   return buffer;
   });

@@ -93,29 +93,30 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'model'          : null,
-			'brand'          : null,
-			'serial'         : null,
-			'category'       : null,
-			'subcategory'    : null,
-			'accesories'     : [],
-			'client_name'    : null,
-			'client_id'      : null,
-			'repairmentType' : 'Garantía',
-			'defect'         : null,
-			'observations'   : null,
-			'status'         : 'Abierto',
-			'cost'           : 0,
-			'solution'       : null,
-			'diagnose'       : null,
-			'replacements'   : null,
-			'inStock'        : null,
-			'departuredAt'   : null,
-			'repairedAt'     : null,
-			'technician_name': null,
-			'technician_id'  : null,
-			'createdBy'      : 'Guzman Monne',
-			'updatedBy'      : 'Guzman Monne',
+			'model'             : null,
+			'brand'             : null,
+			'serial'            : null,
+			'category'          : null,
+			'subcategory'       : null,
+			'accessories'       : [],
+			'client_name'       : null,
+			'client_id'         : null,
+			'repairment_type'   : 'Garantía',
+			'defect'            : null,
+			'observations'      : null,
+			'status'            : 'Abierto',
+			'cost'              : 0,
+			'solution'          : null,
+			'diagnose'          : null,
+			'replacements'      : null,
+			'inStock'           : null,
+			'departuredAt'      : null,
+			'repairedAt'        : null,
+			'technician_name'   : null,
+			'technician_id'     : null,
+			'createdBy'         : 'Guzman Monne',
+			'updatedBy'         : 'Guzman Monne',
+			'service_request_id': null,
 		};
 	},
 });
@@ -197,18 +198,51 @@ App.Models.Address = App.Models.BaseModel.extend({
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
+	initialize: function(attributes, options){
+		if (App.defined(attributes)){
+			this.parseAttributes(attributes);
+		}
+	},
+
 	defaults: function(){
 		return {
-			'client_name'  : null,
-			'client_id'    : null,
-			'status'       : 'Pendiente',
-			'createdAt'    : null,
-			'updatedAt'    : null,
-			'invoiceNumber': null,
-			'appliances'   : new App.Collections.Appliances(),
-			'createdBy'    : 'Guzmán Monné',
-			'updatedBy'    : 'Guzmán Monné',
+			'client_name'   : null,
+			'client_id'     : null,
+			'status'        : 'Pendiente',
+			'createdAt'     : null,
+			'updatedAt'     : null,
+			'invoiceNumber' : null,
+			'appliances'    : new App.Collections.Appliances(),
+			'createdBy'     : 'Guzmán Monné',
+			'updatedBy'     : 'Guzmán Monné',
+			'closedAt'			: null,
 		};
+	},
+
+	parse: function(response){
+		if (this.id){
+			if (App.defined(response.appliances)){
+				this.setAppliances(response.appliances);
+			}
+			return response; 
+		} else {
+			return response;
+		}
+	},
+
+	parseAttributes: function(response){
+		this.setAppliances(response.appliances);
+		return response;
+	},
+
+	setAppliances: function(array){
+		if(!App.defined(array)){
+			array = this.get('appliances');
+		}
+		if (_.isArray(array)){
+			this.set('appliances', new App.Collections.Appliances(array), {silent: true});
+		}
+		return this;
 	},
 
 	serialize: function(){
@@ -236,8 +270,15 @@ App.Collections.Addresses = Giraffe.Collection.extend({
 	model: App.Models.Address,
 });
 App.Collections.ServiceRequests = Giraffe.Collection.extend({
-	url  : '/api/service_requests',
-	model: App.Models.Client,
+	url  : function(){
+		var u = '/api/service_requests';
+		if (this.client_id){
+			u = u + '/client/' + this.client_id;
+		}
+		return u;
+	},
+
+	model: App.Models.ServiceRequest,
 });
 App.Views.BaseView = Giraffe.View.extend({
 	canSync: function(){
@@ -267,9 +308,10 @@ App.Views.BaseView = Giraffe.View.extend({
 			e.preventDefault();
 		}
 		var self = this;
-		App.animate(this.$el, 'fadeOut', function(){
-			self.dispose();
-		});
+		this.dispose();
+		//App.animate(this.$el, 'fadeOut', function(){
+		//	self.dispose();
+		//});
 	},
 
 	serialize: function(){
@@ -293,7 +335,9 @@ App.Views.BaseView = Giraffe.View.extend({
 	},
 });
 App.Views.TableView = App.Views.BaseView.extend({
-	oTable   : null,
+	oTable     : null,
+	
+	firstRender: true,
 
 	initialize: function(){
 		var self = this;
@@ -322,10 +366,13 @@ App.Views.TableView = App.Views.BaseView.extend({
 			return new Error('Attribute tableEl must be set.');
 		}
 		this.oTable = this.$(this.tableEl).dataTable();	
-		if(this.collection.length > 0){
-			this.appendCollection(this.collection);
-		} else {
-			this.collection.fetch();
+		if (this.firstRender){
+			if(this.collection.length > 0){
+				this.appendCollection(this.collection);
+			} else {
+				this.collection.fetch();
+			}
+			this.firstRender = false;
 		}
 	},
 
@@ -388,7 +435,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 
 	getDocName: function(doc){
 		var docName = '';
-		if (doc.indexOf('_') !== -1){
+		if (doc.indexOf('_') === -1){
 			docName = this.capitaliseFirstLetter(doc);
 		} else {
 			var nameArray = doc.split('_');
@@ -468,14 +515,19 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
-		if (App.defined(this.model.collection)){
-			this.listenTo(this.model.collection, 'appliance:deleted', this.saveAndDispose);
+		if (!App.defined(this.model)){
+			this.model = new App.Models.Appliance();
+		}
+		var col = this.model.collection;
+		if (App.defined(col)){
+			this.listenTo(col, 'appliance:deleted', this.saveAndDispose);
+			this.listenTo(col, 'service_request:create:success', this.dispose);
 		}
 	},
 
 	afterRender: function(){
 		App.animate(this.$el, 'fadeInDown');
-		this.$('[name=accesories]').tagsinput();
+		this.$('[name=accessories]').tagsinput();
 		if(this.firstRender){
 			App.scrollTo(this.$el);
 			this.firstRender = false;
@@ -490,7 +542,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		var input = this.$('.bootstrap-tagsinput input');
 		var value = input.val();
 		if (value !== ''){
-			this.$('[name=accesories]').tagsinput('add', value);
+			this.$('[name=accessories]').tagsinput('add', value);
 			input.val('');
 		}
 		this.$('.bootstrap-tagsinput').removeClass('active');
@@ -508,10 +560,10 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		this.model.set('category', this.$('[name=category]').val());
 		this.model.set('subcategory', this.$('[name=subcategory]').val());
 		this.model.set('observations', this.$('[name=observations]').val());
-		this.model.set('repairementType', this.$('[name=repairementType]').val());
+		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
 		this.model.set('defect', this.$('[name=defect]').val());
-		this.model.set('accesories', this.$('[name=accesories]').tagsinput('items'));
-	},
+		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
+	}, 
 });
 App.Views.ClientRowView = App.Views.BaseView.extend({
 	template : HBS.client_row_template,
@@ -765,6 +817,11 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		"client:row:rendered": 'announce',
 	},
 
+	events:{
+		'click #client-edit'            : 'renderForm',
+		'click #client-service-requests': 'renderServiceRequests',
+	},
+
 	initialize: function(){
 		this.update      = _.throttle(this.update, 500);
 		this.synchronize = _.throttle(this.synchronize, 500);
@@ -773,7 +830,7 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 			this.bindEvents();
 		} else {
 			if (App.defined(this.modelId)){
-				this.model    = new App.Models.Client();
+				this.model = new App.Models.Client();
 				this.model.set('_id', this.modelId);
 				this.model.id = this.modelId;
 				this.model.fetch({
@@ -791,8 +848,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.announce();
 		this.setName();
 		this.parent.setHeader();
-		this.renderForm();
-		this.renderServiceRequests();
 	},
 
 	bindEvents: function(){
@@ -850,14 +905,21 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 	},
 
 	renderForm: function(){
-		this.clientForm = new App.Views.ClientFormView({model: this.model});
-		this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+		if (!App.defined(this.clientForm)){
+			this.clientForm = new App.Views.ClientFormView({model: this.model});
+			this.clientForm.attachTo(this.$('#client-form-' + this.model.id), {method: 'html'});
+		}
 	},
 
 	renderServiceRequests: function(){
-		var id = this.model.id;
-		this.serviceRequests = new App.Views.ServiceRequestIndexView();
-		this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
+		if (!App.defined(this.serviceRequests)){
+			var id = this.model.id;
+			this.serviceRequests = new App.Views.ServiceRequestIndexView({
+				collection: new App.Collections.ServiceRequests()
+			});
+			this.serviceRequests.collection.client_id = this.model.id;
+			this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
+		}
 	},
 
 	announce: function(){
@@ -1154,6 +1216,31 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	tagName: 'li', 
 	className: 'dropdown',
 });
+App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
+	template: HBS.service_request_row_template,
+
+	tagName  : 'tr',
+
+	initialize: function(){
+		this.listenTo(this.model, 'change', this.render);
+	},
+
+	serialize: function(){
+		var object = {};
+		if (App.defined(this.model)){
+			object = this.model.toJSON();
+			var appliances = this.model.get('appliances');
+			var createdAt = this.model.get('createdAt');
+			if (App.defined(appliances)){
+				object.appliances_length = this.model.get('appliances').length;	
+			}
+			if (App.defined(createdAt)){
+				object.createdAt = this.model.dateDDMMYYYY(createdAt);
+			}
+		}
+		return object;
+	},
+});
 App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	template     : HBS.service_request_form_template,
 	formContainer: HBS.appliance_form_container,
@@ -1210,6 +1297,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	createServiceRequest: function(e){
 		e.preventDefault();
+		var self = this;
 		var grandpa = this.parent.parent;
 		if (this.model.get('appliances').length === 0 && App.defined(grandpa)){
 			grandpa.flash = {
@@ -1224,8 +1312,29 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		console.log(this.model.serialize());
-		return false;
+		this.model.save({}, {
+			success: function(model, response, options){
+				model.setAppliances();
+				app.trigger('service_request:create:success', model);
+				grandpa.flash = {
+					title   : 'Orden de Servicio Creada',
+					message : 'La Orden de Servicio se ha creado con exito!.',
+					class   : 'success',
+					method  : 'html',
+					htmlMsg : '<p><a type="button" class="btn btn-info" href="#render/service_request/show/'+ model.id +'">' + 
+										'<i class="fa fa-eye"></i> Abrir Orden de Servicio' + 
+										'</a></p>',
+					lifetime: 0 
+				};
+				self.model = new App.Models.ServiceRequest({
+					client_name: model.get('client_name'),
+					client_id: model.get('client_id'),
+				});
+				self.render();
+				grandpa.displayFlash();
+				App.scrollTo(grandpa.el);
+			},
+		});
 	},
 
 	saveModel: function(){
@@ -1243,12 +1352,12 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	tableCollection: 'ServiceRequests',
 	modelView      : App.Views.ServiceRequestRowView,
 
-	events:{
-		'click button#new-service-request': 'newServiceRequest',
+	appEvents: {
+		'service_request:create:success': 'checkModel',
 	},
 
-	onSync: function(){
-		this.collection.fetch();
+	events:{
+		'click button#new-service-request': 'newServiceRequest',
 	},
 
 	comparator: function(view){
@@ -1278,6 +1387,16 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		});
 		app.Renderer.appendToContent(portletView);
 	},
+
+	checkModel: function(model){
+		console.log(model);
+		if (App.defined(model)){
+			var client_id = model.get('client_id');
+			if (client_id && client_id === this.parent.model.id){
+				this.collection.add(model);
+			}
+		}
+	},
 });
 App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	name: "Nueva Orden de Servicio",
@@ -1305,6 +1424,53 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 			model: model
 		});
 		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
+	},
+});
+App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
+	template: HBS.service_request_show_template,
+
+	name: null,
+
+	initialize: function(){
+		var self = this;
+		if(App.defined(this.model)){
+			this.bindEvents();
+		} else {
+			if (App.defined(this.modelId)){
+				this.model = new App.Models.ServiceRequest();
+				this.model.set('_id', this.modelId);
+				this.model.id = this.modelId;
+				this.model.fetch({
+					success: function(){
+						self.render();
+						self.bindEvents();
+					},
+				});
+			}
+		}
+	},
+
+	bindEvents: function(){
+
+	},
+
+	afterRender: function(){
+		App.scrollTo(this.parent.el);
+		this.announce();
+		this.setName();
+		this.parent.setHeader();
+	},
+
+	setName: function(){
+		this.name = 'Orden de Servicio #' + this.model.get('id');
+	},
+
+	announce: function(){
+		app.trigger('service_request:show:active', this.model.id);
+	},
+
+	beforeDispose: function(){
+		app.trigger('service_request:show:close', this.model.id);
 	},
 });
 App.Routers.MainRouter = Giraffe.Router.extend({

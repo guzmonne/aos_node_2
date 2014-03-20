@@ -1,8 +1,8 @@
 // ======================
 // MODELS AND CONTROLLERS
 // ======================
-var Client = require('../models/client').ClientModel;
-var Client = new Client();
+var ClientModel = require('../models/client').ClientModel;
+var Client      = new ClientModel();
 
 exports.index = function(req, res){
 	Client.findAll(function(error, clients){
