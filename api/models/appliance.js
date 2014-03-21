@@ -69,6 +69,8 @@ var Appliance = mongoose.model('Appliance');
 ApplianceModel = function(){};
 // FUNCTIONS
 // ---------
+// Create new appliance
+// --------------------
 ApplianceModel.prototype.create = function(params, callback){
 	var appliance = new Appliance({
 		'model'             : params['model'],
@@ -103,6 +105,17 @@ ApplianceModel.prototype.create = function(params, callback){
 		callback(null, appliance);
 	});
 };
+// Get all appliances
+// ------------------
+ApplianceModel.prototype.findAll = function(callback){
+	Appliance.find({}, function(err, appliances){
+		callback(null, appliances);
+	});
+};
+// =========
+// FUNCTIONS
+// =========
+
 // =======
 // EXPORTS
 // =======

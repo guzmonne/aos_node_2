@@ -332,9 +332,9 @@ App.Views.BaseView = Giraffe.View.extend({
 	},
 });
 App.Views.TableView = App.Views.BaseView.extend({
-	oTable     : null,
-	
-	firstRender: true,
+	oTable        : null,
+	firstRender   : true,
+	rowViewOptions: {},
 
 	initialize: function(){
 		var self = this;
@@ -382,9 +382,12 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	append: function(model){
 		if (App.defined(this.modelView)){
-			var view = new this.modelView({model: model});
+			this.rowViewOptions.model = model;
+			var view = new this.modelView(this.rowViewOptions);
 			this.addChild(view);
 			this.oTable.fnAddTr(view.render().el);
+		} else {
+			return new Error('Option modelView not defined');
 		}
 	},
 });
@@ -541,6 +544,77 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		app.attach(view, {el: '#content-el', method: 'prepend'});
 	},
 });
+App.Views.ApplianceRowView = App.Views.BaseView.extend({
+	template: HBS.appliance_row_template,
+
+	tagName  : 'tr',
+
+	initialize: function(){
+		console.log(this.sameClient);
+		this.listenTo(this.model, 'change', this.render);
+	},
+
+	serialize: function(){
+		var object = {};
+		if (App.defined(this.model)){
+			var createdAt    = this.model.get('createdAt');
+			var updatedAt    = this.model.get('updatedAt');
+			var closedAt     = this.model.get('closedAt');
+			object           = this.model.toJSON();
+			object.createdAt	=	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
+			object.updatedAt	=	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
+			object.closedAt		=	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)	: null;
+		}
+		return object;
+	},
+});
+App.Views.ApplianceIndexView = App.Views.TableView.extend({
+	template : HBS.appliance_index_template,
+	className: "table-responsive",
+	name     : "Equipos",
+	
+	tableEl        : '#appliances-table',
+	tableCollection: 'Appliances',
+	modelView      : App.Views.ApplianceRowView,
+
+	sameClient: true,
+
+	appEvents: {
+		'appliance:create:success': 'checkModel',
+	},
+
+	serialize: function(){
+		var options = (App.defined(this.model)) ? (this.model.toJSON) : {};
+		return options;
+	},
+
+	checkModel: function(model){
+		if (App.defined(model)){
+			var client_id = model.get('client_id');
+			if (client_id && client_id === this.parent.model.id){
+				this.collection.add(model);
+			}
+		}
+	},
+
+	checkIfsameClient: function(){
+		var prev_client_id, model;
+		var length = this.collection.length;
+		if(length <= 1){
+			this.sameClient = true;
+			return true;
+		}
+		for(var i = 0; i < length; i++){
+			model          = this.collection.at(i);
+			prev_client_id = (prev_client_id) ? prev_client_id : model.get('client_id');
+			if (prev_client_id !== model.get('client_id')){
+				this.sameClient = false;
+				break;
+			}
+		}
+		return this.sameClient;
+	},
+});
 App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_single_form_template,
 
@@ -666,11 +740,11 @@ App.Views.ClientDetailsView = App.Views.BaseView.extend({
 	className: 'row',
 
 	serialize: function(){
-		var result = (App.defined(this.model)) ? this.model.serialize() : {};
-		var createdAt  = this.model.get('createdAt');
-		var updatedAt  = this.model.get('updatedAt');
-		result.createdAtShort = this.model.dateDDMMYYYY(createdAt);
-		result.updatedAtShort = this.model.dateDDMMYYYY(updatedAt);
+		var result       = (App.defined(this.model)) ? this.model.serialize() : {};
+		var createdAt    = this.model.get('createdAt');
+		var updatedAt    = this.model.get('updatedAt');
+		result.createdAt = this.model.dateDDMMYYYY(createdAt);
+		result.updatedAt = this.model.dateDDMMYYYY(updatedAt);
 		return result;
 	},
 });
@@ -895,12 +969,19 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 				},
 			});
 		}	else {
-			this.renderDetails();
+			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
+				this.renderChilds();
+			}
 			this.announce();
 			this.setName();
 			this.parent.setHeader();
 			App.scrollTo(this.parent.el);
+
 		}
+	},
+
+	renderChilds: function(){
+		this.renderDetails();
 	},
 
 	bindEvents: function(){
@@ -1500,47 +1581,86 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 	name: null,
 
 	initialize: function(){
-		var self = this;
 		if(App.defined(this.model)){
 			this.bindEvents();
 		} else {
 			if (App.defined(this.modelId)){
 				this.model = new App.Models.ServiceRequest();
-				this.model.set('_id', this.modelId);
-				this.model.id = this.modelId;
-				this.model.fetch({
-					success: function(){
-						self.render();
-						self.bindEvents();
-					},
-				});
 			}
 		}
+		this.timestamp = new Date().getTime();
 	},
 
-	bindEvents: function(){
-
+	afterRender: function(){
+		var self = this;
+		if(this.model.isNew() && App.defined(this.modelId)){
+			this.model.set('_id', this.modelId);
+			this.model.fetch({
+				success: function(){
+					self.render();
+					self.bindEvents();
+				},
+			});
+		} else {
+			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
+				this.renderChilds();
+			}
+			this.announce();
+			this.setName();
+			this.parent.setHeader();
+			App.scrollTo(this.parent.el);
+		}
 	},
+
+	renderChilds: function(){
+		this.renderAppliancesIndex();
+	},
+
+	renderAppliancesIndex: function(){
+		if(
+				!App.defined(this.appliancesIndex)	&& 
+				App.defined(this.model)							&&
+				App.defined(this.model.appliances)
+		){
+			this.appliancesIndex = new App.Views.ApplianceIndexView({
+				collection: this.model.appliances
+			});
+			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
+				method: 'html'
+			});
+		}
+	},
+	
+	bindEvents: function(){},
 
 	serialize: function(){
-		var result;
-		if(!App.defined(this.model)){return {};}
-		result = this.model.toJSON();
-		if(result.createdAt){
-			result.createdAt = this.model.dateDDMMYYYY(result.createdAt);
-		}
-		if(result.updatedAt){
-			result.updatedAt = this.model.dateDDMMYYYY(result.updatedAt);
+		var result = (App.defined(this.model)) ? this.model.toJSON() : {};
+		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
+		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
+		result.timestamp = this.timestamp;
+		if(result.status){
+			var label;
+			switch (result.status){
+				case "Pendiente":
+					label = "label-primary";
+					break;
+				case "Abierto":
+					label = "label-info";
+					break;
+				case "Atrasaodo":
+					label = "label-danger";
+					break;
+				case "Cerrado":
+					label = "label-success";
+					break;
+				default:
+					label = "label-default";
+			}
+			result.label = label;
 		}
 		return result;
 	},
 
-	afterRender: function(){
-		App.scrollTo(this.parent.el);
-		this.announce();
-		this.setName();
-		this.parent.setHeader();
-	},
 
 	setName: function(){
 		this.name = 'Orden de Servicio #' + this.model.get('id');

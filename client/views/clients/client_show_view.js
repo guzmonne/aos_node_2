@@ -34,12 +34,19 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 				},
 			});
 		}	else {
-			this.renderDetails();
+			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
+				this.renderChilds();
+			}
 			this.announce();
 			this.setName();
 			this.parent.setHeader();
 			App.scrollTo(this.parent.el);
+
 		}
+	},
+
+	renderChilds: function(){
+		this.renderDetails();
 	},
 
 	bindEvents: function(){

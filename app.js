@@ -95,6 +95,7 @@ app.use(function(req, res, next){
 // ==========
 var client          = require('./api/controllers/client'); 
 var service_request = require('./api/controllers/service_request'); 
+var appliance       = require('./api/controllers/appliance'); 
 
 // ======
 // ROUTES
@@ -118,6 +119,10 @@ app.get('/api/service_requests/client/:id', service_request.index);
 app.get('/api/service_requests', service_request.index);
 app.get('/api/service_requests/:id', service_request.show);
 app.post('/api/service_requests', service_request.create);
+// Appliances
+// ----------
+app.get('/api/appliances', appliance.index);
+
 
 // =============
 // DEFAULT ROUTE

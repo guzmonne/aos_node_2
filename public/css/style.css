@@ -685,6 +685,10 @@ input, select {
 }
 
 /* TABLES */
+.table>thead>tr>th {
+  vertical-align: top;
+}
+
 table.table-office thead {
   color:#D5DDE5;;
   background: #2c3e50;
@@ -877,4 +881,9 @@ td.center-vh{
 .row.closing {
   transform: translate(500px);
   opacity: 0;
+}
+
+/* LINKS */
+h1 a:hover {
+  text-decoration: none;
 }

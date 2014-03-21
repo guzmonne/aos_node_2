@@ -1,7 +1,7 @@
 App.Views.TableView = App.Views.BaseView.extend({
-	oTable     : null,
-	
-	firstRender: true,
+	oTable        : null,
+	firstRender   : true,
+	rowViewOptions: {},
 
 	initialize: function(){
 		var self = this;
@@ -49,9 +49,12 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	append: function(model){
 		if (App.defined(this.modelView)){
-			var view = new this.modelView({model: model});
+			this.rowViewOptions.model = model;
+			var view = new this.modelView(this.rowViewOptions);
 			this.addChild(view);
 			this.oTable.fnAddTr(view.render().el);
+		} else {
+			return new Error('Option modelView not defined');
 		}
 	},
 });
