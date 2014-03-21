@@ -1,14 +1,16 @@
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	template : HBS.service_request_index_template,
-	className: "table-responsive",
+	className: "row",
 	name     : "Ordenes de Servicio",
 	
 	tableEl        : '#service_requests-table',
-	tableCollection: 'ServiceRequests',
+	tableCollection: App.Collections.ServiceRequests,
 	modelView      : App.Views.ServiceRequestRowView,
 
+	appStorage: 'serviceRequests',
+
 	appEvents: {
-		'service_request:create:success': 'checkModel',
+		"service_request:create:success": 'checkCreatedModel', 
 	},
 
 	events:{
@@ -26,6 +28,10 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	},
 
 	newServiceRequest: function(){
+		if(!this.parent.model || !(this.parent.model instanceof App.Models.Client)){
+			Backbone.history.navigate('render/service_request/new', {trigger: true});
+			return;
+		}
 		var targetView = app.Renderer.viewIsRendered(this.comparator, this);
 		if (targetView){
 			return App.scrollTo(targetView.el);
@@ -44,12 +50,15 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		App.scrollTo(portletView.el);
 	},
 
-	checkModel: function(model){
-		if (App.defined(model)){
-			var client_id = model.get('client_id');
-			if (client_id && client_id === this.parent.model.id){
-				this.collection.add(model);
-			}
+	checkCreatedModel: function(model){
+		if (this.collection === app.serviceRequests){ return; }
+		if (
+			App.defined(this.parent)												&&
+			App.defined(this.parent.model)									&&
+			this.parent.model instanceof App.Models.Client	&&
+			this.parent.model.id === model.get('client_id')
+		){
+			this.collection.add(model);
 		}
 	},
 });

@@ -332,7 +332,6 @@ App.Views.BaseView = Giraffe.View.extend({
 	},
 });
 App.Views.TableView = App.Views.BaseView.extend({
-	oTable        : null,
 	firstRender   : true,
 	rowViewOptions: {},
 
@@ -341,29 +340,38 @@ App.Views.TableView = App.Views.BaseView.extend({
 		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
 			this.beforeInitialize();
 		}
-		if(!App.defined(this.tableCollection)){
-			return new Error('Attribute tableCollection must be set.');
-		}
-		if(!App.defined(App.Collections[this.tableCollection])){
-			return new Error('This tableCollection is not defined.');
-		}
 		if (!App.defined(this.collection)){
-			if(App.defined(this.setCollection)){
+			if(_.isFunction(this.setCollection)){
 				this.collection = this.setCollection();
 			} else {
-				this.collection = new App.Collections[this.tableCollection]();
+				this.collection = new this.tableCollection();
 			}
 		}
 		this.listenTo(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'sync', this.afterSync);
+		_.bind(this.append, this);
+		this.timestamp = new Date().getTime();
+	},
+
+	serialize: function(){
+		return {
+			timestamp: this.timestamp,
+		};
+	},
+
+	setCollection: function(){
+		if(!App.defined(app[this.appStorage])){
+			app[this.appStorage] = new this.tableCollection();
+		}
+		return app[this.appStorage];
 	},
 
 	afterRender: function(){
 		if(!App.defined(this.tableEl)){
 			return new Error('Attribute tableEl must be set.');
 		}
-		this.oTable = this.$(this.tableEl).dataTable();	
 		if (this.firstRender){
+			this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
 			if(this.collection.length > 0){
 				this.appendCollection(this.collection);
 			} else {
@@ -385,10 +393,15 @@ App.Views.TableView = App.Views.BaseView.extend({
 			this.rowViewOptions.model = model;
 			var view = new this.modelView(this.rowViewOptions);
 			this.addChild(view);
+			console.log(this.oTable);
 			this.oTable.fnAddTr(view.render().el);
 		} else {
 			return new Error('Option modelView not defined');
 		}
+	},
+
+	onSync: function(){
+		this.collection.fetch();
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -550,7 +563,6 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 	tagName  : 'tr',
 
 	initialize: function(){
-		console.log(this.sameClient);
 		this.listenTo(this.model, 'change', this.render);
 	},
 
@@ -570,50 +582,14 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 });
 App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	template : HBS.appliance_index_template,
-	className: "table-responsive",
+	className: "row air-b",
 	name     : "Equipos",
 	
 	tableEl        : '#appliances-table',
-	tableCollection: 'Appliances',
+	tableCollection: App.Collections.Appliances,
 	modelView      : App.Views.ApplianceRowView,
 
-	sameClient: true,
-
-	appEvents: {
-		'appliance:create:success': 'checkModel',
-	},
-
-	serialize: function(){
-		var options = (App.defined(this.model)) ? (this.model.toJSON) : {};
-		return options;
-	},
-
-	checkModel: function(model){
-		if (App.defined(model)){
-			var client_id = model.get('client_id');
-			if (client_id && client_id === this.parent.model.id){
-				this.collection.add(model);
-			}
-		}
-	},
-
-	checkIfsameClient: function(){
-		var prev_client_id, model;
-		var length = this.collection.length;
-		if(length <= 1){
-			this.sameClient = true;
-			return true;
-		}
-		for(var i = 0; i < length; i++){
-			model          = this.collection.at(i);
-			prev_client_id = (prev_client_id) ? prev_client_id : model.get('client_id');
-			if (prev_client_id !== model.get('client_id')){
-				this.sameClient = false;
-				break;
-			}
-		}
-		return this.sameClient;
-	},
+	appStorage: 'appliances',
 });
 App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_single_form_template,
@@ -860,9 +836,12 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	handleSuccess: function(context, model, response, options){
-		var attrs = new App.Models.Client(response);
-		if (App.defined(app.ClientIndexView) && App.defined(app.ClientIndexView.view)){
-			app.ClientIndexView.view.collection.add(attrs);
+		var newModel = new App.Models.Client(response);
+		if(
+			App.defined(app.clients) &&
+			app.clients instanceof Giraffe.Collection
+		){
+			app.clients.add(newModel);
 		}
 		context.displayPortletMessage({
 			viewCid: context.parent.cid,
@@ -901,23 +880,14 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 });
 App.Views.ClientIndexView = App.Views.TableView.extend({
 	template : HBS.client_index_template,
-	className: "table-responisve",
+	className: "row",
 	name     : "Clientes",
 	
 	tableEl        : '#clients-table',
-	tableCollection: 'Clients',
+	tableCollection: App.Collections.Clients,
 	modelView      : App.Views.ClientRowView,
-	
-	onSync: function(){
-		this.collection.fetch();
-	},
 
-	setCollection: function(){
-		if(!App.defined(app.clients)){
-			app.clients = new App.Collections.Clients();
-		}
-		return app.clients;
-	},
+	appStorage : 'clients',
 });
 App.Views.ClientNewView = App.Views.BaseView.extend({	
 	name: "Nuevo Cliente",
@@ -966,6 +936,9 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 				success: function(){
 					self.render();
 					self.bindEvents();
+				},
+				error: function(){
+					self.parent.dispose();
 				},
 			});
 		}	else {
@@ -1185,11 +1158,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		'click #collapse': 'collapseView',
 	},
 
-	initialize: function(options){
-		this.model = new Backbone.Model();
-		this.model.set('cid', this.cid);
-	},
-
 	afterRender: function(options){
 		this.setFrame();
 		this.setMainChildView();
@@ -1293,6 +1261,12 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		options.model = new Backbone.Model(data);
 		var callout   = new App.Views.BSCalloutView(options);
 		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
+	},
+
+	serialize: function(){
+		return {
+			cid: this.cid,
+		};
 	},
 });
 App.Views.SearchView = App.Views.BaseView.extend({
@@ -1400,7 +1374,6 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			message : 'La Orden de Servicio se ha creado con exito!.',
 			class   : 'success',
 			method  : 'html',
-			lifetime: 0 
 		};
 	},
 
@@ -1466,9 +1439,14 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			child.saveModel();
 		});
 		this.model.save(this.model.serialize(), {
-			wait: true,
 			success: function(model, response, options){
 				app.trigger('service_request:create:success', model);
+				if(App.defined(app.serviceRequests)){
+					app.serviceRequests.add(model);
+				}
+				if(App.defined(app.appliances)){
+					app.appliances.add(model.appliances.models);
+				}
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
 					viewModel        : model,
@@ -1488,15 +1466,17 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 });
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	template : HBS.service_request_index_template,
-	className: "table-responsive",
+	className: "row",
 	name     : "Ordenes de Servicio",
 	
 	tableEl        : '#service_requests-table',
-	tableCollection: 'ServiceRequests',
+	tableCollection: App.Collections.ServiceRequests,
 	modelView      : App.Views.ServiceRequestRowView,
 
+	appStorage: 'serviceRequests',
+
 	appEvents: {
-		'service_request:create:success': 'checkModel',
+		"service_request:create:success": 'checkCreatedModel', 
 	},
 
 	events:{
@@ -1514,6 +1494,10 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	},
 
 	newServiceRequest: function(){
+		if(!this.parent.model || !(this.parent.model instanceof App.Models.Client)){
+			Backbone.history.navigate('render/service_request/new', {trigger: true});
+			return;
+		}
 		var targetView = app.Renderer.viewIsRendered(this.comparator, this);
 		if (targetView){
 			return App.scrollTo(targetView.el);
@@ -1532,12 +1516,15 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		App.scrollTo(portletView.el);
 	},
 
-	checkModel: function(model){
-		if (App.defined(model)){
-			var client_id = model.get('client_id');
-			if (client_id && client_id === this.parent.model.id){
-				this.collection.add(model);
-			}
+	checkCreatedModel: function(model){
+		if (this.collection === app.serviceRequests){ return; }
+		if (
+			App.defined(this.parent)												&&
+			App.defined(this.parent.model)									&&
+			this.parent.model instanceof App.Models.Client	&&
+			this.parent.model.id === model.get('client_id')
+		){
+			this.collection.add(model);
 		}
 	},
 });
@@ -1600,9 +1587,12 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 					self.render();
 					self.bindEvents();
 				},
+				error: function(){
+					self.parent.dispose();
+				},
 			});
 		} else {
-			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
+			if (_.isFunction(this.renderChilds)){
 				this.renderChilds();
 			}
 			this.announce();
@@ -1731,94 +1721,17 @@ App.Views.GoToTopView = App.Views.BaseView.extend({
 		}
 	},
 });
-var clientFixtures = 
-	[
-		{
-			'id'        : 1,
-			'name'      : 'Guzmán Monné',
-			'doc-type'  : 'CI',
-			'doc-number': '41234567',
-			'phones'    :
-			[
-				{
-					'number': '099123456'
-				},
-				{
-					'number': '094789456'
-				},
-			],
-			'addresses':
-			[
-				{
-					'street'    : 'Av. Italia 7274',
-					'city'      : 'Carrasco',
-					'department': 'Montevideo'
-				},
-				{
-					'street'    : '8 de Octubre 2012',
-					'city'      : 'Tres Cruces',
-					'department': 'Montevideo'
-				},
-			],
-			'email': 'guz@example.com'
-		},
-		{
-			'id': 2,
-			'name': 'Juan Perez',
-			'doc-type'  : 'CI',
-			'doc-number': '478963214',
-			'phones':
-			[
-				{
-					'number': '099987654'
-				},
-			],
-			'addresses':
-			[
-				{
-					'street'    : 'Av. 18 de Julio 7274',
-					'city'      : 'Centro',
-					'department': 'Montevideo'
-				},
-			],
-			'email': 'jperez@example.com'
-		},
-		{
-			'id': 3,
-			'name': 'Pedro Picapiedra',
-			'doc-type'  : 'CI',
-			'doc-number': '65478912342',
-			'phones':
-			[
-				{
-					'number': '099000000'
-				},
-				{
-					'number': '091000000'
-				},
-			],
-			'addresses':
-			[
-				{
-					'street'    : 'Piedra Floja 123',
-					'city'      : 'Piedra Lisa',
-					'department': 'Pedragoza'
-				},
-				{
-					'street'    : 'Piedra Dura',
-					'city'      : 'Piedra Lisa',
-					'department': 'Pedragoza'
-				},
-			],
-			'email': 'guz@example.com'
-		},
-	];
+App.GiraffeApp = Giraffe.App.extend({
+	template: HBS.app_template,
 
-var app     = new Giraffe.App();
-var clients = new App.Collections.Clients(clientFixtures);
+	// Collection storage
+	clients: null,
+});
 
-app.template  = HBS.app_template;
-app.className = "row";
+// var app     = new Giraffe.App();
+var app = new App.GiraffeApp();
+// app.template  = HBS.app_template;
+// app.className = "row";
 
 // Configure Ajax to use CSRF
 app.addInitializer(function(){

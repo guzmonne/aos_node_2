@@ -1,5 +1,4 @@
 App.Views.TableView = App.Views.BaseView.extend({
-	oTable        : null,
 	firstRender   : true,
 	rowViewOptions: {},
 
@@ -8,29 +7,38 @@ App.Views.TableView = App.Views.BaseView.extend({
 		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
 			this.beforeInitialize();
 		}
-		if(!App.defined(this.tableCollection)){
-			return new Error('Attribute tableCollection must be set.');
-		}
-		if(!App.defined(App.Collections[this.tableCollection])){
-			return new Error('This tableCollection is not defined.');
-		}
 		if (!App.defined(this.collection)){
-			if(App.defined(this.setCollection)){
+			if(_.isFunction(this.setCollection)){
 				this.collection = this.setCollection();
 			} else {
-				this.collection = new App.Collections[this.tableCollection]();
+				this.collection = new this.tableCollection();
 			}
 		}
 		this.listenTo(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'sync', this.afterSync);
+		_.bind(this.append, this);
+		this.timestamp = new Date().getTime();
+	},
+
+	serialize: function(){
+		return {
+			timestamp: this.timestamp,
+		};
+	},
+
+	setCollection: function(){
+		if(!App.defined(app[this.appStorage])){
+			app[this.appStorage] = new this.tableCollection();
+		}
+		return app[this.appStorage];
 	},
 
 	afterRender: function(){
 		if(!App.defined(this.tableEl)){
 			return new Error('Attribute tableEl must be set.');
 		}
-		this.oTable = this.$(this.tableEl).dataTable();	
 		if (this.firstRender){
+			this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
 			if(this.collection.length > 0){
 				this.appendCollection(this.collection);
 			} else {
@@ -52,9 +60,14 @@ App.Views.TableView = App.Views.BaseView.extend({
 			this.rowViewOptions.model = model;
 			var view = new this.modelView(this.rowViewOptions);
 			this.addChild(view);
+			console.log(this.oTable);
 			this.oTable.fnAddTr(view.render().el);
 		} else {
 			return new Error('Option modelView not defined');
 		}
+	},
+
+	onSync: function(){
+		this.collection.fetch();
 	},
 });

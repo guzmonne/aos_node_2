@@ -32,6 +32,9 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 					self.render();
 					self.bindEvents();
 				},
+				error: function(){
+					self.parent.dispose();
+				},
 			});
 		}	else {
 			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){

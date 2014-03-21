@@ -16,7 +16,6 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			message : 'La Orden de Servicio se ha creado con exito!.',
 			class   : 'success',
 			method  : 'html',
-			lifetime: 0 
 		};
 	},
 
@@ -82,9 +81,14 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			child.saveModel();
 		});
 		this.model.save(this.model.serialize(), {
-			wait: true,
 			success: function(model, response, options){
 				app.trigger('service_request:create:success', model);
+				if(App.defined(app.serviceRequests)){
+					app.serviceRequests.add(model);
+				}
+				if(App.defined(app.appliances)){
+					app.appliances.add(model.appliances.models);
+				}
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
 					viewModel        : model,

@@ -20,6 +20,12 @@
     background-color: #fff;
 }
 
+@media(max-width: 767px){
+  .table-responsive {
+    border: none;
+  }
+}
+
 @media(min-width:768px) {
     #page-wrapper {
         margin: 0;

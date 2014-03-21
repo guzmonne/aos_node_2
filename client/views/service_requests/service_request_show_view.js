@@ -23,9 +23,12 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 					self.render();
 					self.bindEvents();
 				},
+				error: function(){
+					self.parent.dispose();
+				},
 			});
 		} else {
-			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
+			if (_.isFunction(this.renderChilds)){
 				this.renderChilds();
 			}
 			this.announce();

@@ -110,9 +110,12 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	handleSuccess: function(context, model, response, options){
-		var attrs = new App.Models.Client(response);
-		if (App.defined(app.ClientIndexView) && App.defined(app.ClientIndexView.view)){
-			app.ClientIndexView.view.collection.add(attrs);
+		var newModel = new App.Models.Client(response);
+		if(
+			App.defined(app.clients) &&
+			app.clients instanceof Giraffe.Collection
+		){
+			app.clients.add(newModel);
 		}
 		context.displayPortletMessage({
 			viewCid: context.parent.cid,

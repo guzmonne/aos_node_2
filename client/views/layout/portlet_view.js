@@ -21,11 +21,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		'click #collapse': 'collapseView',
 	},
 
-	initialize: function(options){
-		this.model = new Backbone.Model();
-		this.model.set('cid', this.cid);
-	},
-
 	afterRender: function(options){
 		this.setFrame();
 		this.setMainChildView();
@@ -129,5 +124,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		options.model = new Backbone.Model(data);
 		var callout   = new App.Views.BSCalloutView(options);
 		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
+	},
+
+	serialize: function(){
+		return {
+			cid: this.cid,
+		};
 	},
 });

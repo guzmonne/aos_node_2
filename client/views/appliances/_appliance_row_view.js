@@ -4,7 +4,6 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 	tagName  : 'tr',
 
 	initialize: function(){
-		console.log(this.sameClient);
 		this.listenTo(this.model, 'change', this.render);
 	},
 

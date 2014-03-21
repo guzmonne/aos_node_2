@@ -90,9 +90,10 @@ ServiceRequestModel.prototype.create = function(params, callback){
 // Find all service requests
 // -------------------------
 ServiceRequestModel.prototype.findAll = function(callback){
-	ServiceRequest.find({}, function(err, service_requests){
+	ServiceRequest.find({}, function(err, sr){
 		if(err){return callback(err);}
-		callback(null, service_requests);
+		if(sr === null){return callback({msg: 'No ServiceRequest found'});}
+		callback(null, sr);
 	});
 };
 // Find all service requests from client
@@ -100,6 +101,7 @@ ServiceRequestModel.prototype.findAll = function(callback){
 ServiceRequestModel.prototype.findByClientId = function(client_id, callback){
 	ServiceRequest.find({'client_id': client_id}, function(err, service_requests){
 		if(err){return callback(err);}
+		if(service_requests === null){return callback({msg: 'No ServiceRequest found'});}
 		ServiceRequest.populate(service_requests, {
 			path: 'appliances'
 		}, function(err, s_r){
@@ -113,6 +115,7 @@ ServiceRequestModel.prototype.findByClientId = function(client_id, callback){
 ServiceRequestModel.prototype.show = function(id, callback){
 	ServiceRequest.findById(id, function(err, sr){
 		if(err){return callback(err);}
+		if(sr === null){return callback({msg: 'No ServiceRequest found'});}
 		sr.populate({path: 'appliances'}, function(err, s_r){
 			if(err){return callback(err);}
 			callback(null, s_r);
