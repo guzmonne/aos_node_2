@@ -60,7 +60,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 			this.rowViewOptions.model = model;
 			var view = new this.modelView(this.rowViewOptions);
 			this.addChild(view);
-			console.log(this.oTable);
 			this.oTable.fnAddTr(view.render().el);
 		} else {
 			return new Error('Option modelView not defined');

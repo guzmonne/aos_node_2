@@ -1,3 +1,65 @@
+this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_carousel_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div class=\"col-lg-12\">\n	<div class=\"row\">\n		<div class=\"col-xs-2\">\n			<button id=\"prev-model\" class=\"btn btn-primary pull-left\">\n				<i class=\"fa fa-chevron-left\"></i> Anterior\n			</button>\n		</div>\n		<div class=\"col-xs-8\">\n			<button class=\"btn btn-primary btn-block active\" style=\"padding: 3px; margin-top: 1px\">\n				<strong style=\"font-size: 18px\">\n					<span id=\"appliance-id\"></span>\n				</strong>\n			</button>\n		</div>\n		<div class=\"col-xs-2\">\n			<button id=\"next-model\" class=\"btn btn-primary pull-right\">\n				Siguiente <i class=\"fa fa-chevron-right\"></i>\n			</button>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 10px\">\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\" id=\"appliance-form\"></div>\n	</div>\n</div>";
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_edit_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  buffer += "\n								<option value=\""
+    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + "\">"
+    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + "</option>\n							";
+  return buffer;
+  }
+
+  buffer += "<div class=\"col-lg-offset-1 col-lg-9 col-md-12\">\n	<form class=\"form-horizontal\">\n		\n		\n		\n		<div class=\"row\">\n			<div class=\"col-md-6\">\n				<div class=\"form-group\">\n					<label for=\"brand\" class=\"col-sm-3 control-label\">Marca</label>\n					<div class=\"col-sm-9\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"brand\" placeholder=\"e.j: Punktal\" value=\"";
+  if (stack1 = helpers.brand) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.brand); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"model\" class=\"col-sm-3 control-label\">Modelo</label>\n					<div class=\"col-sm-9\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"model\" placeholder=\"e.j: PKT1020\" value=\"";
+  if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"serial\" class=\"col-sm-3 control-label\">Serie</label>\n					<div class=\"col-sm-9\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"serial\" placeholder=\"e.j: AXE102032\" value=\"";
+  if (stack1 = helpers.serial) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.serial); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n					</div>\n				</div>\n			</div>\n			<div class=\"col-md-6\">\n				<div class=\"form-group\">\n					<label for=\"category\" class=\"col-sm-4 control-label\">Categoría</label>\n					<div class=\"col-sm-8\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"category\" placeholder=\"e.j: Electrodomestico\" value=\"";
+  if (stack1 = helpers.category) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.category); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"subcategory\" class=\"col-sm-4 control-label\">Subcategoría</label>\n					<div class=\"col-sm-8\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"subcategory\" placeholder=\"e.j: Plancha\" value=\"";
+  if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n					</div>\n				</div>\n			</div>\n		</div>\n\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<hr style=\"margin-top: 0;\">\n			</div>\n		</div>\n		\n\n		\n		\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<div class=\"form-group\">\n					<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n					<div class=\"col-sm-10\">\n						<select disabled class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n							";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "	\n						</select>	\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"observations\" class=\"col-sm-2 control-label\">Observaciones</label>\n					<div class=\"col-sm-10\">\n						<textarea readonly class=\"form-control\" name=\"observations\">";
+  if (stack1 = helpers.observations) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.observations); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</textarea>\n					</div>\n				</div>\n			</div>\n		</div>\n\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<hr style=\"margin-top: 0;\">\n			</div>\n		</div>\n		\n\n		\n		\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<div class=\"form-group\">\n					<label for=\"repairement_type\" class=\"col-sm-2 control-label\">Tipo de Rep.</label>\n					<div class=\"col-sm-10\">\n						<select disabled class=\"form-control\" name=\"repairement_type\" value=";
+  if (stack1 = helpers.repairment_type) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.repairment_type); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ">\n							<option value=\"Garantía\">Garantía</option>\n							<option value=\"Presupuesto\">Presupuesto</option>\n						</select>	\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"defect\" class=\"col-sm-2 control-label\">Defecto</label>\n					<div class=\"col-sm-10\">\n						<textarea readonly class=\"form-control\" name=\"defect\">";
+  if (stack1 = helpers.defect) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.defect); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</textarea>\n					</div>\n				</div>\n			</div>\n		</div>\n\n	</form>\n</div>";
+  return buffer;
+  });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_form_container"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -143,7 +205,7 @@ function program3(depth0,data) {
   if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-offset-4 col-sm-8\">\n					<button class=\"btn btn-info btn-block\" tabindex=\"-1\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Detalles Adicionales</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n						";
+    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-offset-4 col-sm-8\">\n					<button class=\"btn btn-info btn-block\" tabindex=\"-1\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n						";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "	\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"observations\" class=\"col-sm-2 control-label\">Observaciones</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"observations\">";
@@ -838,11 +900,15 @@ function program1(depth0,data) {
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" data-toggle=\"tab\">\n  		Detalle\n  	</a>\n  </li>\n  <li>\n  	<a href=\"#service-request-edit-";
+    + "\" data-toggle=\"tab\">\n  		Detalle\n  	</a>\n  </li>\n  <li>\n    <a href=\"#service-request-appliances-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" data-toggle=\"tab\" id=\"service-request-edit\">\n  		Editar Datos\n  	</a>\n  </li>\n</ul>\n<div id=\"client-tab-content\" class=\"tab-content\">\n  <div class=\"tab-pane fade in active\" id=\"client-details-";
+    + "\" data-toggle=\"tab\" class=\"sr-appliances\">\n      Equipos\n    </a>\n  </li>\n  <li>\n  	<a href=\"#service-request-edit-";
+  if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" data-toggle=\"tab\" id=\"service-request-edit\">\n  		Editar Datos\n  	</a>\n  </li>\n</ul>\n<div id=\"service-request-tab-content\" class=\"tab-content\">\n  <div class=\"tab-pane fade in active\" id=\"service-request-details-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -881,14 +947,18 @@ function program1(depth0,data) {
   if (stack1 = helpers.updatedBy) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.updatedBy); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\n        </small>\n      </div>\n    </div>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"client-edit-";
+    + "\n        </small>\n      </div>\n    </div>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"service-request-edit-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n    <h3>Editar Datos de Cliente</h3>\n    <div id=\"client-form-";
+    + "\">\n    <h3>Editar Datos de Orden de Servicio</h3>\n    <div id=\"service-request-form-";
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"row\"></div>\n  </div>\n</div>";
+    + "\" class=\"row\"></div>\n  </div>\n  <div class=\"tab-pane fade in\" id=\"service-request-appliances-";
+  if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\"></div>\n</div>";
   return buffer;
   });

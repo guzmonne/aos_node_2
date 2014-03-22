@@ -3,6 +3,10 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 
 	name: null,
 
+	events: {
+		'click .sr-appliances' : 'renderAppliancesCarousel',
+	},
+
 	initialize: function(){
 		if(App.defined(this.model)){
 			this.bindEvents();
@@ -87,6 +91,19 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 		return result;
 	},
 
+	renderAppliancesCarousel: function(){
+		if (!this.appliancesCarousel){
+			if (!App.defined(this.model) || !App.defined(this.model.appliances)){
+				return;
+			}
+			this.appliancesCarousel = new App.Views.ApplianceCarouselView({
+				collection : this.model.appliances,
+			});
+			this.appliancesCarousel.attachTo(this.$('#service-request-appliances-' + this.timestamp), {
+				method: 'html',
+			});
+		}
+	},
 
 	setName: function(){
 		this.name = 'Orden de Servicio #' + this.model.get('id');
