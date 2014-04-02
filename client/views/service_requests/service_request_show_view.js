@@ -93,15 +93,20 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 
 	renderAppliancesCarousel: function(){
 		if (!this.appliancesCarousel){
-			if (!App.defined(this.model) || !App.defined(this.model.appliances)){
+			if (!App.defined(this.model) || 
+				!App.defined(this.model.appliances)
+			){
 				return;
 			}
 			this.appliancesCarousel = new App.Views.ApplianceCarouselView({
 				collection : this.model.appliances,
 			});
-			this.appliancesCarousel.attachTo(this.$('#service-request-appliances-' + this.timestamp), {
-				method: 'html',
-			});
+			this.appliancesCarousel.attachTo(
+				this.$('#service-request-appliances-' + this.timestamp), 
+				{
+					method: 'html',
+				}
+			);
 		}
 	},
 

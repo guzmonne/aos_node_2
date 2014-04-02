@@ -55,4 +55,32 @@ App.Views.BaseView = Giraffe.View.extend({
 		var opts = typeof options !== 'undefined' ? options : defaultOptions; 
 		app.trigger('portlet:message', opts);
 	},
+
+	blockForm: function(){
+		this.$('input').attr('readonly', true);
+		this.$('textarea').attr('readonly', true);
+		this.$('select').attr('disabled', true);
+		this.$('span[data-role=remove]').attr('data-role', 'not-remove');
+	},
+
+	unblockForm: function(){
+		this.$('input').attr('readonly', false);
+		this.$('textarea').attr('readonly', false);
+		this.$('select').attr('disabled', false);
+		this.$('span[data-role=not-remove]').attr('data-role', 'remove');
+	},
+
+	activateTags: function(){
+		this.$('.bootstrap-tagsinput').addClass('active');
+	},
+
+	deactivateTags: function(){
+		var input = this.$('.bootstrap-tagsinput input');
+		var value = input.val();
+		if (value !== ''){
+			this.$('[name=accessories]').tagsinput('add', value);
+			input.val('');
+		}
+		this.$('.bootstrap-tagsinput').removeClass('active');
+	},
 });

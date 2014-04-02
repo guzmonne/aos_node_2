@@ -512,11 +512,11 @@ input, select {
   padding-left: 8px;
   padding-right: 0;
 }
-/*
+
 .form-horizontal .control-label {
   text-align: left;
 }
-*/
+
 /* PORTLET */
 
 .portlet {
@@ -582,7 +582,7 @@ input, select {
 }
 
 .portlet .portlet-body {
-  padding: 15px 15px 0px 15px;
+  padding: 15px;
   background: #fff;
 }
 

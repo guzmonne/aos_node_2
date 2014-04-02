@@ -11,19 +11,19 @@ var timestamps    = require('mongoose-timestamp');
 var Schema   = mongoose.Schema;
 
 var Appliance = new Schema({
-	'model'          : String,
-	'brand'          : String,
-	'serial'         : String,
-	'category'       : String,
-	'subcategory'    : String,
-	'accessories'    : [String],
-	'client_name'    : String,
-	'client_id'      : String,
-	'repirement_type': String,
-	'defect'         : String,
-	'observations'   : String,
-	'status'         : String,
-	'cost'           : {
+	'model'           : String,
+	'brand'           : String,
+	'serial'          : String,
+	'category'        : String,
+	'subcategory'     : String,
+	'accessories'     : [String],
+	'client_name'     : String,
+	'client_id'       : String,
+	'repairement_type': String,
+	'defect'          : String,
+	'observations'    : String,
+	'status'          : String,
+	'cost'            : {
 		type: Number,
 		min : [0, 'El costo no puede ser menor que 0'],
 	},
@@ -39,16 +39,15 @@ var Appliance = new Schema({
 	'updatedBy'         : String,
 	'service_request_id': {
 		type: Schema.Types.ObjectId,
-		ref: 'ServiceRequest'
-	}
+		ref : 'ServiceRequest'
+	},
+	'createdAt': Date,
+	'updatedAt': Date,
 });
 
 // =======
 // PLUGINS
 // =======
-// Timestamps
-// ----------
-Appliance.plugin(timestamps);
 // AutoIncrement ID
 // ----------------
 Appliance.plugin(autoIncrement.plugin, {
@@ -69,10 +68,10 @@ var Appliance = mongoose.model('Appliance');
 ApplianceModel = function(){};
 // FUNCTIONS
 // ---------
-// Create new appliance
-// --------------------
-ApplianceModel.prototype.create = function(params, callback){
-	var appliance = new Appliance({
+// Fill object
+function fillObject(params){
+	var date = new Date();
+	var result = {
 		'model'             : params['model'],
 		'brand'             : params['brand'],
 		'serial'            : params['serial'],
@@ -80,7 +79,7 @@ ApplianceModel.prototype.create = function(params, callback){
 		'subcategory'       : params['subcategory'],
 		'client_name'       : params['client_name'],
 		'client_id'         : params['client_id'],
-		'repairment_type'   : params['repairment_type'],
+		'repairement_type'  : params['repairement_type'],
 		'defect'            : params['defect'],
 		'observations'      : params['observations'],
 		'status'            : params['status'],
@@ -96,10 +95,19 @@ ApplianceModel.prototype.create = function(params, callback){
 		'createdBy'         : params['createdBy'],
 		'updatedBy'         : params['updatedBy'],
 		'service_request_id': params['service_request_id'],
-	});
-	for(var i = 0; i < params['accessories'].length; i++){
-		appliance.accessories.push(params['accessories'][i]);
+		'accessories'       : params['accessories'],
+		'updatedAt'         : date,
 	}
+	if (!params['_id']){
+		result.createdAt = date;
+	}
+	return result;
+}
+// Create new appliance
+// --------------------
+ApplianceModel.prototype.create = function(params, callback){
+	var object = fillObject(params);
+	var appliance = new Appliance(object);
 	appliance.save(function(err, appliance){
 		if (err){return callback(err);}
 		callback(null, appliance);
@@ -109,7 +117,16 @@ ApplianceModel.prototype.create = function(params, callback){
 // ------------------
 ApplianceModel.prototype.findAll = function(callback){
 	Appliance.find({}, function(err, appliances){
+		if (err){return callback(err);}
 		callback(null, appliances);
+	});
+};
+// Update appliance by id
+ApplianceModel.prototype.updateById = function(id, params, callback){
+	var object = fillObject(params);
+	Appliance.findByIdAndUpdate(id, object, function(err, appliance){
+		if (err){return callback(err);}
+		callback(null, appliance);
 	});
 };
 // =========

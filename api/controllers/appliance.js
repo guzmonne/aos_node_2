@@ -9,3 +9,10 @@ exports.index = function(req, res){
 		res.send(appliances);
 	});
 };
+
+exports.update = function(req, res){
+	var id = req.params.id;
+	Appliance.updateById(id, req.body, function(error, appliance){
+		res.send(appliance);
+	});
+}

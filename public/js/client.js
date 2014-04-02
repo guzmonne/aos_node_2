@@ -330,6 +330,71 @@ App.Views.BaseView = Giraffe.View.extend({
 		var opts = typeof options !== 'undefined' ? options : defaultOptions; 
 		app.trigger('portlet:message', opts);
 	},
+
+	blockForm: function(){
+		this.$('input').attr('readonly', true);
+		this.$('textarea').attr('readonly', true);
+		this.$('select').attr('disabled', true);
+		this.$('span[data-role=remove]').attr('data-role', 'not-remove');
+	},
+
+	unblockForm: function(){
+		this.$('input').attr('readonly', false);
+		this.$('textarea').attr('readonly', false);
+		this.$('select').attr('disabled', false);
+		this.$('span[data-role=not-remove]').attr('data-role', 'remove');
+	},
+
+	activateTags: function(){
+		this.$('.bootstrap-tagsinput').addClass('active');
+	},
+
+	deactivateTags: function(){
+		var input = this.$('.bootstrap-tagsinput input');
+		var value = input.val();
+		if (value !== ''){
+			this.$('[name=accessories]').tagsinput('add', value);
+			input.val('');
+		}
+		this.$('.bootstrap-tagsinput').removeClass('active');
+	},
+});
+App.Views.CarouselView = App.Views.BaseView.extend({
+	template: HBS.carousel_template,
+
+	className: "row",
+
+	initialize: function(){
+		if (this.air){
+			this.$el.addClass("air-t");
+		}
+	},
+
+	afterRender: function(){
+		var view;
+		var carouselItemView = App.Views[this.carouselItemView];
+		var options = (this.carouselItemViewOptions) ? this.carouselItemViewOptions : {}; 
+		if(!App.defined(carouselItemView)){return;}
+		if (!this.collection){return;}
+		for(var i = 0; i < this.collection.length; i++){
+			options.model     = this.collection.at(i);
+			options.className = (i === 0) ? "item active" : "item";
+			view              = new carouselItemView(options);
+			view.attachTo(this.$('#carousel-items-' + this.cid));
+		}
+		this.$('#carousel-' + this.cid).carousel({
+      interval: 0,
+      pause: "hover"
+    });
+	},
+
+	serialize: function(){
+		var options               = {};
+		options.cid               = this.cid;
+		options.carouselClassName = (this.carouselClassName) ? this.carouselClassName : null;
+		options.carouselTitle     = (this.carouselTitle)     ? this.carouselTitle     : null;
+		return options;
+	},
 });
 App.Views.TableView = App.Views.BaseView.extend({
 	firstRender   : true,
@@ -579,47 +644,68 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 		return object;
 	},
 });
-App.Views.ApplianceCarouselView = App.Views.BaseView.extend({
-	template: HBS.appliance_carousel_template,
-
-	className: "row air-t",
-
-	modelIndex: 0,
-
-	initialize: function(){
-		this.colLength = (this.collection) ? this.collection.length : 0;
-	},
-
-	afterRender: function(){
-		if (!this.collection){return;}
-		this.carouselView = new App.Views.ApplianceEditFormView({
-			collection: this.collection,
-		});
-		this.carouselView.attachTo(this.$('#appliance-form'), {method: 'html'});
-	},
-
-	swapModel: function(){
-		var model = this.collection.at(this.modelIndex);
-	},
+App.Views.ApplianceCarouselView = App.Views.CarouselView.extend({
+	air              : true,
+	carouselItemView : "ApplianceEditFormView",
+	carouselClassName: "col-lg-offset-2 col-lg-8 col-md-12",
+	carouselTitle    : "Equipos",
 });
 App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_edit_form_template, 
 
 	className: "row",
 
+	events: {
+		'click #edit-appliance'              : "editAppliance",
+		'click #save-appliance'              : "saveAppliance",
+		'click #render-appliance'            : "rerender",
+		'focus .bootstrap-tagsinput input'   : 'activateTags',
+		'focusout .bootstrap-tagsinput input': 'deactivateTags',
+	},
+
 	afterRender: function(){
-		App.animate(this.$el, this.animation);
 		this.$('[name=accessories]').tagsinput();
-		$('#myCarousel.slide').carousel({
-      interval: 0,
-      pause: "hover"
-    });
+		this.blockForm();
+		this.toggleButtons();
+	},
+
+	toggleButtons: function(){
+		this.$('button').toggleClass('hide');
+	},
+
+	editAppliance: function(e){
+		e.preventDefault();
+		this.unblockForm();
+		this.toggleButtons();
+	},
+
+	saveAppliance: function(e){
+		e.preventDefault();
+		this.saveModel();
+		this.model.save();
+		this.blockForm();
+		this.toggleButtons();
+	},
+
+	rerender: function(e){
+		e.preventDefault();
+		this.render();
 	},
 
 	serialize: function(){
-		return {
-			appliances: this.collection.toJSON()
-		};
+		return this.model.toJSON();
+	},
+
+	saveModel: function(){
+		this.model.set('brand', this.$('[name=brand]').val());
+		this.model.set('model', this.$('[name=model]').val());
+		this.model.set('serial', this.$('[name=serial]').val());
+		this.model.set('category', this.$('[name=category]').val());
+		this.model.set('subcategory', this.$('[name=subcategory]').val());
+		this.model.set('observations', this.$('[name=observations]').val());
+		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
+		this.model.set('defect', this.$('[name=defect]').val());
+		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
 	},
 });
 App.Views.ApplianceIndexView = App.Views.TableView.extend({
@@ -663,20 +749,6 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 			App.scrollTo(this.$el);
 			this.firstRender = false;
 		}
-	},
-
-	activateTags: function(){
-		this.$('.bootstrap-tagsinput').addClass('active');
-	},
-
-	deactivateTags: function(){
-		var input = this.$('.bootstrap-tagsinput input');
-		var value = input.val();
-		if (value !== ''){
-			this.$('[name=accessories]').tagsinput('add', value);
-			input.val('');
-		}
-		this.$('.bootstrap-tagsinput').removeClass('active');
 	},
 
 	saveAndDispose: function(){
@@ -1699,15 +1771,20 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 
 	renderAppliancesCarousel: function(){
 		if (!this.appliancesCarousel){
-			if (!App.defined(this.model) || !App.defined(this.model.appliances)){
+			if (!App.defined(this.model) || 
+				!App.defined(this.model.appliances)
+			){
 				return;
 			}
 			this.appliancesCarousel = new App.Views.ApplianceCarouselView({
 				collection : this.model.appliances,
 			});
-			this.appliancesCarousel.attachTo(this.$('#service-request-appliances-' + this.timestamp), {
-				method: 'html',
-			});
+			this.appliancesCarousel.attachTo(
+				this.$('#service-request-appliances-' + this.timestamp), 
+				{
+					method: 'html',
+				}
+			);
 		}
 	},
 

@@ -30,20 +30,6 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		}
 	},
 
-	activateTags: function(){
-		this.$('.bootstrap-tagsinput').addClass('active');
-	},
-
-	deactivateTags: function(){
-		var input = this.$('.bootstrap-tagsinput input');
-		var value = input.val();
-		if (value !== ''){
-			this.$('[name=accessories]').tagsinput('add', value);
-			input.val('');
-		}
-		this.$('.bootstrap-tagsinput').removeClass('active');
-	},
-
 	saveAndDispose: function(){
 		this.saveModel();
 		this.dispose();

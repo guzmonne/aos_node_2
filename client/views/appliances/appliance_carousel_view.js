@@ -1,23 +1,6 @@
-App.Views.ApplianceCarouselView = App.Views.BaseView.extend({
-	template: HBS.appliance_carousel_template,
-
-	className: "row air-t",
-
-	modelIndex: 0,
-
-	initialize: function(){
-		this.colLength = (this.collection) ? this.collection.length : 0;
-	},
-
-	afterRender: function(){
-		if (!this.collection){return;}
-		this.carouselView = new App.Views.ApplianceEditFormView({
-			collection: this.collection,
-		});
-		this.carouselView.attachTo(this.$('#appliance-form'), {method: 'html'});
-	},
-
-	swapModel: function(){
-		var model = this.collection.at(this.modelIndex);
-	},
+App.Views.ApplianceCarouselView = App.Views.CarouselView.extend({
+	air              : true,
+	carouselItemView : "ApplianceEditFormView",
+	carouselClassName: "col-lg-offset-2 col-lg-8 col-md-12",
+	carouselTitle    : "Equipos",
 });

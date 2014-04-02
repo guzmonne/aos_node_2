@@ -122,7 +122,7 @@ app.post('/api/service_requests', service_request.create);
 // Appliances
 // ----------
 app.get('/api/appliances', appliance.index);
-
+app.put('/api/appliances/:id', appliance.update);
 
 // =============
 // DEFAULT ROUTE
