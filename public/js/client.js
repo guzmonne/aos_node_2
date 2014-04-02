@@ -18,11 +18,11 @@ window.App = {
 		}
 	},
 
-	animate: function(el, animation, callback){
+	animate: function(el, animation, callback, context){
 		$(el).addClass("animated " + animation);
 		var wait = window.setTimeout(function () {
 			$(el).removeClass("animated " + animation);
-			if(_.isFunction(callback)){callback();}
+			if(_.isFunction(callback)){callback.apply(context);}
 		}, 800);
 	},
 
@@ -584,11 +584,6 @@ App.Views.ApplianceCarouselView = App.Views.BaseView.extend({
 
 	className: "row air-t",
 
-	events: {
-		'click #prev-model': 'prevModel',
-		'click #next-model': 'nextModel',
-	},
-
 	modelIndex: 0,
 
 	initialize: function(){
@@ -597,41 +592,35 @@ App.Views.ApplianceCarouselView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		if (!this.collection){return;}
-		this.swapModel();
+		this.carouselView = new App.Views.ApplianceEditFormView({
+			collection: this.collection,
+		});
+		this.carouselView.attachTo(this.$('#appliance-form'), {method: 'html'});
 	},
 
 	swapModel: function(){
 		var model = this.collection.at(this.modelIndex);
-		if(this.carouselView){
-			this.carouselView.dispose();
-		}
-		this.carouselView = new App.Views.ApplianceEditFormView({
-			model: model
-		});
-		this.$('#appliance-id').text('ID #' + model.get('id'));
-		this.carouselView.attachTo(this.$('#appliance-form'), {method: 'html'});
-	},
-
-	prevModel: function(){
-		this.modelIndex = this.modelIndex - 1;
-		if (this.modelIndex < 0){
-			this.modelIndex = this.colLength - 1;
-		}
-		this.swapModel();
-	},
-
-	nextModel: function(){
-		this.modelIndex = this.modelIndex + 1;
-		if (this.modelIndex >= this.colLength){
-			this.modelIndex = 0;
-		}
-		this.swapModel();
 	},
 });
 App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_edit_form_template, 
 
 	className: "row",
+
+	afterRender: function(){
+		App.animate(this.$el, this.animation);
+		this.$('[name=accessories]').tagsinput();
+		$('#myCarousel.slide').carousel({
+      interval: 0,
+      pause: "hover"
+    });
+	},
+
+	serialize: function(){
+		return {
+			appliances: this.collection.toJSON()
+		};
+	},
 });
 App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	template : HBS.appliance_index_template,

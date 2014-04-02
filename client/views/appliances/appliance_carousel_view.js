@@ -3,11 +3,6 @@ App.Views.ApplianceCarouselView = App.Views.BaseView.extend({
 
 	className: "row air-t",
 
-	events: {
-		'click #prev-model': 'prevModel',
-		'click #next-model': 'nextModel',
-	},
-
 	modelIndex: 0,
 
 	initialize: function(){
@@ -16,34 +11,13 @@ App.Views.ApplianceCarouselView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		if (!this.collection){return;}
-		this.swapModel();
+		this.carouselView = new App.Views.ApplianceEditFormView({
+			collection: this.collection,
+		});
+		this.carouselView.attachTo(this.$('#appliance-form'), {method: 'html'});
 	},
 
 	swapModel: function(){
 		var model = this.collection.at(this.modelIndex);
-		if(this.carouselView){
-			this.carouselView.dispose();
-		}
-		this.carouselView = new App.Views.ApplianceEditFormView({
-			model: model
-		});
-		this.$('#appliance-id').text('ID #' + model.get('id'));
-		this.carouselView.attachTo(this.$('#appliance-form'), {method: 'html'});
-	},
-
-	prevModel: function(){
-		this.modelIndex = this.modelIndex - 1;
-		if (this.modelIndex < 0){
-			this.modelIndex = this.colLength - 1;
-		}
-		this.swapModel();
-	},
-
-	nextModel: function(){
-		this.modelIndex = this.modelIndex + 1;
-		if (this.modelIndex >= this.colLength){
-			this.modelIndex = 0;
-		}
-		this.swapModel();
 	},
 });

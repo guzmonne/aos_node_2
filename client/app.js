@@ -18,11 +18,11 @@ window.App = {
 		}
 	},
 
-	animate: function(el, animation, callback){
+	animate: function(el, animation, callback, context){
 		$(el).addClass("animated " + animation);
 		var wait = window.setTimeout(function () {
 			$(el).removeClass("animated " + animation);
-			if(_.isFunction(callback)){callback();}
+			if(_.isFunction(callback)){callback.apply(context);}
 		}, 800);
 	},
 

@@ -582,7 +582,7 @@ input, select {
 }
 
 .portlet .portlet-body {
-  padding: 15px;
+  padding: 15px 15px 0px 15px;
   background: #fff;
 }
 
@@ -892,4 +892,10 @@ td.center-vh{
 /* LINKS */
 h1 a:hover {
   text-decoration: none;
+}
+
+/* HR */
+hr {
+  margin-top   : 5px;
+  margin-bottom: 5px;
 }
