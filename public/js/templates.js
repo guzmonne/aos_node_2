@@ -728,7 +728,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"col-lg-12 carousel slide\">\n	<div class=\"row well well-sm\" style=\"border-radius: 0\">\n		<div class=\"col-xs-12\">\n			<h2 class=\"text-center\" style=\"margin-top: 10px\">\n				<a href=\"#carousel-";
+    + "\" class=\"col-lg-12 carousel slide\">\n	<div class=\"row well well-sm\" style=\"border-radius: 0; margin-bottom:10px\">\n		<div class=\"col-xs-12\">\n			<h2 class=\"text-center\" style=\"margin-top: 10px\">\n				<a href=\"#carousel-";
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -736,11 +736,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.carouselTitle) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.carouselTitle); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\n				<a href=\"#carousel-";
+    + "\n				<button type=\"button\" class=\"btn btn-green\" data-toggle=\"collapse\" data-target=\"#range-carousel-selector\">\n					<i class=\"fa fa-bars\"></i>\n				</button>\n				<a href=\"#carousel-";
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" id=\"next-model\" class=\"btn btn-green pull-right\" data-slide=\"next\">\n					<i class=\"fa fa-chevron-right\"></i>\n				</a>\n			</h2>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"";
+    + "\" id=\"next-model\" class=\"btn btn-green pull-right\" data-slide=\"next\">\n					<i class=\"fa fa-chevron-right\"></i>\n				</a>\n			</h2>\n		</div>\n	</div>\n	<div class=\"row collapse\" id=\"range-carousel-selector\">\n		<div class=\"col-lg-12\">\n			<div class=\"range range-green\" style=\"margin: 0px 0px 10px 0px\">\n        <input type=\"range\" name=\"range\" min=\"1\" max=\"100\" value=\"1\" id=\"range-selector\">\n        <output id=\"range\">1</output>\n      </div>\n      <hr>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"";
   if (stack1 = helpers.carouselClassName) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.carouselClassName); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
