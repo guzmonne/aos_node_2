@@ -18,7 +18,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 			'cost'              : 0,
 			'solution'          : null,
 			'diagnose'          : null,
-			'replacements'      : null,
+			'replacements'      : [],
 			'inStock'           : null,
 			'departuredAt'      : null,
 			'repairedAt'        : null,

@@ -113,6 +113,14 @@
       return sum;
     });
 
+    Handlebars.registerHelper('selected?', function(compareValue, value){
+        if (compareValue === value){
+            return 'selected';
+        } else {
+            return null;
+        }
+    });
+
     return eR;
 
 }));

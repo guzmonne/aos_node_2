@@ -70,15 +70,17 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('span[data-role=not-remove]').attr('data-role', 'remove');
 	},
 
-	activateTags: function(){
-		this.$('.bootstrap-tagsinput').addClass('active');
+	activateTags: function(e){
+		if (!e){return;}
+		this.$(e.currentTarget).closest('.bootstrap-tagsinput').addClass('active');
 	},
 
-	deactivateTags: function(){
-		var input = this.$('.bootstrap-tagsinput input');
+	deactivateTags: function(e){
+		if (!e){return;}
+		var input = this.$(e.target);
 		var value = input.val();
 		if (value !== ''){
-			this.$('[name=accessories]').tagsinput('add', value);
+			this.$(e.target.offsetParent).find('select').tagsinput('add', value);
 			input.val('');
 		}
 		this.$('.bootstrap-tagsinput').removeClass('active');
