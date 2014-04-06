@@ -195,6 +195,27 @@ App.Models.Address = App.Models.BaseModel.extend({
 		};
 	},
 });
+App.Models.Model = App.Models.BaseModel.extend({
+	
+	url: function(){
+		var u = '/api/models';
+		if (this.id){
+			u = u + '/' + id;
+		}
+		return u;
+	},
+
+	defaults: function(){
+		return {
+			'model'      : null,
+			'brand'      : null,
+			'category'   : null,
+			'subcategory': null,
+			'createdBy'  : 'Guzmán Monné',
+			'updatedBy'  : 'Guzmán Monné'
+		};
+	},
+});
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
@@ -274,6 +295,7 @@ App.Collections.ServiceRequests = Giraffe.Collection.extend({
 	model: App.Models.ServiceRequest,
 });
 App.Views.BaseView = Giraffe.View.extend({
+
 	canSync: function(){
 		if (App.defined(this.onSync)){
 			this.onSync();
@@ -435,6 +457,20 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 		}
 		this.$range.val(rangeVal);
 		this.$rangeOutput.val(rangeVal);
+	},
+});
+App.Views.NewView = App.Views.BaseView.extend({
+	className: "row",
+
+	afterRender: function(){
+		this.renderForm();
+	},
+
+	renderForm: function(){
+		this.formView = new App.Views[this.formViewName]({
+			model: new App.Models[this.modelName]()
+		});
+		this.formView.attachTo(this.$el, {method: 'html'});
 	},
 });
 App.Views.TableView = App.Views.BaseView.extend({
@@ -759,9 +795,22 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	saveAppliance: function(e){
+		var self    = this;
 		e.preventDefault();
 		this.saveModel();
-		this.model.save();
+		this.model.save({}, {
+			success: function(){
+				var options = {
+					title  : 'Equipo Actualizado',
+					message: 'El equipos se ha actualizado con exito',
+					class  : 'success'
+				};
+				var view = new App.Views.BSCalloutView({
+					model: new Giraffe.Model(options)
+				});
+				view.attachTo(self.$('#message'), {method: 'html'});
+			}
+		});
 		this.blockForm();
 		this.toggleButtons();
 	},
@@ -1088,19 +1137,10 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 
 	appStorage : 'clients',
 });
-App.Views.ClientNewView = App.Views.BaseView.extend({	
-	name: "Nuevo Cliente",
-
-	className: "row",
-
-	afterRender: function(){
-		this.renderForm();
-	},
-
-	renderForm: function(){
-		this.clientForm = new App.Views.ClientFormView({model: new App.Models.Client()});
-		this.clientForm.attachTo(this.$el, {method: 'html'});
-	},
+App.Views.ClientNewView = App.Views.NewView.extend({	
+	name        : "Nuevo Cliente",
+	formViewName: "ClientFormView",
+	modelName   : "Client",
 });
 App.Views.ClientShowView = App.Views.BaseView.extend({
 	template: HBS.client_show_template,
@@ -1449,11 +1489,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	showMessage: function(data){
 		var options = {};
 		var method  = 'prepend';
-		if(App.defined(data.lifetime)){
+		if(data.lifetime){
 			options.lifetime = data.lifetime;
 			delete data.lifetime;
 		}
-		if(App.defined(data.method)){
+		if(data.method){
 			method = data.method;
 			delete data.method;
 		}
@@ -1529,6 +1569,51 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	template: HBS.user_settings_template,
 	tagName: 'li', 
 	className: 'dropdown',
+});
+App.Views.ModelFormView = App.Views.BaseView.extend({
+	template: HBS.model_form_template,
+
+	events: {
+		'submit form': 'createModel',
+	},
+
+	createModel: function(e){
+		var self = this;
+		e.preventDefault();
+		this.saveModel();
+		this.model.save({}, {
+			success: function(){
+				self.displayPortletMessage({
+					viewCid: self.parent.cid,
+					title  : 'Modelo Creado',
+					message: 'El nuevo modelo se ha creado con exito.',
+					class  : 'success',
+				});
+			},
+		});
+		this.model.dispose();
+		this.model = new App.Models.Model();
+		this.cleanForm();
+	},
+
+	saveModel: function(){
+		this.model.set('brand', this.$('[name=brand]').val());
+		this.model.set('model', this.$('[name=model]').val());
+		this.model.set('category', this.$('[name=category]').val());
+		this.model.set('subcategory', this.$('[name=subcategory]').val());
+	},
+
+	cleanForm: function(){
+		this.$('[name=brand]').val('');
+		this.$('[name=model]').val('');
+		this.$('[name=category]').val('');
+		this.$('[name=subcategory]').val('');
+	}
+});
+App.Views.ModelNewView = App.Views.NewView.extend({
+	name        : "Nuevo Modelo",
+	formViewName: "ModelFormView",
+	modelName   : "Model",
 });
 App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
 	template: HBS.service_request_row_template,
@@ -1816,7 +1901,8 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 				App.defined(this.model.appliances)
 		){
 			this.appliancesIndex = new App.Views.ApplianceIndexView({
-				collection: this.model.appliances
+				collection: this.model.appliances,
+				portlet   : this.parent,
 			});
 			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
 				method: 'html'

@@ -1,0 +1,28 @@
+- Estados de Equipos:
+	- Recibido:
+	 - Estanteria en espera
+	- En reparación
+	 - Se le llevo al tecnico
+	- En espera
+	 - 
+	- Atrasado
+	 - 
+	- Reparado
+	 - Vuelve a la estantería apartado para entregar o mandar por encomienda
+	- Enviado
+	 - Se fue pero bajo responsabilidad de la empresa
+	- Entregado
+	 - Se fue
+
+- Registrar cambios de estado.
+- Bloquear cambios de estado hacia atras.
+
+- Repuestos
+	- Serie
+	- Cantidad
+	- Numero y Descripción
+
+Asignación de Tecnicos
+- 
+
+- Papel unitario por equipo, mas alta que ancha

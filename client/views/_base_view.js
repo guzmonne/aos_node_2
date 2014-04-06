@@ -1,4 +1,5 @@
 App.Views.BaseView = Giraffe.View.extend({
+
 	canSync: function(){
 		if (App.defined(this.onSync)){
 			this.onSync();

@@ -66,9 +66,22 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	saveAppliance: function(e){
+		var self    = this;
 		e.preventDefault();
 		this.saveModel();
-		this.model.save();
+		this.model.save({}, {
+			success: function(){
+				var options = {
+					title  : 'Equipo Actualizado',
+					message: 'El equipos se ha actualizado con exito',
+					class  : 'success'
+				};
+				var view = new App.Views.BSCalloutView({
+					model: new Giraffe.Model(options)
+				});
+				view.attachTo(self.$('#message'), {method: 'html'});
+			}
+		});
 		this.blockForm();
 		this.toggleButtons();
 	},

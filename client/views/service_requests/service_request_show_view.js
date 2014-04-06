@@ -53,7 +53,8 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 				App.defined(this.model.appliances)
 		){
 			this.appliancesIndex = new App.Views.ApplianceIndexView({
-				collection: this.model.appliances
+				collection: this.model.appliances,
+				portlet   : this.parent,
 			});
 			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
 				method: 'html'

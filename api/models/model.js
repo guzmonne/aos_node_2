@@ -12,7 +12,6 @@ var Schema   = mongoose.Schema;
 var Model = new Schema({
 	'model'      : String,
 	'brand'      : String,
-	'serial'     : String,
 	'category'   : String,
 	'subcategory': String,
 	'createdBy'  : String,
@@ -30,7 +29,7 @@ var Model = new Schema({
 // =======
 // AutoIncrement ID
 // ----------------
-Appliance.plugin(autoIncrement.plugin, {
+Model.plugin(autoIncrement.plugin, {
     model: 'Model',
     field: 'id',
     startAt: 1,
@@ -91,9 +90,6 @@ ModelModel.prototype.updateById = function(id, params, callback){
 		callback(null, model);
 	});
 };
-// =========
-// FUNCTIONS
-// =========
 
 // =======
 // EXPORTS

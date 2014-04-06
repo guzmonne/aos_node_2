@@ -113,11 +113,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	showMessage: function(data){
 		var options = {};
 		var method  = 'prepend';
-		if(App.defined(data.lifetime)){
+		if(data.lifetime){
 			options.lifetime = data.lifetime;
 			delete data.lifetime;
 		}
-		if(App.defined(data.method)){
+		if(data.method){
 			method = data.method;
 			delete data.method;
 		}
