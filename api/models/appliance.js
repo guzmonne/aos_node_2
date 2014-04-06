@@ -11,11 +11,15 @@ var timestamps    = require('mongoose-timestamp');
 var Schema   = mongoose.Schema;
 
 var Appliance = new Schema({
-	'model'           : String,
-	'brand'           : String,
-	'serial'          : String,
-	'category'        : String,
-	'subcategory'     : String,
+	'model_id'        : {
+		type: Schema.Types.ObjectId,
+		ref : 'Model'
+	},
+	//'model'           : String,
+	//'brand'           : String,
+	//'serial'          : String,
+	//'category'        : String,
+	//'subcategory'     : String,
 	'accessories'     : [String],
 	'client_name'     : String,
 	'client_id'       : String,
