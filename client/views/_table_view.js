@@ -64,6 +64,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		} else {
 			return new Error('Option modelView not defined');
 		}
+		if (_.isFunction(this.afterAppend)){this.afterAppend();}
 	},
 
 	onSync: function(){

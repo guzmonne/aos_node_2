@@ -39,7 +39,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		var parentModel = this.parent.model;
 		var object = {
 			client_name: parentModel.get('name'),
-			client_id  : parentModel.id,
+			client_id  : parentModel.get('id')
 		};
 		var model = new App.Models.ServiceRequest(object);
 		var portletView = new App.Views.PortletView({

@@ -15,6 +15,7 @@ App.Views.RowView = App.Views.BaseView.extend({
 			this.activate();
 		}
 		app.trigger(this.modelName + ':row:rendered');
+		if(_.isFunction(this.onceRendered)){this.onceRendered();}
 	},
 
 	serialize: function(){

@@ -14,8 +14,10 @@ var Appliance      = new ApplianceModel();
 var Schema   = mongoose.Schema;
 
 var ServiceRequest = new Schema({
-	'client_name'  : String,
-	'client_id'    : String,
+	'client_id'    : {
+		type: Schema.Types.ObjectId,
+		ref : 'Client'
+	},
 	'status'       : String,
 	'invoiceNumber': String,
 	'appliances'   : [{

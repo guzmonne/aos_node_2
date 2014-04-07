@@ -1,9 +1,10 @@
 // ===================
 // MODULE DEPENDENCIES
 // ===================
-var mongoose   = require('mongoose');
-var ShortId    = require('mongoose-shortid');
-var timestamps = require('mongoose-timestamp');
+var mongoose      = require('mongoose');
+var ShortId       = require('mongoose-shortid');
+var timestamps    = require('mongoose-timestamp');
+var autoIncrement = require('mongoose-auto-increment');
 
 // =======
 // SCHEMAS
@@ -21,27 +22,34 @@ var Phone = new Schema({
 });
 
 var Client = new Schema({
-	_id: {
-		type   : ShortId,
-		len    : 6,
-		base   : 10,
-		retries: 10
-	}, 
-	name        : String,
+	'name'      : String,
 	'doc-type'  : String,
 	'doc-number': String,
-	phones      : [Phone],
-	addresses   : [Address],
-	email       : {
-		type: String,
-		lowecase: true,
+	'phones'    : [Phone],
+	'addresses' : [Address],
+	'email'     : {
+		'type'    : String,
+		'lowecase': true,
 	},
+	'service_requests' : [{
+		type: Schema.Types.ObjectId,
+		ref: 'ServiceRequest',
+	}],
 });
 
 // =======
 // PLUGINS
 // =======
+// Timestamps
+// ----------
 Client.plugin(timestamps);
+// Auto ID
+// -------
+Client.plugin(autoIncrement.plugin, {
+    model: 'Client',
+    field: 'id',
+    startAt: 1,
+});
 
 // =====
 // MODEL

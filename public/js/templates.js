@@ -592,7 +592,7 @@ function program3(depth0,data) {
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" id=\"show-client\" class=\"btn btn-green\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n</td>";
+    + "\" id=\"show-client\" class=\"btn btn-green\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Más Información\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n	<a id=\"select-client\" class=\"btn btn-warning hide\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar\">\n		<i class=\"fa fa-external-link fa-lg\"></i>\n	</a>\n</td>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_select_modal_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -601,7 +601,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<p>Hello!</p>\n";
+  return "<div id=\"client-index\">\n	\n</div>\n";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];

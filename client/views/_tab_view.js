@@ -49,7 +49,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 				};
 			}
 			if(tab.active){
-				console.log(tab);
 				tabDetails.active = true;
 				self.activeView = tabFunction;
 			} else {

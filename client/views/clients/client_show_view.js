@@ -34,7 +34,7 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 	},
 
 	setName: function(){
-		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
+		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
 
 	onSync: function(){

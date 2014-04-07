@@ -39,44 +39,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			return;
 		}
 	},
-
-	showOrGoToOld: function(viewName, params){
-		var rendered, viewRef, portletFrameClass;
-		params = (params) ? params : {};
-		if(!App.defined(App.Views[viewName])){return;}
-		if (viewName.indexOf('Show') === -1){
-			_.each(app.children, function(view){
-				if (view instanceof(App.Views.PortletView) && 
-						App.defined(view.viewName) && 
-						view.viewName === viewName
-				){
-					rendered = true;
-					viewRef  = view; 
-				}
-			});
-		} else {
-			if(!App.defined(params.viewModelId)){return;}
-			_.each(app.children, function(pView){
-				if (pView instanceof(App.Views.PortletView) &&
-						App.defined(pView.view) &&
-						App.defined(pView.view.model) &&
-						pView.view.model.id === params.viewModelId
-				){
-					rendered = true;
-					viewRef  = pView; 
-				}
-			});
-			portletFrameClass = 'green';
-		}
-		if(rendered){
-			App.scrollTo(viewRef.el);
-		} else {
-			params.portletFrameClass = portletFrameClass;
-			params.viewName          = viewName;
-			this.show(params);
-		}
-	},
-
+	
 	defaultComparator: function(view){
 		return (
 			view instanceof(App.Views.PortletView)	&& 

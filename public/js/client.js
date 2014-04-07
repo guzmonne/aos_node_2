@@ -542,6 +542,7 @@ App.Views.RowView = App.Views.BaseView.extend({
 			this.activate();
 		}
 		app.trigger(this.modelName + ':row:rendered');
+		if(_.isFunction(this.onceRendered)){this.onceRendered();}
 	},
 
 	serialize: function(){
@@ -623,7 +624,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 				};
 			}
 			if(tab.active){
-				console.log(tab);
 				tabDetails.active = true;
 				self.activeView = tabFunction;
 			} else {
@@ -746,6 +746,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		} else {
 			return new Error('Option modelView not defined');
 		}
+		if (_.isFunction(this.afterAppend)){this.afterAppend();}
 	},
 
 	onSync: function(){
@@ -793,44 +794,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			return;
 		}
 	},
-
-	showOrGoToOld: function(viewName, params){
-		var rendered, viewRef, portletFrameClass;
-		params = (params) ? params : {};
-		if(!App.defined(App.Views[viewName])){return;}
-		if (viewName.indexOf('Show') === -1){
-			_.each(app.children, function(view){
-				if (view instanceof(App.Views.PortletView) && 
-						App.defined(view.viewName) && 
-						view.viewName === viewName
-				){
-					rendered = true;
-					viewRef  = view; 
-				}
-			});
-		} else {
-			if(!App.defined(params.viewModelId)){return;}
-			_.each(app.children, function(pView){
-				if (pView instanceof(App.Views.PortletView) &&
-						App.defined(pView.view) &&
-						App.defined(pView.view.model) &&
-						pView.view.model.id === params.viewModelId
-				){
-					rendered = true;
-					viewRef  = pView; 
-				}
-			});
-			portletFrameClass = 'green';
-		}
-		if(rendered){
-			App.scrollTo(viewRef.el);
-		} else {
-			params.portletFrameClass = portletFrameClass;
-			params.viewName          = viewName;
-			this.show(params);
-		}
-	},
-
+	
 	defaultComparator: function(view){
 		return (
 			view instanceof(App.Views.PortletView)	&& 
@@ -1099,6 +1063,10 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 App.Views.ClientRowView = App.Views.RowView.extend({
 	template : HBS.client_row_template,
 	modelName: 'client',
+	
+	onceRendered: function(){
+		this.$el.tooltip();
+	},
 });
 App.Views.ClientDetailsView = App.Views.BaseView.extend({
 	template: HBS.client_details_template,
@@ -1277,7 +1245,14 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	tableCollection: App.Collections.Clients,
 	modelView      : App.Views.ClientRowView,
 
-	appStorage : 'clients',
+	appStorage      : 'clients',
+
+	afterAppend: function(){
+		if (this.selection){
+			this.$('a#show-client').remove();
+			this.$('a#select-client').removeClass('hide');
+		}
+	},
 });
 App.Views.ClientNewView = App.Views.NewView.extend({	
 	name        : "Nuevo Cliente",
@@ -1293,7 +1268,13 @@ App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 		title     : "Seleccione un Cliente",
 		footer    : false,
 		modalClass: "modal-lg",
-	} 
+	},
+
+	afterRender: function(){
+		this.clientIndex = new App.Views.ClientIndexView();
+		this.clientIndex.selection = true;
+		this.clientIndex.attachTo('#client-index');
+	},
 });
 App.Views.ClientShowView = App.Views.TabView.extend({
 	name     : null,
@@ -1331,7 +1312,7 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 	},
 
 	setName: function(){
-		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.id;
+		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
 
 	onSync: function(){
@@ -2023,7 +2004,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		var parentModel = this.parent.model;
 		var object = {
 			client_name: parentModel.get('name'),
-			client_id  : parentModel.id,
+			client_id  : parentModel.get('id')
 		};
 		var model = new App.Models.ServiceRequest(object);
 		var portletView = new App.Views.PortletView({
