@@ -40,19 +40,6 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		}
 	},
 
-	titelize: function(doc){
-		var docName = '';
-		if (doc.indexOf('_') === -1){
-			docName = this.capitaliseFirstLetter(doc);
-		} else {
-			var nameArray = doc.split('_');
-			for(var i = 0; i < nameArray.length; i++){
-				docName = docName + this.capitaliseFirstLetter(nameArray[i]); 
-			}
-		}
-		return docName;
-	},
-
 	showOrGoToOld: function(viewName, params){
 		var rendered, viewRef, portletFrameClass;
 		params = (params) ? params : {};

@@ -283,6 +283,10 @@ App.Collections.Phones = Giraffe.Collection.extend({
 App.Collections.Addresses = Giraffe.Collection.extend({
 	model: App.Models.Address,
 });
+App.Collections.Models = Giraffe.Collection.extend({
+	url  : '/api/models',
+	model: App.Models.Model,
+});
 App.Collections.ServiceRequests = Giraffe.Collection.extend({
 	url  : function(){
 		var u = '/api/service_requests';
@@ -341,6 +345,19 @@ App.Views.BaseView = Giraffe.View.extend({
 
 	capitaliseFirstLetter: function(string){
 		return string.charAt(0).toUpperCase() + string.slice(1);
+	},
+
+	titelize: function(doc){
+		var docName = '';
+		if (doc.indexOf('_') === -1){
+			docName = this.capitaliseFirstLetter(doc);
+		} else {
+			var nameArray = doc.split('_');
+			for(var i = 0; i < nameArray.length; i++){
+				docName = docName + this.capitaliseFirstLetter(nameArray[i]); 
+			}
+		}
+		return docName;
 	},
 
 	displayPortletMessage: function(options){
@@ -473,6 +490,161 @@ App.Views.NewView = App.Views.BaseView.extend({
 		this.formView.attachTo(this.$el, {method: 'html'});
 	},
 });
+App.Views.RowView = App.Views.BaseView.extend({
+	tagName  : 'tr',
+	
+	activated  : false,
+	
+	initialize: function(){
+		this.listenTo(this.model, 'updated', this.render);
+		this.listenTo(this.model, 'change', this.render);
+		this.listenTo(app, this.modelName + ":show:close", this.deactivate);
+		this.listenTo(app, this.modelName + ":show:active", this.activateRenderedViews);
+	},
+
+	afterRender: function(){
+		if(this.activated){
+			this.activate();
+		}
+		app.trigger(this.modelName + ':row:rendered');
+	},
+
+	serialize: function(){
+		if(!App.defined(this.model)){return;}
+		if (_.isFunction(this.model.serialize)){
+			return this.model.serialize();
+		} else {
+			return this.model.toJSON();
+		}
+	},
+
+	activate: function(e){
+		this.activated = true;
+		this.$el.addClass('selected');
+	},
+
+	activateRenderedViews: function(id){
+		if(this.model.id === id){
+			this.activate();
+		}
+	},
+
+	deactivate: function(id){
+		if(id === this.model.id && this.$el.hasClass('selected')){
+			this.activated = false;
+			this.$el.removeClass('selected');
+			this.className = '';
+		}
+	},
+});
+App.Views.TabView = App.Views.BaseView.extend({
+	template: HBS.tabs_template,
+
+	tabs      : {},
+	tabDetails: {},
+	activeView: null,
+
+	events: {},
+	
+	initialize: function(){
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
+		if(App.defined(this.model) && _.isFunction(this.bindEvents)){
+			this.bindEvents();
+		} else {
+			var titelizeModelName = this.titelize(this.modelName);
+			if (App.defined(App.Models[titelizeModelName])){
+				this.model = new App.Models[titelizeModelName]();
+			} else {
+				this.model = new Giraffe.Model();
+			}
+		}
+		this.timestamp = new Date().getTime();
+		this.createTabs();
+		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
+	},
+
+	createTabs: function(){
+		if(!this.modelName){return new Error('View must have a modelName defined');}
+		var self   = this;
+		var object = {
+			modelName: this.modelName,
+			tab      : [],
+		};
+		_.forEach(this.tabs, function(tab, index){
+			var tabFunction;
+			var tabDetails = {
+				href : self.modelName + "-" + tab.id + "-" + self.timestamp,
+				id   : self.modelName + "-" + tab.id,
+				title: tab.title,
+			};
+			if (tab.class){
+				tabDetails.class = tab.class; 
+			}
+			if (_.isFunction(tab.renderFunction)){
+				tabFunction = tab.renderFunction;
+			} else {
+				tabFunction = function(){	
+					self.renderTabView(tab.id, tab.view);
+				};
+			}
+			if(tab.active){
+				console.log(tab);
+				tabDetails.active = true;
+				self.activeView = tabFunction;
+			} else {
+				self["renderTab" + index] = tabFunction;
+				self.events['click #' + self.modelName + "-" + tab.id] = "renderTab" + index;
+			}
+			object.tab.push(tabDetails);
+		});
+		this.tabDetails = object;
+	},
+
+	renderTabView: function(id, viewName){
+		if (!App.defined(this[id])){
+			this[id] = new App.Views[viewName]({model: this.model});
+			this[id].attachTo(this.$('#' + this.modelName + '-' + id + '-' + this.timestamp), {method: 'html'});
+		}
+	},
+
+	afterRender: function(){
+		var self = this;
+		if(this.model.isNew() && App.defined(this.modelId)){
+			this.model.set('_id', this.modelId);
+			this.model.fetch({
+				success: function(){
+					self.render();
+					self.bindEvents();
+				},
+				error: function(){
+					self.parent.dispose();
+				},
+			});
+		}	else {
+			if (_.isFunction(this.activeView)){this.activeView();}
+			if (_.isFunction(this.setName)){this.setName();}
+			if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
+			this.announce();
+			App.scrollTo(this.parent.el);
+		}
+	},
+
+	serialize: function(){
+		return this.tabDetails;
+	},
+
+	beforeDispose: function(){
+		if(!App.defined(this.model)){return;}
+		app.trigger(this.modelName + ':show:close', this.model.id);
+	},
+
+	announce: function(){
+		if(!App.defined(this.model)){return;}
+		app.trigger(this.modelName + ':show:active', this.model.id);
+	},
+
+	bindEvents: function(){},
+});
 App.Views.TableView = App.Views.BaseView.extend({
 	firstRender   : true,
 	rowViewOptions: {},
@@ -585,19 +757,6 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		} else {
 			return;
 		}
-	},
-
-	titelize: function(doc){
-		var docName = '';
-		if (doc.indexOf('_') === -1){
-			docName = this.capitaliseFirstLetter(doc);
-		} else {
-			var nameArray = doc.split('_');
-			for(var i = 0; i < nameArray.length; i++){
-				docName = docName + this.capitaliseFirstLetter(nameArray[i]); 
-			}
-		}
-		return docName;
 	},
 
 	showOrGoToOld: function(viewName, params){
@@ -902,61 +1061,9 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
 	}, 
 });
-App.Views.ClientRowView = App.Views.BaseView.extend({
+App.Views.ClientRowView = App.Views.RowView.extend({
 	template : HBS.client_row_template,
-
-	tagName  : 'tr',
-
-	activated  : false,
-
-	ui: {
-		$showClient: '#show-client',
-	},
-
-	appEvents: {
-		'client:show:close' : 'deactivate',
-		'client:show:active': 'activateRenderedViews', 
-	},
-
-	initialize: function(){
-		this.listenTo(this.model, 'updated', this.render);
-		this.listenTo(this.model, 'change', this.render);
-	},
-
-	afterRender: function(){
-		if(this.activated){
-			this.activate();
-		}
-		app.trigger('client:row:rendered');
-	},
-
-	serialize: function(){
-		return this.model.serialize();
-	},
-
-	onDelete: function(){
-		this.model.dispose();
-	},
-
-	activate: function(e){
-		this.activated = true;
-		this.$el.addClass('selected');
-	},
-
-	activateRenderedViews: function(id){
-		if(this.model.id === id){
-			this.activate();
-		}
-	},
-
-	deactivate: function(id){
-		if(id === this.model.id && this.$el.hasClass('selected')){
-			this.activated = false;
-			this.$('#show-client>i').removeClass('fa-spin');
-			this.$el.removeClass('selected');
-			this.className = '';
-		}
-	},
+	modelName: 'client',
 });
 App.Views.ClientDetailsView = App.Views.BaseView.extend({
 	template: HBS.client_details_template,
@@ -1142,59 +1249,33 @@ App.Views.ClientNewView = App.Views.NewView.extend({
 	formViewName: "ClientFormView",
 	modelName   : "Client",
 });
-App.Views.ClientShowView = App.Views.BaseView.extend({
-	template: HBS.client_show_template,
-	form    : HBS.client_form_template,
+App.Views.ClientShowView = App.Views.TabView.extend({
+	name     : null,
+	modelId  : null,
+	modelName: 'client',
 
-	name    : null,
-	modelId : null,
-
-	appEvents: {
-		"client:row:rendered": 'announce',
-	},
-
-	events:{
-		'click #client-edit'            : 'renderForm',
-		'click #client-service-requests': 'renderServiceRequests',
-	},
-
-	initialize: function(){
-		if(App.defined(this.model)){
-			this.bindEvents();
-		} else {
-			this.model = new App.Models.Client();
+	tabs: [
+		{
+			id    : 'details',
+			title : 'Detalle',
+			view  : 'ClientDetailsView',
+			active: true,
+		},
+		{
+			id            : 'service_requests',
+			title         : 'Ordenes de Servicio',
+			class         : 'air-t',
+			renderFunction: function(){
+				this.renderServiceRequests();
+			},
+		},
+		{
+			id   : 'edit',
+			title: 'Editar Datos',
+			class: 'air-t row',
+			view : 'ClientFormView',
 		}
-		this.timestamp = new Date().getTime();
-	},
-
-	afterRender: function(){
-		var self = this;
-		if(this.model.isNew() && App.defined(this.modelId)){
-			this.model.set('_id', this.modelId);
-			this.model.fetch({
-				success: function(){
-					self.render();
-					self.bindEvents();
-				},
-				error: function(){
-					self.parent.dispose();
-				},
-			});
-		}	else {
-			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
-				this.renderChilds();
-			}
-			this.announce();
-			this.setName();
-			this.parent.setHeader();
-			App.scrollTo(this.parent.el);
-
-		}
-	},
-
-	renderChilds: function(){
-		this.renderDetails();
-	},
+	],
 
 	bindEvents: function(){
 		this.listenTo(this.model, 'updated', this.update);
@@ -1215,10 +1296,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 				self.update();
 			},
 		});
-	},
-
-	afterSync: function(){
-		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
 	},
 
 	update: function(){
@@ -1242,45 +1319,14 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.parent.displayFlash();
 	},
 
-	serialize: function(){
-		var result = (App.defined(this.model)) ? this.model.serialize() : {};
-		result.timestamp = this.timestamp;
-		return result;
-	},
-
-	renderForm: function(){
-		if (!App.defined(this.clientForm)){
-			var id = this.timestamp;
-			this.clientForm = new App.Views.ClientFormView({model: this.model});
-			this.clientForm.attachTo(this.$('#client-form-'+id), {method: 'html'});
-		}
-	},
-
-	renderDetails: function(){
-		if (!App.defined(this.clientDetails)){
-			var id = this.timestamp;
-			this.clientDetails = new App.Views.ClientDetailsView({model: this.model});
-			this.clientDetails.attachTo(this.$('#client-details-'+id), {method: 'html'});
-		}
-	},
-
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){
-			var id = this.timestamp;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
 				collection: new App.Collections.ServiceRequests()
 			});
 			this.serviceRequests.collection.client_id = this.model.id;
-			this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
+			this.serviceRequests.attachTo(this.$('#client-service_requests-'+ this.timestamp), {method: 'html'});
 		}
-	},
-
-	announce: function(){
-		app.trigger('client:show:active', this.model.id);
-	},
-
-	beforeDispose: function(){
-		app.trigger('client:show:close', this.model.id);
 	},
 });
 App.Views.BreadCrumbsView = Giraffe.View.extend({
@@ -1328,6 +1374,54 @@ App.Views.BSCalloutView = App.Views.BaseView.extend({
 			clearTimeout(this.timer);
 		}
 		this.dispose();
+	},
+});
+App.Views.GoToTopView = App.Views.BaseView.extend({
+	template: HBS.go_to_top_template,
+
+	winH: 0,
+	winW: 0,
+	win: null,
+
+	events: {
+		'click': function(e){e.preventDefault(); App.scrollTo(0);},
+	},
+
+	initialize: function(){
+		var self = this;
+		this.win = $(window);
+		this.win.scroll(function(){
+			self.toggleViewOnOverflow();
+		});
+	},
+
+	afterRender: function(){
+		this.toggleViewOnOverflow();
+		this.$el.tooltip();
+	},
+
+	windowHeight: function(){
+		if( typeof( window.innerWidth ) == 'number' ) {
+			//Non-IE
+			this.winW = window.innerWidth;
+			this.winH = window.innerHeight;
+		} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+			//IE 6+ in 'standards compliant mode'
+			this.winW = document.documentElement.clientWidth;
+			this.winH = document.documentElement.clientHeight;
+		} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+			//IE 4 compatible
+			this.winW = document.body.clientWidth;
+			this.winH = document.body.clientHeight;
+		}
+	},
+
+	toggleViewOnOverflow: function(){
+		if(this.win.scrollTop() > 300){
+			this.$el.fadeIn();
+		} else {
+			this.$el.fadeOut();
+		}
 	},
 });
 App.Views.MessagesLayoutView = Giraffe.View.extend({
@@ -1570,6 +1664,10 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 	tagName: 'li', 
 	className: 'dropdown',
 });
+App.Views.ModelRowView = App.Views.RowView.extend({
+	template : HBS.model_row_template,
+	modelName: 'model',
+});
 App.Views.ModelFormView = App.Views.BaseView.extend({
 	template: HBS.model_form_template,
 
@@ -1610,6 +1708,17 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 		this.$('[name=subcategory]').val('');
 	}
 });
+App.Views.ModelIndexView = App.Views.TableView.extend({
+	template : HBS.model_index_template,
+	className: "row",
+	name     : "Modeles",
+	
+	tableEl        : '#models-table',
+	tableCollection: App.Collections.Models,
+	modelView      : App.Views.ModelRowView,
+
+	appStorage : 'models',
+});
 App.Views.ModelNewView = App.Views.NewView.extend({
 	name        : "Nuevo Modelo",
 	formViewName: "ModelFormView",
@@ -1638,6 +1747,54 @@ App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
 			}
 		}
 		return object;
+	},
+});
+App.Views.ServiceRequestDetailsView = App.Views.BaseView.extend({
+	template: HBS.service_request_details_template,
+	className: 'row',
+
+	afterRender: function(){
+		if(
+				!App.defined(this.appliancesIndex)	&& 
+				App.defined(this.model)							&&
+				App.defined(this.model.appliances)
+		){
+			this.appliancesIndex = new App.Views.ApplianceIndexView({
+				collection: this.model.appliances,
+				portlet   : this.parent,
+			});
+			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
+				method: 'html'
+			});
+		}
+	},
+
+	serialize: function(){
+		var result = (App.defined(this.model)) ? this.model.toJSON() : {};
+		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
+		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
+		result.timestamp = this.timestamp;
+		if(result.status){
+			var label;
+			switch (result.status){
+				case "Pendiente":
+					label = "label-primary";
+					break;
+				case "Abierto":
+					label = "label-info";
+					break;
+				case "Atrasaodo":
+					label = "label-danger";
+					break;
+				case "Cerrado":
+					label = "label-success";
+					break;
+				default:
+					label = "label-default";
+			}
+			result.label = label;
+		}
+		return result;
 	},
 });
 App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
@@ -1846,99 +2003,26 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
 	},
 });
-App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
-	template: HBS.service_request_show_template,
+App.Views.ServiceRequestShowView = App.Views.TabView.extend({
+	name     : null,
+	modelId  : null,
+	modelName: 'service_request',
 
-	name: null,
-
-	events: {
-		'click .sr-appliances' : 'renderAppliancesCarousel',
-	},
-
-	initialize: function(){
-		if(App.defined(this.model)){
-			this.bindEvents();
-		} else {
-			if (App.defined(this.modelId)){
-				this.model = new App.Models.ServiceRequest();
-			}
+	tabs: [
+		{
+			id    : 'details',
+			title : 'Detalle',
+			view  : 'ServiceRequestDetailsView',
+			active: true,
+		},
+		{
+			id            : 'appliances',
+			title         : 'Equipos',
+			renderFunction: function(){
+				this.renderAppliancesCarousel();
+			},
 		}
-		this.timestamp = new Date().getTime();
-	},
-
-	afterRender: function(){
-		var self = this;
-		if(this.model.isNew() && App.defined(this.modelId)){
-			this.model.set('_id', this.modelId);
-			this.model.fetch({
-				success: function(){
-					self.render();
-					self.bindEvents();
-				},
-				error: function(){
-					self.parent.dispose();
-				},
-			});
-		} else {
-			if (_.isFunction(this.renderChilds)){
-				this.renderChilds();
-			}
-			this.announce();
-			this.setName();
-			this.parent.setHeader();
-			App.scrollTo(this.parent.el);
-		}
-	},
-
-	renderChilds: function(){
-		this.renderAppliancesIndex();
-	},
-
-	renderAppliancesIndex: function(){
-		if(
-				!App.defined(this.appliancesIndex)	&& 
-				App.defined(this.model)							&&
-				App.defined(this.model.appliances)
-		){
-			this.appliancesIndex = new App.Views.ApplianceIndexView({
-				collection: this.model.appliances,
-				portlet   : this.parent,
-			});
-			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
-				method: 'html'
-			});
-		}
-	},
-	
-	bindEvents: function(){},
-
-	serialize: function(){
-		var result = (App.defined(this.model)) ? this.model.toJSON() : {};
-		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
-		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
-		result.timestamp = this.timestamp;
-		if(result.status){
-			var label;
-			switch (result.status){
-				case "Pendiente":
-					label = "label-primary";
-					break;
-				case "Abierto":
-					label = "label-info";
-					break;
-				case "Atrasaodo":
-					label = "label-danger";
-					break;
-				case "Cerrado":
-					label = "label-success";
-					break;
-				default:
-					label = "label-default";
-			}
-			result.label = label;
-		}
-		return result;
-	},
+	],
 
 	renderAppliancesCarousel: function(){
 		if (!this.appliancesCarousel){
@@ -1951,7 +2035,7 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 				collection : this.model.appliances,
 			});
 			this.appliancesCarousel.attachTo(
-				this.$('#service-request-appliances-' + this.timestamp), 
+				this.$('#' + this.modelName + '-appliances-' + this.timestamp), 
 				{
 					method: 'html',
 				}
@@ -1962,14 +2046,6 @@ App.Views.ServiceRequestShowView = App.Views.BaseView.extend({
 	setName: function(){
 		this.name = 'Orden de Servicio #' + this.model.get('id');
 	},
-
-	announce: function(){
-		app.trigger('service_request:show:active', this.model.id);
-	},
-
-	beforeDispose: function(){
-		app.trigger('service_request:show:close', this.model.id);
-	},
 });
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {
@@ -1977,55 +2053,6 @@ App.Routers.MainRouter = Giraffe.Router.extend({
 		'render/:doc/:type'                        : 'render:doc',
 		':doc/show/:id'                            : 'render:show',
 		':doc/:type'                               : 'render:doc',
-	},
-});
-App.Views.GoToTopView = App.Views.BaseView.extend({
-	template: HBS.go_to_top_template,
-
-	winH: 0,
-	winW: 0,
-	win: null,
-
-	events: {
-		'click': function(e){e.preventDefault(); App.scrollTo(0);},
-	},
-
-	initialize: function(){
-		var self = this;
-		this.win = $(window);
-		this.win.scroll(function(){
-			self.toggleViewOnOverflow();
-		});
-		//this.toggleViewOnOverflow = _.throttle(this.toggleViewOnOverflow, 10 * 1000);
-	},
-
-	afterRender: function(){
-		this.toggleViewOnOverflow();
-		this.$el.tooltip();
-	},
-
-	windowHeight: function(){
-		if( typeof( window.innerWidth ) == 'number' ) {
-			//Non-IE
-			this.winW = window.innerWidth;
-			this.winH = window.innerHeight;
-		} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
-			//IE 6+ in 'standards compliant mode'
-			this.winW = document.documentElement.clientWidth;
-			this.winH = document.documentElement.clientHeight;
-		} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
-			//IE 4 compatible
-			this.winW = document.body.clientWidth;
-			this.winH = document.body.clientHeight;
-		}
-	},
-
-	toggleViewOnOverflow: function(){
-		if(this.win.scrollTop() > 300){
-			this.$el.fadeIn();
-		} else {
-			this.$el.fadeOut();
-		}
 	},
 });
 App.GiraffeApp = Giraffe.App.extend({

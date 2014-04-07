@@ -15,7 +15,6 @@ App.Views.GoToTopView = App.Views.BaseView.extend({
 		this.win.scroll(function(){
 			self.toggleViewOnOverflow();
 		});
-		//this.toggleViewOnOverflow = _.throttle(this.toggleViewOnOverflow, 10 * 1000);
 	},
 
 	afterRender: function(){

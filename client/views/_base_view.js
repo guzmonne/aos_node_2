@@ -47,6 +47,19 @@ App.Views.BaseView = Giraffe.View.extend({
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
+	titelize: function(doc){
+		var docName = '';
+		if (doc.indexOf('_') === -1){
+			docName = this.capitaliseFirstLetter(doc);
+		} else {
+			var nameArray = doc.split('_');
+			for(var i = 0; i < nameArray.length; i++){
+				docName = docName + this.capitaliseFirstLetter(nameArray[i]); 
+			}
+		}
+		return docName;
+	},
+
 	displayPortletMessage: function(options){
 		var defaultOptions = {
 			viewCid: this.parent.cid,

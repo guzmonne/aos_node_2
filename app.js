@@ -126,6 +126,7 @@ app.get('/api/appliances', appliance.index);
 app.put('/api/appliances/:id', appliance.update);
 // Models
 // ------
+app.get('/api/models', models.index);
 app.post('/api/models', models.create);
 
 // =============

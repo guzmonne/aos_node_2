@@ -1,56 +1,30 @@
-App.Views.ClientShowView = App.Views.BaseView.extend({
-	template: HBS.client_show_template,
-	form    : HBS.client_form_template,
+App.Views.ClientShowView = App.Views.TabView.extend({
+	name     : null,
+	modelId  : null,
+	modelName: 'client',
 
-	name    : null,
-	modelId : null,
-
-	appEvents: {
-		"client:row:rendered": 'announce',
-	},
-
-	events:{
-		'click #client-edit'            : 'renderForm',
-		'click #client-service-requests': 'renderServiceRequests',
-	},
-
-	initialize: function(){
-		if(App.defined(this.model)){
-			this.bindEvents();
-		} else {
-			this.model = new App.Models.Client();
+	tabs: [
+		{
+			id    : 'details',
+			title : 'Detalle',
+			view  : 'ClientDetailsView',
+			active: true,
+		},
+		{
+			id            : 'service_requests',
+			title         : 'Ordenes de Servicio',
+			class         : 'air-t',
+			renderFunction: function(){
+				this.renderServiceRequests();
+			},
+		},
+		{
+			id   : 'edit',
+			title: 'Editar Datos',
+			class: 'air-t row',
+			view : 'ClientFormView',
 		}
-		this.timestamp = new Date().getTime();
-	},
-
-	afterRender: function(){
-		var self = this;
-		if(this.model.isNew() && App.defined(this.modelId)){
-			this.model.set('_id', this.modelId);
-			this.model.fetch({
-				success: function(){
-					self.render();
-					self.bindEvents();
-				},
-				error: function(){
-					self.parent.dispose();
-				},
-			});
-		}	else {
-			if (App.defined(this.renderChilds) && _.isFunction(this.renderChilds)){
-				this.renderChilds();
-			}
-			this.announce();
-			this.setName();
-			this.parent.setHeader();
-			App.scrollTo(this.parent.el);
-
-		}
-	},
-
-	renderChilds: function(){
-		this.renderDetails();
-	},
+	],
 
 	bindEvents: function(){
 		this.listenTo(this.model, 'updated', this.update);
@@ -71,10 +45,6 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 				self.update();
 			},
 		});
-	},
-
-	afterSync: function(){
-		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
 	},
 
 	update: function(){
@@ -98,44 +68,13 @@ App.Views.ClientShowView = App.Views.BaseView.extend({
 		this.parent.displayFlash();
 	},
 
-	serialize: function(){
-		var result = (App.defined(this.model)) ? this.model.serialize() : {};
-		result.timestamp = this.timestamp;
-		return result;
-	},
-
-	renderForm: function(){
-		if (!App.defined(this.clientForm)){
-			var id = this.timestamp;
-			this.clientForm = new App.Views.ClientFormView({model: this.model});
-			this.clientForm.attachTo(this.$('#client-form-'+id), {method: 'html'});
-		}
-	},
-
-	renderDetails: function(){
-		if (!App.defined(this.clientDetails)){
-			var id = this.timestamp;
-			this.clientDetails = new App.Views.ClientDetailsView({model: this.model});
-			this.clientDetails.attachTo(this.$('#client-details-'+id), {method: 'html'});
-		}
-	},
-
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){
-			var id = this.timestamp;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
 				collection: new App.Collections.ServiceRequests()
 			});
 			this.serviceRequests.collection.client_id = this.model.id;
-			this.serviceRequests.attachTo(this.$('#client-service_requests-'+id), {method: 'html'});
+			this.serviceRequests.attachTo(this.$('#client-service_requests-'+ this.timestamp), {method: 'html'});
 		}
-	},
-
-	announce: function(){
-		app.trigger('client:show:active', this.model.id);
-	},
-
-	beforeDispose: function(){
-		app.trigger('client:show:close', this.model.id);
 	},
 });
