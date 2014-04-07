@@ -1132,6 +1132,40 @@ hr {
 }
 
 /* MODALS */
-.modal-open, .modal-open .navbar-fixed-top {
-  margin-right: 15px !important;
+@media screen and (min-width: 768px){
+  .modal-dialog.modal-lg {
+    width : 90%;
+    margin: 30px auto;
+  }
+}
+
+.modal-content {
+  border-radius: 0px;
+  border       : 1px solid;
+  border-color : #34495e;
+}
+
+.modal-header {
+  border          : 1px solid;
+  border-color    : #34495e;
+  color           : #fff;
+  background-color: #34495e;
+  padding         : 10px;
+}
+
+.modal-header .close {
+  margin-top: 3px;
+  color: #fff;
+  opacity: 1;
+}
+
+.modal-body {
+  padding   : 10px;
+  min-height: 100px;
+}
+
+.modal-footer {
+  padding         : 10px;
+  background-color: #F5F5F5;
+  margin-top      : 0px;
 }

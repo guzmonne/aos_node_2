@@ -32,7 +32,7 @@ app.addInitializer(function(options){
 // Build Modal Controller View
 app.addInitializer(function(){
 	app.modalController = new App.Views.ModalController();
-	app.modalController.attachTo('#modal-el');
+	app.modalController.attachTo('#wrapper');
 });
 
 // Build Scroller
