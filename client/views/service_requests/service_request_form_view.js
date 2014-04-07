@@ -8,6 +8,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button#single-appliance': 'singleApplianceForm',
 		'click button.appliance-delete': 'deleteAppliance',
 		'click button[type=submit]'    : 'createServiceRequest',
+		'click button#select-client'   : 'selectClient',
+	},
+
+	afterRequest: function(){
+		this.$el.tooltip();
 	},
 
 	serviceRequestSuccessFlash: function(id){
@@ -24,6 +29,13 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
 		class  : 'warning',
 		method : 'html' 
+	},
+
+	selectClient: function(){
+		if(!this.clientSelectModalView){
+			this.clientSelectModalView = new App.Views.ClientSelectModalView();
+		}
+		app.modalController.displayModal(this.clientSelectModalView);
 	},
 
 	deleteAppliance: function(e){

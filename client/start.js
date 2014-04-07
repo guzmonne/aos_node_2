@@ -1,14 +1,12 @@
 App.GiraffeApp = Giraffe.App.extend({
-	template: HBS.app_template,
-
-	// Collection storage
-	clients: null,
+	attributes: function(){
+		return {
+			'id': 'content-el',
+		};
+	},
 });
 
-// var app     = new Giraffe.App();
 var app = new App.GiraffeApp();
-// app.template  = HBS.app_template;
-// app.className = "row";
 
 // Configure Ajax to use CSRF
 app.addInitializer(function(){
@@ -31,10 +29,16 @@ app.addInitializer(function(options){
 	app.sideNav.attachTo('#sidebar-el');
 });
 
-// Main Content
+// Build Modal Controller View
+app.addInitializer(function(){
+	app.modalController = new App.Views.ModalController();
+	app.modalController.attachTo('#modal-el');
+});
+
+// Build Scroller
 app.addInitializer(function(options){
 	app.GoToTopView = new App.Views.GoToTopView();
-	app.GoToTopView.attachTo('#content-el');
+	app.GoToTopView.attachTo('#scroller-el');
 });
 
 // Start Backbone History, Renderer and main router

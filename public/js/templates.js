@@ -595,6 +595,14 @@ function program3(depth0,data) {
     + "\" id=\"show-client\" class=\"btn btn-green\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n</td>";
   return buffer;
   });
+this["HBS"] = this["HBS"] || {};this["HBS"]["client_select_modal_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<p>Hello!</p>\n";
+  });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -766,6 +774,68 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
   return "\n  <a data-toggle=\"dropdown\" href=\"#\" class=\"dropdown-toggle messages-link\">\n    <i class=\"fa fa-envelope fa-fw\">\n    </i>\n    <i class=\"fa fa-caret-down\">\n    </i>\n  </a>\n  <!-- DROPDOWN MESSAGES BEGIN-->\n  <ul class=\"dropdown-menu dropdown-messages\">\n    <li>\n      <a href=\"#\">\n        <div>\n          <strong>\n            Guzman Monne\n          </strong>\n          <span class=\"pull-right text-muted\">\n            <em>\n              Yesterday\n            </em>\n          </span>\n        </div>\n        <div>\n          lorem ipsum sit amet, concsefic adipscil elit.\n        </div>\n      </a>\n    </li>\n    <li class=\"divider\">\n    </li>\n    <li>\n      <a class=\"#\">\n        <div>\n          <strong>\n            Guzman Monne\n          </strong>\n          <span class=\"pull-right text-muted\">\n            <em>\n              Yesterday\n            </em>\n          </span>\n        </div>\n        <div>\n          All my troubles seem so far away. Now I'm here just seeing you say. Oh, I believe in yesterday\n        </div>\n      </a>\n    </li>\n    <li class=\"divider\">\n    </li>\n    <li>\n      <a href=\"#\" class=\"text-center\">\n        <strong>\n          Read all messages \n        </strong>\n        <i class=\"fa fa-angle-right\">\n        </i>\n      </a>\n    </li>\n  </ul>\n  <!-- DROPDOWN MESSAGES END-->\n";
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["modal_base_layout_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var stack1;
+  if (stack1 = helpers['class']) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0['class']); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  return escapeExpression(stack1);
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n	  <div class=\"modal-header\">\n	    <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-hidden=\"true\">&times;</button>\n	    <h4 class=\"modal-title\" id=\"myModalLabel\">";
+  if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.title); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</h4>\n	  </div>\n	  ";
+  return buffer;
+  }
+
+function program5(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n	  <div class=\"modal-footer\">\n	  	";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.customFooter), {hash:{},inverse:self.program(8, program8, data),fn:self.program(6, program6, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	  </div>\n	  ";
+  return buffer;
+  }
+function program6(depth0,data) {
+  
+  var buffer = "", stack1;
+  buffer += "\n	  		";
+  if (stack1 = helpers.customFooter) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.customFooter); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n	  	";
+  return buffer;
+  }
+
+function program8(depth0,data) {
+  
+  
+  return "\n		    <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Cerrar</button>\n		    <button type=\"button\" class=\"btn btn-primary\">Guardar</button>\n	    ";
+  }
+
+  buffer += "<div class=\"modal-dialog ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0['class']), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\">\n	<div class=\"modal-content\">\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.header), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	  <div class=\"modal-body\"></div>\n	  ";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.footer), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	</div>\n</div>";
+  return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["nav_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -1058,7 +1128,7 @@ function program5(depth0,data) {
 function program7(depth0,data) {
   
   
-  return "\n					<div class=\"col-xs-2\">\n						<button class=\"btn btn-info\">\n							<i class=\"fa fa-search\"></i>\n						</button>\n					</div>\n				";
+  return "\n					<div class=\"col-xs-2\">\n						<button class=\"btn btn-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Buscar Cliente\" id=\"select-client\">\n							<i class=\"fa fa-search\"></i>\n						</button>\n					</div>\n				";
   }
 
 function program9(depth0,data) {

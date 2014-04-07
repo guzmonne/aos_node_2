@@ -1130,3 +1130,8 @@ hr {
 .range.range-green output {
     background-color: #1abc9c;
 }
+
+/* MODALS */
+.modal-open, .modal-open .navbar-fixed-top {
+  margin-right: 15px !important;
+}

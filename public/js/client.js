@@ -1249,6 +1249,13 @@ App.Views.ClientNewView = App.Views.NewView.extend({
 	formViewName: "ClientFormView",
 	modelName   : "Client",
 });
+App.Views.ClientSelectModalView = App.Views.BaseView.extend({
+	template: HBS.client_select_modal_template,
+	
+	name: "ClientSelectModalView",
+	title: "Seleccione un Cliente",
+	'class': "modal-lg",
+});
 App.Views.ClientShowView = App.Views.TabView.extend({
 	name     : null,
 	modelId  : null,
@@ -1428,6 +1435,55 @@ App.Views.MessagesLayoutView = Giraffe.View.extend({
 	template: HBS.messages_layout_template,
 	tagName: 'li', 
 	className: 'dropdown',
+});
+App.Views.ModalController = App.Views.BaseView.extend({
+	template: HBS.modal_base_layout_template,
+	
+	currentModal: null,
+	header      : true,
+	footer      : true,
+	customFooter: false,
+	title       : '',
+	class       : false,
+
+	attributes: function(){
+		return {
+			'class'          : "modal fade",
+			'tabindex'       : "-1",
+			'role'           : "dialog",
+			'aria-labelledby': this.name,
+			'aria-hidden'    : true,
+			'id'             : 'modalContainer',
+		};
+	},
+
+	displayModal: function(view){
+		if(!App.defined(this.currentModal) || this.currentModal.cid !== view.cid){
+			this.setCurrentModal(view);
+		}	
+		this.$el.modal('show');
+	},
+
+	setCurrentModal: function(view){
+		if(this.currentModal){this.currentModal.dispose();}
+		this.currentModal = view;
+		if(view.title){this.title = view.title;}
+		if(view.class){this.class = view.class;}
+		this.render();
+		this.attach(view, {el: '.modal-body', method: 'html'});
+	},
+
+	serialize: function(){
+		var result = {
+			header      : this.header,
+			footer      : this.footer,
+			customFooter: this.customFooter,
+			title       : this.title,
+			class       : this.class,
+		};
+		console.log(result);
+		return result;
+	}
 });
 App.Views.NavView = Giraffe.View.extend({
 	template: HBS.nav_template,
@@ -1807,6 +1863,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button#single-appliance': 'singleApplianceForm',
 		'click button.appliance-delete': 'deleteAppliance',
 		'click button[type=submit]'    : 'createServiceRequest',
+		'click button#select-client'   : 'selectClient',
+	},
+
+	afterRequest: function(){
+		this.$el.tooltip();
 	},
 
 	serviceRequestSuccessFlash: function(id){
@@ -1823,6 +1884,13 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
 		class  : 'warning',
 		method : 'html' 
+	},
+
+	selectClient: function(){
+		if(!this.clientSelectModalView){
+			this.clientSelectModalView = new App.Views.ClientSelectModalView();
+		}
+		app.modalController.displayModal(this.clientSelectModalView);
 	},
 
 	deleteAppliance: function(e){
@@ -2056,16 +2124,14 @@ App.Routers.MainRouter = Giraffe.Router.extend({
 	},
 });
 App.GiraffeApp = Giraffe.App.extend({
-	template: HBS.app_template,
-
-	// Collection storage
-	clients: null,
+	attributes: function(){
+		return {
+			'id': 'content-el',
+		};
+	},
 });
 
-// var app     = new Giraffe.App();
 var app = new App.GiraffeApp();
-// app.template  = HBS.app_template;
-// app.className = "row";
 
 // Configure Ajax to use CSRF
 app.addInitializer(function(){
@@ -2088,10 +2154,16 @@ app.addInitializer(function(options){
 	app.sideNav.attachTo('#sidebar-el');
 });
 
-// Main Content
+// Build Modal Controller View
+app.addInitializer(function(){
+	app.modalController = new App.Views.ModalController();
+	app.modalController.attachTo('#modal-el');
+});
+
+// Build Scroller
 app.addInitializer(function(options){
 	app.GoToTopView = new App.Views.GoToTopView();
-	app.GoToTopView.attachTo('#content-el');
+	app.GoToTopView.attachTo('#scroller-el');
 });
 
 // Start Backbone History, Renderer and main router
