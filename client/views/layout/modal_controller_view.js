@@ -16,4 +16,8 @@ App.Views.ModalController = App.Views.BaseView.extend({
 		this.currentModal = new App.Views.ModalView({bodyView: view});
 		this.attach(this.currentModal, {el: this.el, method: 'html'});
 	},
+
+	closeModal: function(){
+		this.$('#modalContainer').modal('hide');
+	}
 });

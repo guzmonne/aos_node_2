@@ -1,10 +1,10 @@
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	appliances: null,
-
 	initialize: function(attributes, options){
-		this.appliances = new App.Collections.Appliances();
+		if(!App.defined(this.appliances)){
+			this.appliances = new App.Collections.Appliances();
+		}
 		if(App.defined(attributes) && App.defined(attributes.appliances)){
 			this.appliances.reset(attributes.appliances);
 		} 
@@ -43,9 +43,7 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 
 	serialize: function(){
 		var attributes = this.toJSON();
-		if(App.defined(this.appliances)){
-			attributes.appliances = this.appliances.toJSON();
-		}
+		attributes.appliances = this.appliances.toJSON();
 		return attributes;
 	},
 });

@@ -4,43 +4,46 @@
 var mongoose      = require('mongoose');
 var autoIncrement = require('mongoose-auto-increment');
 var timestamps    = require('mongoose-timestamp');
+var _             = require('underscore');
+var ModelModel    = require('../models/model').ModelModel;
+var Model         = new ModelModel();
 
 // =======
 // SCHEMAS
 // =======
-var Schema   = mongoose.Schema;
+var Schema = mongoose.Schema;
 
 var Appliance = new Schema({
-	'model_id'        : {
+	'model_id': {
 		type: Schema.Types.ObjectId,
 		ref : 'Model'
 	},
-	//'model'           : String,
-	//'brand'           : String,
-	//'serial'          : String,
-	//'category'        : String,
-	//'subcategory'     : String,
-	'accessories'     : [String],
-	'client_name'     : String,
-	'client_id'       : String,
+	//'model' : String,
+	//'brand' : String,
+	//'serial': String,
+	//'category': String,
+	//'subcategory' : String,
+	'accessories' : [String],
+	'client_name' : String,
+	'client_id' : String,
 	'repairement_type': String,
-	'defect'          : String,
-	'observations'    : String,
-	'status'          : String,
-	'cost'            : {
+	'defect': String,
+	'observations': String,
+	'status': String,
+	'cost': {
 		type: Number,
 		min : [0, 'El costo no puede ser menor que 0'],
 	},
-	'solution'          : String,
-	'diagnose'          : String,
-	'replacements'      : [String],
-	'inStock'           : Boolean,
-	'departuredAt'      : Date,
-	'repairedAt'        : Date,
-	'technician_name'   : String,
-	'technician_id'     : String,
-	'createdBy'         : String,
-	'updatedBy'         : String,
+	'solution': String,
+	'diagnose': String,
+	'replacements': [String],
+	'inStock' : Boolean,
+	'departuredAt': Date,
+	'repairedAt': Date,
+	'technician_name' : String,
+	'technician_id' : String,
+	'createdBy' : String,
+	'updatedBy' : String,
 	'service_request_id': {
 		type: Schema.Types.ObjectId,
 		ref : 'ServiceRequest'
@@ -55,9 +58,9 @@ var Appliance = new Schema({
 // AutoIncrement ID
 // ----------------
 Appliance.plugin(autoIncrement.plugin, {
-    model: 'Appliance',
-    field: 'id',
-    startAt: 1,
+model: 'Appliance',
+field: 'id',
+startAt: 1,
 });
 
 // =====
@@ -73,35 +76,31 @@ ApplianceModel = function(){};
 // FUNCTIONS
 // ---------
 // Fill object
-function fillObject(params){
+function pickParams(params){
 	var date = new Date();
-	var result = {
-		'model'             : params['model'],
-		'brand'             : params['brand'],
-		'serial'            : params['serial'],
-		'category'          : params['category'],
-		'subcategory'       : params['subcategory'],
-		'client_name'       : params['client_name'],
-		'client_id'         : params['client_id'],
-		'repairement_type'  : params['repairement_type'],
-		'defect'            : params['defect'],
-		'observations'      : params['observations'],
-		'status'            : params['status'],
-		'cost'              : params['cost'],
-		'solution'          : params['solution'],
-		'diagnose'          : params['diagnose'],
-		'replacements'      : params['replacements'],
-		'inStock'           : params['inStock'],
-		'departuredAt'      : params['departuredAt'],
-		'repairedAt'        : params['repairedAt'],
-		'technician_name'   : params['technician_name'],
-		'technician_id'     : params['technician_id'],
-		'createdBy'         : params['createdBy'],
-		'updatedBy'         : params['updatedBy'],
-		'service_request_id': params['service_request_id'],
-		'accessories'       : params['accessories'],
-		'updatedAt'         : date,
-	}
+	var result = _.pick(params, 
+		 'model_id'
+		,'client_name' 
+		,'client_id' 
+		,'repairement_type'
+		,'defect'
+		,'observations'
+		,'status'
+		,'cost'
+		,'solution'
+		,'diagnose'
+		,'replacements'
+		,'inStock' 
+		,'departuredAt'
+		,'repairedAt'
+		,'technician_name' 
+		,'technician_id' 
+		,'createdBy' 
+		,'updatedBy' 
+		,'service_request_id'
+		,'accessories'
+	);
+	result.updatedAt = date;
 	if (!params['_id']){
 		result.createdAt = date;
 	}
@@ -110,10 +109,17 @@ function fillObject(params){
 // Create new appliance
 // --------------------
 ApplianceModel.prototype.create = function(params, callback){
-	var object = fillObject(params);
+	var object = pickParams(params);
 	var appliance = new Appliance(object);
 	appliance.save(function(err, appliance){
 		if (err){return callback(err);}
+		Model.findById(appliance.model_id, function(err, model){
+			if (err){return callback(err);}
+			model.appliances.push(appliance);
+			model.save(function(err, model){
+				if (err){return callback(err);}
+			});
+		});
 		callback(null, appliance);
 	});
 };
@@ -127,7 +133,7 @@ ApplianceModel.prototype.findAll = function(callback){
 };
 // Update appliance by id
 ApplianceModel.prototype.updateById = function(id, params, callback){
-	var object = fillObject(params);
+	var object = pickParams(params);
 	Appliance.findByIdAndUpdate(id, object, function(err, appliance){
 		if (err){return callback(err);}
 		callback(null, appliance);

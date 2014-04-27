@@ -202,11 +202,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<h5>Datos del Cliente</h5>\n			</div>\n		</div>\n		<div class=\"row\">\n			<div class=\"col-md-6 col-sm-6\">\n				<div class=\"form-group\">\n					<label for=\"client_name\" class=\"col-sm-3 control-label\">\n						Cliente\n					</label>\n					<div class=\"col-sm-9\">\n						<input type=\"text\" class=\"form-control\" name=\"client_name\" placeholder=\"e.j: Juan Perez\" value=\"";
+  buffer += "\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<h5>Datos del Cliente</h5>\n			</div>\n		</div>\n		<div class=\"row\">\n			<div class=\"col-md-6 col-sm-6\">\n				<div class=\"form-group\">\n					<label for=\"client_name\" class=\"col-sm-3 control-label\">\n						Cliente\n					</label>\n					<div class=\"col-sm-9\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"client_name\" placeholder=\"e.j: Juan Perez\" value=\"";
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n					</div>\n				</div>\n			</div>\n			<div class=\"col-md-5 col-sm-5\">\n				<div class=\"form-group\">\n					<label for=\"client_id\" class=\"col-sm-5 control-label\">ID de Cliente</label>\n					<div class=\"col-sm-7\" style=\"padding-left:5px;\">\n						<input type=\"text\" class=\"form-control\" name=\"client_id\" placeholder=\"e.j: nn1234\" value=\"";
+    + "\">\n					</div>\n				</div>\n			</div>\n			<div class=\"col-md-5 col-sm-5\">\n				<div class=\"form-group\">\n					<label for=\"client_id\" class=\"col-sm-5 control-label\">ID de Cliente</label>\n					<div class=\"col-sm-7\" style=\"padding-left:5px;\">\n						<input readonly type=\"text\" class=\"form-control\" name=\"client_id\" placeholder=\"e.j: nn1234\" value=\"";
   if (stack1 = helpers.client_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -228,11 +228,11 @@ function program3(depth0,data) {
   buffer += "<div id=\"appliance-form\" class=\"form-horizontal\">\n	\n	";
   stack1 = helpers.unless.call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Datos del Equipo</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"brand\" class=\"col-sm-3 control-label\">Marca</label>\n				<div class=\"col-sm-9\">\n					<input type=\"text\" class=\"form-control\" name=\"brand\" placeholder=\"e.j: Punktal\" value=\"";
+  buffer += "\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<h5>Datos del Equipo</h5>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"brand\" class=\"col-sm-3 control-label\">Marca</label>\n				<div class=\"col-sm-9\">\n					<input readonly type=\"text\" class=\"form-control\" name=\"brand\" placeholder=\"e.j: Punktal\" value=\"";
   if (stack1 = helpers.brand) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.brand); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"model\" class=\"col-sm-3 control-label\">Modelo</label>\n				<div class=\"col-sm-9\">\n					<input type=\"text\" class=\"form-control\" name=\"model\" placeholder=\"e.j: PKT1020\" value=\"";
+    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"model\" class=\"col-sm-3 control-label\">Modelo</label>\n				<div class=\"col-sm-9\">\n					<input readonly type=\"text\" class=\"form-control\" name=\"model\" placeholder=\"e.j: PKT1020\" value=\"";
   if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -240,15 +240,15 @@ function program3(depth0,data) {
   if (stack1 = helpers.serial) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.serial); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n		</div>\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"category\" class=\"col-sm-4 control-label\">Categoría</label>\n				<div class=\"col-sm-8\">\n					<input type=\"text\" class=\"form-control\" name=\"category\" placeholder=\"e.j: Electrodomestico\" value=\"";
+    + "\">\n				</div>\n			</div>\n		</div>\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"category\" class=\"col-sm-4 control-label\">Categoría</label>\n				<div class=\"col-sm-8\">\n					<input readonly type=\"text\" class=\"form-control\" name=\"category\" placeholder=\"e.j: Electrodomestico\" value=\"";
   if (stack1 = helpers.category) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.category); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"subcategory\" class=\"col-sm-4 control-label\">Subcategoría</label>\n				<div class=\"col-sm-8\">\n					<input type=\"text\" class=\"form-control\" name=\"subcategory\" placeholder=\"e.j: Plancha\" value=\"";
+    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"subcategory\" class=\"col-sm-4 control-label\">Subcategoría</label>\n				<div class=\"col-sm-8\">\n					<input readonly type=\"text\" class=\"form-control\" name=\"subcategory\" placeholder=\"e.j: Plancha\" value=\"";
   if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-offset-4 col-sm-8\">\n					<button class=\"btn btn-info btn-block\" tabindex=\"-1\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n						";
+    + "\">\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-sm-offset-4 col-sm-8\">\n					<button class=\"btn btn-info btn-block\" tabindex=\"-1\" id=\"select-model\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin: 0;\">\n		</div>\n	</div>\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n						";
   stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "	\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"observations\" class=\"col-sm-2 control-label\">Observaciones</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"observations\">";
@@ -592,7 +592,7 @@ function program3(depth0,data) {
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" id=\"show-client\" class=\"btn btn-green\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Más Información\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n	<a id=\"select-client\" class=\"btn btn-warning hide\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar\">\n		<i class=\"fa fa-external-link fa-lg\"></i>\n	</a>\n</td>";
+    + "\" id=\"show\" class=\"btn btn-green\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Más Información\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n	<a id=\"selected\" class=\"btn btn-warning hide\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar\">\n		<i class=\"fa fa-external-link fa-lg\"></i>\n	</a>\n</td>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_select_modal_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -601,7 +601,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<div id=\"client-index\">\n	\n</div>\n";
+  return "<div id=\"client-index\"></div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -1045,8 +1045,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"btn btn-green\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n</td>";
+    + "\" class=\"btn btn-green\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Más Información\" id=\"show\">\n		<i class=\"fa fa-ellipsis-h fa-lg\"></i>\n	</a>\n	<a id=\"selected\" class=\"btn btn-warning hide\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar\">\n		<i class=\"fa fa-external-link fa-lg\"></i>\n	</a>\n</td>";
   return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["model_select_modal_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<div id=\"model-index\"></div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_details_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -1105,73 +1113,58 @@ function program1(depth0,data) {
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, self=this, functionType="function", escapeExpression=this.escapeExpression;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
-  
-  return "col-xs-10";
-  }
-
-function program3(depth0,data) {
-  
-  
-  return "col-xs-8";
-  }
-
-function program5(depth0,data) {
   
   
   return "readonly";
   }
 
+function program3(depth0,data) {
+  
+  
+  return "disabled";
+  }
+
+function program5(depth0,data) {
+  
+  
+  return "\n			<div class=\"col-xs-offset-10 col-xs-2\">\n				<button type=\"submit\" class=\"btn btn-dark-blue pull-right\" disabled>Crear</button>\n			</div>\n		";
+  }
+
 function program7(depth0,data) {
-  
-  
-  return "\n					<div class=\"col-xs-2\">\n						<button class=\"btn btn-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Buscar Cliente\" id=\"select-client\">\n							<i class=\"fa fa-search\"></i>\n						</button>\n					</div>\n				";
-  }
-
-function program9(depth0,data) {
-  
-  
-  return "\n			<div class=\"col-xs-offset-10 col-xs-2\">\n				<button type=\"submit\" class=\"btn btn-dark-blue pull-right\">Crear</button>\n			</div>\n		";
-  }
-
-function program11(depth0,data) {
   
   
   return "\n			<div class=\"col-xs-offset-10 col-xs-2\">\n				<button id=\"update-form\" class=\"btn btn-warning pull-right\">Actualizar</button>\n			</div>\n		";
   }
 
-  buffer += "<div class=\"form-horizontal\">\n	<div class=\"row\">\n		<div class=\"col-lg-offset-1 col-lg-6 col-md-8 col-xs-8\">\n			<div class=\"form-group\">\n				<label for=\"client_name\" class=\"col-xs-2 control-label\">Cliente</label>\n				<div class=\"";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\">\n					<input type=\"text\" class=\"form-control\" name=\"client_name\" placeholder=\"Juan Perez\" value=\"";
+  buffer += "<div class=\"form-horizontal\">\n	<div class=\"row\">\n		<div class=\"col-lg-offset-1 col-lg-6 col-md-8 col-xs-8\">\n			<div class=\"form-group\">\n				<label for=\"client_name\" class=\"col-xs-2 control-label\">Cliente</label>\n				<div class=\"col-xs-8\">\n					<input type=\"text\" class=\"form-control\" name=\"client_name\" placeholder=\"Seleccione un Cliente\" value=\"";
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.client_name), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n				</div>\n				";
-  stack1 = helpers.unless.call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data});
-  if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n			</div>\n		</div>\n		<div class=\"col-lg-3 col-md-4 col-xs-4\">\n			<div class=\"form-group\">\n				<label for=\"invoiceNumber\" class=\"col-xs-4 control-label\">Remito</label>\n				<div class=\"col-xs-8\">\n					<input type=\"text\" class=\"form-control\" name=\"invoiceNumber\" placeholder=\"e.j: A142985\" value=\"";
+    + "\" readonly>\n				</div>\n				<div class=\"col-xs-2\">\n					<button class=\"btn btn-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Buscar Cliente\" id=\"select-client\">\n						<i class=\"fa fa-search\"></i>\n					</button>\n				</div>\n			</div>\n		</div>\n		<div class=\"col-lg-3 col-md-4 col-xs-4\">\n			<div class=\"form-group\">\n				<label for=\"invoiceNumber\" class=\"col-xs-4 control-label\">Remito</label>\n				<div class=\"col-xs-8\">\n					<input type=\"text\" class=\"form-control\" name=\"invoiceNumber\" placeholder=\"e.j: A142985\" value=\"";
   if (stack1 = helpers.invoiceNumber) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.invoiceNumber); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.invoiceNumber), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.invoiceNumber), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += ">\n				</div>\n			</div>\n		</div>\n		<div class=\"col-lg-6 col-md-6\" style=\"display: none;\">\n			<div class=\"form-group\">\n				<label for=\"client_id\" class=\"col-xs-4 control-label\">ID Cliente</label>\n				<div class=\"col-xs-8\">\n					<input type=\"text\" class=\"form-control\" name=\"client_id\" placeholder=\"Juan Perez\" value=\"";
   if (stack1 = helpers.client_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
     + "\" ";
-  stack1 = helpers['if'].call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n				</div>\n			</div>\n		</div>\n	</div>\n	<hr style=\"margin-top: 0\">\n	<div class=\"row\">\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<div class=\"row\" id=\"appliance-views\"></div>\n		</div>\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<button class=\"btn btn-success\" id=\"single-appliance\">\n				<i class=\"fa fa-plus\"></i> Nuevo Equipo\n			</button>\n			<button class=\"btn btn-success\" id=\"multiple-appliance\">\n				<i class=\"fa fa-table\"></i> Carga Masiva\n			</button>\n			<hr style=\"margin-bottom: 0;\">\n		</div>\n	</div>\n	<div class=\"form-group\" style=\"margin-top: 10px;\">\n		";
-  stack1 = helpers.unless.call(depth0, (depth0 && depth0._id), {hash:{},inverse:self.program(11, program11, data),fn:self.program(9, program9, data),data:data});
+  buffer += ">\n				</div>\n			</div>\n		</div>\n	</div>\n	<hr style=\"margin-top: 0\">\n	<div class=\"row\">\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<div class=\"row\" id=\"appliance-views\"></div>\n		</div>\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<button ";
+  stack1 = helpers.unless.call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += " class=\"btn btn-success\" id=\"single-appliance\">\n				<i class=\"fa fa-plus\"></i> Nuevo Equipo\n			</button>\n			<button ";
+  stack1 = helpers.unless.call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += " class=\"btn btn-success\" id=\"multiple-appliance\">\n				<i class=\"fa fa-table\"></i> Carga Masiva\n			</button>\n			<hr style=\"margin-bottom: 0;\">\n		</div>\n	</div>\n	<div class=\"form-group\" style=\"margin-top: 10px;\">\n		";
+  stack1 = helpers.unless.call(depth0, (depth0 && depth0._id), {hash:{},inverse:self.program(7, program7, data),fn:self.program(5, program5, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n	</div>\n</div>";
   return buffer;

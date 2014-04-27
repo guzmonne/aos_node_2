@@ -7,6 +7,8 @@ var timestamps     = require('mongoose-timestamp');
 var async          = require('async');
 var ApplianceModel = require('../models/appliance').ApplianceModel;
 var Appliance      = new ApplianceModel();
+var ClientModel    = require('../models/client').ClientModel;
+var Client         = new ClientModel();
 
 // =======
 // SCHEMAS
@@ -14,6 +16,7 @@ var Appliance      = new ApplianceModel();
 var Schema   = mongoose.Schema;
 
 var ServiceRequest = new Schema({
+	'client_name'  : String, 
 	'client_id'    : {
 		type: Schema.Types.ObjectId,
 		ref : 'Client'
@@ -66,23 +69,46 @@ ServiceRequestModel.prototype.create = function(params, callback){
 		'createdBy'    : params['createdBy'],    
 		'updatedBy'    : params['updatedBy'],    
 	});
+	// Save Service Request
 	service_request.save(function(err, service_request){
 		if (err){return callback(err);}
+		// Find Client to add the new service request
+		Client.show({_id: service_request['client_id']}, function(err, client){
+			if(err){return callback(err);}
+			// Push the service request to the client model
+			client.service_requests.push(service_request);
+			// Save the updated client model
+			client.save(function(err, client){
+				if(err){return callback(err);}
+			});
+		});
+		// If there are no appliances for this service request then return
 		if (!params['appliances']){return callback(null, service_request);}
+		// Save all the appliances in parallel asynchronously
+		// async.each([array], function(array_element, callback()))
 		async.each(params['appliances'], function(applianceParams, cb){
+			// Set the service_request_id parameter for the appliance
 			applianceParams['service_request_id'] = service_request['_id'];
+			// Create the appliance passing the appliance parameters
 			Appliance.create(applianceParams, function(err, appliance){
+				// Push the created appliance to the service request created before
+				// This is necessary to populate it at the end before returning
 				service_request.appliances.push(appliance);
+				// Async.Each uses this callback to check when the tasks end
 				cb(null, appliance);
 			});
+		// This function gets run wen all the asyn functions finish
 		}, function(err, results){
 			if (err){return callback(err);}
+			// We save the service request with all the freshly created appliances
 			service_request.save(function(err, service_request){
 				if (err){return callback(err);}
+				// We populate them to return them to the client
 				service_request.populate({
 					path: 'appliances'
 				}, function(err, s_r){
 					if(err){return callback(err);}
+					// Return the populated service request
 					callback(null, s_r);
 				});
 			});

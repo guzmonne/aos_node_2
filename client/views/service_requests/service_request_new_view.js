@@ -1,5 +1,16 @@
 App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
-	name: "Nueva Orden de Servicio",
+	name: function(){
+		var clientName, clientID;
+		var result = "Nueva Orden de Servicio";
+		if (!App.defined(this.model)){return result;}
+		clientName = this.model.get('client_name');
+		clientID   = this.model.get('client_id');
+		if(App.defined(clientName) && App.defined(clientID)){
+			return "Nueva Orden de Servicio para " + clientName;
+		} else {
+			return result;
+		}
+	},
 
 	className: "row",
 
@@ -11,12 +22,6 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		this.renderForm();
-		var clientName = this.model.get('client_name');
-		var clientID   = this.model.get('client_id');
-		if(App.defined(clientName) && App.defined(clientID)){
-			this.name = "Nueva Orden de Servicio para " + clientName + " #" + clientID;
-			this.parent.setHeader();
-		}
 	},
 
 	renderForm: function(){
@@ -30,5 +35,13 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 			model: model
 		});
 		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
+		this.listenTo(this.serviceRequestForm.model, 'change:client_name', this.updateName);
+	},
+
+	updateName: function(){
+		console.log('yeah!');
+		if(this.parent){
+			this.parent.setHeader(this.name());
+		}
 	},
 });

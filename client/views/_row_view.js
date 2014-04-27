@@ -3,6 +3,11 @@ App.Views.RowView = App.Views.BaseView.extend({
 	
 	activated  : false,
 	
+
+	events: {
+		'click #selected': 'selected',
+	},
+	
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(this.model, 'change', this.render);
@@ -15,7 +20,26 @@ App.Views.RowView = App.Views.BaseView.extend({
 			this.activate();
 		}
 		app.trigger(this.modelName + ':row:rendered');
+		this.$el.tooltip();
+		if(this.parent.selection){
+			this.$('a#show').remove();
+			this.$('a#selected').removeClass('hide');
+		}
 		if(_.isFunction(this.onceRendered)){this.onceRendered();}
+	},
+
+	selected: function(){
+		var data;
+		if(this.parent.parentView){
+			data = {
+				model     : this.model,
+				parentView: this.parent.parentView
+			};
+		} else {
+			data = this.model;
+		}
+		app.trigger(this.modelName + ':selected', data);
+		app.modalController.closeModal();
 	},
 
 	serialize: function(){

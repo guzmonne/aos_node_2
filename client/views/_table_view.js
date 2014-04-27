@@ -17,7 +17,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.listenTo(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'sync', this.afterSync);
 		_.bind(this.append, this);
-		this.timestamp = new Date().getTime();
+		this.timestamp = _.uniqueId();
 	},
 
 	serialize: function(){
@@ -64,7 +64,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 		} else {
 			return new Error('Option modelView not defined');
 		}
-		if (_.isFunction(this.afterAppend)){this.afterAppend();}
 	},
 
 	onSync: function(){

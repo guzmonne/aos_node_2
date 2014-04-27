@@ -3,6 +3,12 @@ App.Views.ClientDetailsView = App.Views.BaseView.extend({
 
 	className: 'row',
 
+	initialize: function(){
+		if(this.model){
+			this.listenTo(this.model, 'sync', this.render);
+		}
+	},
+
 	serialize: function(){
 		var result       = (App.defined(this.model)) ? this.model.serialize() : {};
 		var createdAt    = this.model.get('createdAt');

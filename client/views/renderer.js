@@ -8,13 +8,13 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	showView: function(doc, id){
 		var docName  = this.titelize(doc);
 		var viewName = docName + 'ShowView';
+		var model    = new App.Models[docName]({_id: id});
 		var params   = {
-			viewModelId      : id,
+			model            : model,
 			viewName         : viewName,
 			portletFrameClass: 'green',
 		};
-		this.checkViewName(params, doc + '/show/' + id, this.showComparator);
-		//this.checkViewName(viewName, doc + '/show/' + id, params);
+		this.showOrGoTo(params, this.showComparator);
 	},
 
 	docView: function(doc, type){
@@ -24,22 +24,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		var params   = {
 			viewName: viewName,
 		};
-		this.checkViewName(params, doc + '/' + type);
+		this.showOrGoTo(params);
 	},
 
-	checkViewName: function(params, route, comparator){
-		if(
-			App.defined(params)						&&
-			App.defined(params.viewName)	&&
-			App.defined(App.Views[params.viewName])
-		){
-			Backbone.history.navigate(route);
-			this.showOrGoTo(params, comparator);
-		} else {
-			return;
-		}
-	},
-	
 	defaultComparator: function(view){
 		return (
 			view instanceof(App.Views.PortletView)	&& 
@@ -53,7 +40,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			view instanceof(App.Views.PortletView)	&&
 			App.defined(view.view)									&&
 			App.defined(view.view.model)						&&
-			view.view.model.id === this.viewModelId
+			view.view.model.id === this.model.id
 		);
 	},
 
@@ -65,7 +52,8 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			return;
 		}
 		var viewRef;
-		params     = (params) ? params : {};
+		Backbone.history.navigate((Backbone.history.fragment).replace('render/', ''));
+		params     = (params)     ? params     : {};
 		comparator = (comparator) ? comparator : this.defaultComparator;
 		viewRef    = this.viewIsRendered(comparator, params);
 		if (viewRef){
@@ -76,14 +64,21 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	show: function(params){
-		var options = (params) ? params : {};
-		if (!options.portletFrameClass){
-			delete options.portletFrameClass;
+		if(!App.defined(params) || !params.viewName){
+			return new Error('The viewName option must be set');
 		}
-		if(!options.viewName){return new Error('The viewName option must be set');}
-		var view = new App.Views.PortletView(options);
-		this.appendToContent(view);
-		App.scrollTo(view.el);
+		var options = {};
+		if(params.model){
+			options.model = params.model;
+			delete params.model;
+		}
+		params.view     = new App.Views[params.viewName](options);
+		var portletView = new App.Views.PortletView(params);
+		if(portletView.view.model){
+			portletView.view.model.fetch();
+		}
+		this.appendToContent(portletView);
+		App.scrollTo(portletView.el);
 	},
 
 	viewIsRendered: function(comparator, context){

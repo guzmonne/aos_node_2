@@ -11,6 +11,10 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button#select-client'   : 'selectClient',
 	},
 
+	appEvents: {
+		'client:selected': 'setClient',
+	},
+
 	afterRequest: function(){
 		this.$el.tooltip();
 	},
@@ -38,12 +42,18 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		app.modalController.displayModal(this.clientSelectModalView);
 	},
 
+	setClient: function(model){
+		this.model.set('client_id', model.get('_id'));
+		this.model.set('client_name', model.get('name'));
+		this.render();
+	},
+
 	deleteAppliance: function(e){
 		e.preventDefault();
-		var self = this;
-		var index = e.currentTarget.dataset.index;
+		var self       = this;
+		var index      = e.currentTarget.dataset.index;
 		var appliances = this.model.appliances;
-		var appliance = appliances.at(index);
+		var appliance  = appliances.at(index);
 		appliances.trigger('appliance:deleted');
 		appliances.remove(appliance);
 		this.$('#appliance-views').empty();
@@ -53,6 +63,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 				firstRender: false,
 			});
 		});
+		if(appliances.length === 0){this.$('button[type=submit]').attr('disabled', true);}
 	},
 
 	singleApplianceForm: function(e){
@@ -62,6 +73,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			client_name: this.model.get('client_name'),
 			client_id  : this.model.get('client_id'),
 		});
+		this.$('button[type=submit]').attr('disabled', false);
 		appliances.add(model);
 		this.appendApplianceForm({model: model});
 	},
@@ -78,6 +90,9 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			style: style
 		}));
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
+		if(index === (appliances.length - 1)){
+			App.scrollTo(view.$el);
+		}
 	},
 
 	createServiceRequest: function(e){
@@ -103,7 +118,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 				}
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
-					viewModel        : model,
+					model            : model,
 					portletFrameClass: 'green',
 					flash            : self.serviceRequestSuccessFlash(model.id)
 				});
@@ -116,5 +131,5 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		this.model.set('client_id', this.$('[name=client_id]').val());
 		this.model.set('client_name', this.$('[name=client_name]').val());
 		this.model.set('invoiceNumber', this.$('[name=invoiceNumber]').val());
-	}
+	},
 });

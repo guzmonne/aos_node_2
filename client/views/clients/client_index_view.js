@@ -8,11 +8,4 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	modelView      : App.Views.ClientRowView,
 
 	appStorage      : 'clients',
-
-	afterAppend: function(){
-		if (this.selection){
-			this.$('a#show-client').remove();
-			this.$('a#select-client').removeClass('hide');
-		}
-	},
 });

@@ -8,10 +8,8 @@ App.Views.TabView = App.Views.BaseView.extend({
 	events: {},
 	
 	initialize: function(){
-		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
-		if(App.defined(this.model) && _.isFunction(this.bindEvents)){
-			this.bindEvents();
-		} else {
+		if(!this.modelName){return new Error('View must have a modelName defined');}
+		if(!App.defined(this.model)){
 			var titelizeModelName = this.titelize(this.modelName);
 			if (App.defined(App.Models[titelizeModelName])){
 				this.model = new App.Models[titelizeModelName]();
@@ -19,13 +17,15 @@ App.Views.TabView = App.Views.BaseView.extend({
 				this.model = new Giraffe.Model();
 			}
 		}
-		this.timestamp = new Date().getTime();
+		this.timestamp = _.uniqueId();
 		this.createTabs();
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
+		if (_.isFunction(this.bindEvents)){this.bindEvents();}
 		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
+		this.listenTo(this.model, 'sync', this.setHeader);
 	},
 
 	createTabs: function(){
-		if(!this.modelName){return new Error('View must have a modelName defined');}
 		var self   = this;
 		var object = {
 			modelName: this.modelName,
@@ -68,25 +68,11 @@ App.Views.TabView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		var self = this;
-		if(this.model.isNew() && App.defined(this.modelId)){
-			this.model.set('_id', this.modelId);
-			this.model.fetch({
-				success: function(){
-					self.render();
-					self.bindEvents();
-				},
-				error: function(){
-					self.parent.dispose();
-				},
-			});
-		}	else {
-			if (_.isFunction(this.activeView)){this.activeView();}
-			if (_.isFunction(this.setName)){this.setName();}
-			if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
-			this.announce();
-			App.scrollTo(this.parent.el);
-		}
+		if (_.isFunction(this.activeView)){this.activeView();}
+		if (_.isFunction(this.setName)){this.setName();}
+		if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
+		this.announce();
+		App.scrollTo(this.parent.el);
 	},
 
 	serialize: function(){
@@ -103,5 +89,9 @@ App.Views.TabView = App.Views.BaseView.extend({
 		app.trigger(this.modelName + ':show:active', this.model.id);
 	},
 
-	bindEvents: function(){},
+	setHeader: function(){
+		if (App.defined(this.parent) && _.isFunction(this.parent.setHeader)){
+			this.parent.setHeader();
+		}
+	}
 });

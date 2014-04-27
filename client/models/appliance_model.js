@@ -3,6 +3,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
+			'model_id'          : null,
 			'model'             : null,
 			'brand'             : null,
 			'serial'            : null,

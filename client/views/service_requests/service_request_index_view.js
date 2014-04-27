@@ -17,13 +17,13 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		'click button#new-service-request': 'newServiceRequest',
 	},
 
-	comparator: function(view){
+	comparator: function(portletView){
 		return (
-				view instanceof App.Views.PortletView &&
-				view.viewName === "ServiceRequestNewView" &&
-				App.defined(view.view) &&
-				App.defined(view.view.model) &&
-				view.view.model.get('client_id') === this.parent.model.id
+				portletView instanceof App.Views.PortletView &&
+				portletView.viewName === "ServiceRequestNewView" &&
+				App.defined(portletView.view) &&
+				App.defined(portletView.view.model) &&
+				portletView.view.model.get('client_id') === this.parent.model.id
 			);
 	},
 
@@ -39,15 +39,13 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 		var parentModel = this.parent.model;
 		var object = {
 			client_name: parentModel.get('name'),
-			client_id  : parentModel.get('id')
+			client_id  : parentModel.get('_id')
 		};
 		var model = new App.Models.ServiceRequest(object);
-		var portletView = new App.Views.PortletView({
+		app.Renderer.show({
 			viewName: 'ServiceRequestNewView',
-			viewModel: model,
+			model: model
 		});
-		app.Renderer.appendToContent(portletView);
-		App.scrollTo(portletView.el);
 	},
 
 	checkCreatedModel: function(model){

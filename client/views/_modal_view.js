@@ -28,7 +28,7 @@ App.Views.ModalView = App.Views.BaseView.extend({
 	afterRender: function(){
 		this.bodyView.attachTo('.modal-body', {method: 'html'});
 	},
-
+	
 	serialize: function(){
 		return this.modalOptions;
 	}

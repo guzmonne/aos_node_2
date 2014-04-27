@@ -90,6 +90,13 @@ ModelModel.prototype.updateById = function(id, params, callback){
 		callback(null, model);
 	});
 };
+// Find model by id
+ModelModel.prototype.findById = function(id, callback){
+	Model.findById(id, function(err, model){
+		if (err){return callback(err);}
+		callback(null, model);
+	});
+};
 
 // =======
 // EXPORTS

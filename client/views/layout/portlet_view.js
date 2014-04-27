@@ -5,8 +5,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 
 	view             : null,
 	viewName         : null,
-	viewModel        : null,
-	viewModelId      : null,
 	portletFrameClass: null,
 	flash            : null,
 	entrance         : 'fadeInLeft',
@@ -24,8 +22,9 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	afterRender: function(options){
 		this.setFrame();
 		this.setMainChildView();
-		this.startTools();
+		this.startTooltips();
 		this.displayFlash();
+		this.setHeader();
 	},
 
 	collapseView: function(){
@@ -68,30 +67,22 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		}
 	},
 
-	startTools: function(){
+	startTooltips: function(){
 		App.animate(this.$el, this.entrance);
 		this.$el.tooltip();
 	},
 
 	setMainChildView: function(){
-		if(App.defined(this.viewName)){
-			if(App.defined(this.viewModel)){
-				this.view = new App.Views[this.viewName]({model: this.viewModel});
-			} else if (App.defined(this.viewModelId)) {
-				this.view = new App.Views[this.viewName]({modelId: this.viewModelId});
-			} else {
+		if(!App.defined(this.viewName)){return new Error('ViewName must be set');}
+		if(!this.view){
 				this.view = new App.Views[this.viewName]();
-			}
-			this.setHeader();
-			this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
-			this.listenTo(this.app, 'portlet:view: '+ this.view.cid +':sync:spin:stop', this.stopSpin);
 		}
+		this.view.attachTo(this.$('#portlet-body'), {method: 'html'});
+		this.listenTo(this.app, 'portlet:view: '+ this.view.cid +':sync:spin:stop', this.stopSpin);
 	},
 
-	setHeader: function(header){
-		if (App.defined(this.view.name)){
-			this.$('#portlet-title-header').text(this.view.name);
-		}
+	setHeader: function(){
+		this.$('#portlet-title-header').text(_.result(this.view, 'name'));
 	},
 
 	setFrame: function(){
@@ -113,7 +104,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	showMessage: function(data){
 		var options = {};
 		var method  = 'prepend';
-		if(data.lifetime){
+		if(App.defined(data.lifetime)){
 			options.lifetime = data.lifetime;
 			delete data.lifetime;
 		}
@@ -122,6 +113,7 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			delete data.method;
 		}
 		options.model = new Backbone.Model(data);
+		console.log(data, options);
 		var callout   = new App.Views.BSCalloutView(options);
 		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
 	},

@@ -1,5 +1,9 @@
 App.Views.ClientShowView = App.Views.TabView.extend({
-	name     : null,
+	
+	name: function(){
+		return 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
+	},
+
 	modelId  : null,
 	modelName: 'client',
 
@@ -28,13 +32,6 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 
 	bindEvents: function(){
 		this.listenTo(this.model, 'updated', this.update);
-		this.listenTo(this.model, 'change', this.synchronize);
-		this.listenTo(this.app, 'sync:client:' + this.model.id, this.update);
-		this.synchronize = _.debounce(this.synchronize, 100);
-	},
-
-	setName: function(){
-		this.name = 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
 
 	onSync: function(){
