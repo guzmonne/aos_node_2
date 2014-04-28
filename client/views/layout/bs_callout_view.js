@@ -16,7 +16,6 @@ App.Views.BSCalloutView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		console.log(this);
 		var self      = this;
 		var className = this.model.get('class');
 		if(App.defined(className)){

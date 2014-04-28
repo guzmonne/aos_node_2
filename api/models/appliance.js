@@ -7,6 +7,7 @@ var timestamps    = require('mongoose-timestamp');
 var _             = require('underscore');
 var ModelModel    = require('../models/model').ModelModel;
 var Model         = new ModelModel();
+var async         = require('async');
 
 // =======
 // SCHEMAS
@@ -109,8 +110,8 @@ function pickParams(params){
 // Create new appliance
 // --------------------
 ApplianceModel.prototype.create = function(params, callback){
-	var object = pickParams(params);
-	var appliance = new Appliance(object);
+	var applianceParams = pickParams(params);
+	var appliance       = new Appliance(applianceParams);
 	appliance.save(function(err, appliance){
 		if (err){return callback(err);}
 		Model.findById(appliance.model_id, function(err, model){
@@ -128,7 +129,18 @@ ApplianceModel.prototype.create = function(params, callback){
 ApplianceModel.prototype.findAll = function(callback){
 	Appliance.find({}, function(err, appliances){
 		if (err){return callback(err);}
-		callback(null, appliances);
+		async.each(appliances, function(appliance, cb){
+			appliance.populate({
+				path  : 'model_id',
+				select: 'brand model category subcategory -_id'
+			}, function(err, appliance){
+				cb(null, appliance);
+			});
+		}, function(err, results){
+			if (err){return callback(err);}
+			// Return the populated service request
+			callback(null, appliances);
+		});
 	});
 };
 // Update appliance by id
@@ -139,10 +151,6 @@ ApplianceModel.prototype.updateById = function(id, params, callback){
 		callback(null, appliance);
 	});
 };
-// =========
-// FUNCTIONS
-// =========
-
 // =======
 // EXPORTS
 // =======

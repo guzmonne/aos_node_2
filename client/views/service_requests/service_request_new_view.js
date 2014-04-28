@@ -39,7 +39,6 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	},
 
 	updateName: function(){
-		console.log('yeah!');
 		if(this.parent){
 			this.parent.setHeader(this.name());
 		}

@@ -113,7 +113,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			delete data.method;
 		}
 		options.model = new Backbone.Model(data);
-		console.log(data, options);
 		var callout   = new App.Views.BSCalloutView(options);
 		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
 	},

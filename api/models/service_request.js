@@ -97,7 +97,7 @@ ServiceRequestModel.prototype.create = function(params, callback){
 				// Async.Each uses this callback to check when the tasks end
 				cb(null, appliance);
 			});
-		// This function gets run wen all the asyn functions finish
+		// This function gets run wen all the async functions finish
 		}, function(err, results){
 			if (err){return callback(err);}
 			// We save the service request with all the freshly created appliances
@@ -108,8 +108,18 @@ ServiceRequestModel.prototype.create = function(params, callback){
 					path: 'appliances'
 				}, function(err, s_r){
 					if(err){return callback(err);}
-					// Return the populated service request
-					callback(null, s_r);
+					async.each(s_r.appliances, function(appliance, cb){
+						appliance.populate({
+							path  : 'model_id',
+							select: 'brand model category subcategory -_id'
+						}, function(err, appliance){
+							cb(null, appliance);
+						});
+					}, function(err, results){
+						if (err){return callback(err);}
+						// Return the populated service request
+						callback(null, s_r);
+					});
 				});
 			});
 		});
@@ -130,12 +140,13 @@ ServiceRequestModel.prototype.findByClientId = function(client_id, callback){
 	ServiceRequest.find({'client_id': client_id}, function(err, service_requests){
 		if(err){return callback(err);}
 		if(service_requests === null){return callback({msg: 'No ServiceRequest found'});}
-		ServiceRequest.populate(service_requests, {
-			path: 'appliances'
-		}, function(err, s_r){
-			if(err){return callback(err);}
-			callback(null, s_r);
-		});
+		callback(null, service_requests);
+		//ServiceRequest.populate(service_requests, {
+		//	path: 'appliances'
+		//}, function(err, s_r){
+		//	if(err){return callback(err);}
+		//	callback(null, s_r);
+		//});
 	});
 };
 // Show Service Request by ID
@@ -144,9 +155,23 @@ ServiceRequestModel.prototype.show = function(id, callback){
 	ServiceRequest.findById(id, function(err, sr){
 		if(err){return callback(err);}
 		if(sr === null){return callback({msg: 'No ServiceRequest found'});}
-		sr.populate({path: 'appliances'}, function(err, s_r){
+		sr.populate({
+			path: 'appliances'
+		}, function(err, s_r){
 			if(err){return callback(err);}
-			callback(null, s_r);
+			async.each(s_r.appliances, function(appliance, cb){
+				appliance.populate({
+					path  : 'model_id',
+					select: 'brand model category subcategory -_id'
+				}, function(err, appliance){
+					cb(null, appliance);
+				});
+			}, function(err, results){
+				if (err){return callback(err);}
+				// Return the populated service request
+				callback(null, s_r);
+			});
+			//callback(null, s_r);
 		});
 	});
 };

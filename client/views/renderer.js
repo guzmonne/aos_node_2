@@ -74,7 +74,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		}
 		params.view     = new App.Views[params.viewName](options);
 		var portletView = new App.Views.PortletView(params);
-		if(portletView.view.model){
+		if(options.model){
 			portletView.view.model.fetch();
 		}
 		this.appendToContent(portletView);

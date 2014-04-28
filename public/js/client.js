@@ -841,7 +841,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		}
 		params.view     = new App.Views[params.viewName](options);
 		var portletView = new App.Views.PortletView(params);
-		if(portletView.view.model){
+		if(options.model){
 			portletView.view.model.fetch();
 		}
 		this.appendToContent(portletView);
@@ -879,9 +879,10 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 			var updatedAt    = this.model.get('updatedAt');
 			var closedAt     = this.model.get('closedAt');
 			object           = this.model.toJSON();
-			object.createdAt	=	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
-			object.updatedAt	=	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
-			object.closedAt		=	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)	: null;
+			_.extend(object, this.model.get('model_id'));
+			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
+			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
+			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
 		}
 		return object;
 	},
@@ -1404,7 +1405,6 @@ App.Views.BSCalloutView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		console.log(this);
 		var self      = this;
 		var className = this.model.get('class');
 		if(App.defined(className)){
@@ -1655,7 +1655,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			delete data.method;
 		}
 		options.model = new Backbone.Model(data);
-		console.log(data, options);
 		var callout   = new App.Views.BSCalloutView(options);
 		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
 	},
@@ -2117,7 +2116,6 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	},
 
 	updateName: function(){
-		console.log('yeah!');
 		if(this.parent){
 			this.parent.setHeader(this.name());
 		}
