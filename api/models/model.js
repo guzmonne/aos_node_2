@@ -3,6 +3,7 @@
 // ===================
 var mongoose      = require('mongoose');
 var autoIncrement = require('mongoose-auto-increment');
+var _             = require('underscore');
 
 // =======
 // SCHEMAS
@@ -78,7 +79,7 @@ ModelModel.prototype.create = function(params, callback){
 // ------------------
 ModelModel.prototype.findAll = function(fields, callback){
 	var query = Model.find({});
-	if (fields){
+	if (arguments.length > 1 && _.isString(fields)){
 		query.select(fields);
 	}
 	query.exec(function(err, models){
@@ -97,8 +98,10 @@ ModelModel.prototype.updateById = function(id, params, callback){
 // Find model by id
 ModelModel.prototype.findById = function(id, fields, callback){
 	var query = Model.findById(id);
-	if (fields){
+	if (arguments.length > 2 && _.isString(fields)){
 		query.select(fields);
+	} else if (arguments.length === 2 && _.isFunction(fields)){
+		callback = fields;
 	}
 	query.exec(function(err, model){
 		if (err){return callback(err);}
