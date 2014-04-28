@@ -1,13 +1,25 @@
 <td>{{id}}</td>
-{{#unless sameClient}}
-	<td>{{client_name}}</td>
-{{/unless}}
-<td>{{brand}}</td>
-<td>{{model}}</td>
-<td>{{serial}}</td>
-<td>{{status}}</td>
-<td>{{updatedAt}}</td>
-<td>{{closedAt}}</td>
+<td>{{client_name}}</td>
+<td>
+	<dt>{{brand}}</dt>
+	<dd>{{model}}</dd>
+	{{#if serial}}
+		<dd><i class="fa fa-barcode"></i> {{serial}}</dd>
+	{{/if}}
+</td>
+<td class="text-center">{{repairement_type}}</td>
+<td class="text-center">{{status}}</td>
+<td>{{technician_name}}</td>
+<td>
+	<dt>Creado</dt>
+	<dd>{{createdAt}}</dd>
+	<dt>Actualizado</dt>
+	<dd>{{updatedAt}}</dd>
+	{{#if closedAt}}
+		<dt>Cerrado</dt>
+		<dd>{{closedAt}}</dd>
+	{{/if}}
+</td>
 <td class="center-vh">
 	<button id="show-appliance" class="btn btn-green">
 		<i class="fa fa-ellipsis-h fa-lg"></i>

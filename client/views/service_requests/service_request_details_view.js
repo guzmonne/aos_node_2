@@ -2,20 +2,28 @@ App.Views.ServiceRequestDetailsView = App.Views.BaseView.extend({
 	template: HBS.service_request_details_template,
 	className: 'row',
 
+	initialize: function(){
+		if (this.model){
+			this.listenTo(this.model, 'sync', this.render);
+		}
+	},
+
 	afterRender: function(){
 		if(
 				!App.defined(this.appliancesIndex)	&& 
 				App.defined(this.model)							&&
-				App.defined(this.model.appliances)
+				App.defined(this.model.appliances)	&&
+				this.model.appliances.length > 0
 		){
+			this.model.appliances.client_id = this.model.id;
 			this.appliancesIndex = new App.Views.ApplianceIndexView({
 				collection: this.model.appliances,
-				portlet   : this.parent,
 			});
 			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
 				method: 'html'
 			});
 		}
+		this.parent.setName();
 	},
 
 	serialize: function(){

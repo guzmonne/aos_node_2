@@ -94,11 +94,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 	defaults: function(){
 		return {
 			'model_id'          : null,
-			'model'             : null,
-			'brand'             : null,
 			'serial'            : null,
-			'category'          : null,
-			'subcategory'       : null,
 			'accessories'       : [],
 			'client_name'       : null,
 			'client_id'         : null,
@@ -696,6 +692,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 App.Views.TableView = App.Views.BaseView.extend({
 	firstRender   : true,
 	rowViewOptions: {},
+	fetchOptions	: {},
 
 	initialize: function(){
 		var self = this;
@@ -737,7 +734,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 			if(this.collection.length > 0){
 				this.appendCollection(this.collection);
 			} else {
-				this.collection.fetch();
+				this.collection.fetch(this.fetchOptions);
 			}
 			this.firstRender = false;
 		}
@@ -762,7 +759,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	onSync: function(){
-		this.collection.fetch();
+		this.collection.fetch(this.fetchOptions);
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -775,7 +772,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	showView: function(doc, id){
 		var docName  = this.titelize(doc);
 		var viewName = docName + 'ShowView';
-		var model    = new App.Models[docName]({_id: id});
+		var model    = this.setModel(doc, id);
 		var params   = {
 			model            : model,
 			viewName         : viewName,
@@ -792,6 +789,19 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			viewName: viewName,
 		};
 		this.showOrGoTo(params);
+	},
+
+	setModel: function(doc, id){
+		var model;
+		var collection = app[doc + 's'];
+		var docName    = this.titelize(doc);
+		if (App.defined(collection)){
+			model = collection.get(id);
+		} else {
+			model = new App.Models[docName]({_id: id});
+			model.fetch();
+		}
+		return model;
 	},
 
 	defaultComparator: function(view){
@@ -841,9 +851,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		}
 		params.view     = new App.Views[params.viewName](options);
 		var portletView = new App.Views.PortletView(params);
-		if(options.model){
-			portletView.view.model.fetch();
-		}
+		//if(options.model){
+		//	portletView.view.model.fetch();
+		//}
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
 	},
@@ -987,7 +997,10 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		return this.model.toJSON();
+		var result = this.model.toJSON();
+		_.extend(result, this.model.get('model_id'));
+		console.log(result);
+		return result;
 	},
 
 	saveModel: function(){
@@ -1071,11 +1084,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('brand', this.$('[name=brand]').val());
-		this.model.set('model', this.$('[name=model]').val());
 		this.model.set('serial', this.$('[name=serial]').val());
-		this.model.set('category', this.$('[name=category]').val());
-		this.model.set('subcategory', this.$('[name=subcategory]').val());
 		this.model.set('observations', this.$('[name=observations]').val());
 		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
 		this.model.set('defect', this.$('[name=defect]').val());
@@ -1278,6 +1287,11 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	modelView      : App.Views.ClientRowView,
 
 	appStorage      : 'clients',
+	fetchOptions		: {
+		data: {
+			fields: '-service_requests'
+		}
+	},
 });
 App.Views.ClientNewView = App.Views.NewView.extend({	
 	name        : "Nuevo Cliente",
@@ -1780,7 +1794,12 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 	tableCollection: App.Collections.Models,
 	modelView      : App.Views.ModelRowView,
 
-	appStorage : 'models',
+	appStorage  : 'models',
+	fetchOptions		: {
+		data: {
+			fields: 'brand model category subcategory'
+		}
+	},
 });
 App.Views.ModelNewView = App.Views.NewView.extend({
 	name        : "Nuevo Modelo",
@@ -1834,20 +1853,28 @@ App.Views.ServiceRequestDetailsView = App.Views.BaseView.extend({
 	template: HBS.service_request_details_template,
 	className: 'row',
 
+	initialize: function(){
+		if (this.model){
+			this.listenTo(this.model, 'sync', this.render);
+		}
+	},
+
 	afterRender: function(){
 		if(
 				!App.defined(this.appliancesIndex)	&& 
 				App.defined(this.model)							&&
-				App.defined(this.model.appliances)
+				App.defined(this.model.appliances)	&&
+				this.model.appliances.length > 0
 		){
+			this.model.appliances.client_id = this.model.id;
 			this.appliancesIndex = new App.Views.ApplianceIndexView({
 				collection: this.model.appliances,
-				portlet   : this.parent,
 			});
 			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
 				method: 'html'
 			});
 		}
+		this.parent.setName();
 	},
 
 	serialize: function(){
@@ -2163,6 +2190,7 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 
 	setName: function(){
 		this.name = 'Orden de Servicio #' + this.model.get('id');
+		this.parent.setHeader();
 	},
 });
 App.Routers.MainRouter = Giraffe.Router.extend({

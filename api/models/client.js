@@ -5,6 +5,7 @@ var mongoose      = require('mongoose');
 var ShortId       = require('mongoose-shortid');
 var timestamps    = require('mongoose-timestamp');
 var autoIncrement = require('mongoose-auto-increment');
+var _             = require('underscore');
 
 // =======
 // SCHEMAS
@@ -65,10 +66,18 @@ ClientModel = function(){};
 // ---------
 // Find all clients
 // ----------------
-ClientModel.prototype.findAll = function(callback){
-	Client.find({}, function(err, clients){
+ClientModel.prototype.findAll = function(fields, callback){
+	var query = Client.find({});
+	if (fields){
+		query.select(fields);
+	}
+	query.exec(function(err, clients){
+		if (err){return callback(err);}
 		callback(null, clients);
-	});
+	}); 
+	//Client.find({}, function(err, clients){
+	//	callback(null, clients);
+	//});
 };
 // Create Client
 // -------------

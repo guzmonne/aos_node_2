@@ -5,13 +5,14 @@ var ModelModel = require('../models/model').ModelModel;
 var Model      = new ModelModel();
 
 exports.index = function(req, res){
-	var id = req.params.id;
+	var id     = req.params.id;
+	var fields = req.query.fields;
 	if (id){
-		Model.findByClientId(id, function(error, models){
+		Model.findByClientId(id, fields, function(error, models){
 			res.send(models);
 		});
 	} else {
-		Model.findAll(function(error, models){
+		Model.findAll(fields, function(error, models){
 			res.send(models);
 		});
 	}

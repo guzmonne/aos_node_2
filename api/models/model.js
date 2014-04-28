@@ -76,8 +76,12 @@ ModelModel.prototype.create = function(params, callback){
 };
 // Get all models
 // ------------------
-ModelModel.prototype.findAll = function(callback){
-	Model.find({}, function(err, models){
+ModelModel.prototype.findAll = function(fields, callback){
+	var query = Model.find({});
+	if (fields){
+		query.select(fields);
+	}
+	query.exec(function(err, models){
 		if (err){return callback(err);}
 		callback(null, models);
 	});
@@ -91,8 +95,12 @@ ModelModel.prototype.updateById = function(id, params, callback){
 	});
 };
 // Find model by id
-ModelModel.prototype.findById = function(id, callback){
-	Model.findById(id, function(err, model){
+ModelModel.prototype.findById = function(id, fields, callback){
+	var query = Model.findById(id);
+	if (fields){
+		query.select(fields);
+	}
+	query.exec(function(err, model){
 		if (err){return callback(err);}
 		callback(null, model);
 	});

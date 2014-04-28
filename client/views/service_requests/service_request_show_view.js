@@ -40,5 +40,6 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 
 	setName: function(){
 		this.name = 'Orden de Servicio #' + this.model.get('id');
+		this.parent.setHeader();
 	},
 });

@@ -1,6 +1,7 @@
 App.Views.TableView = App.Views.BaseView.extend({
 	firstRender   : true,
 	rowViewOptions: {},
+	fetchOptions	: {},
 
 	initialize: function(){
 		var self = this;
@@ -42,7 +43,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 			if(this.collection.length > 0){
 				this.appendCollection(this.collection);
 			} else {
-				this.collection.fetch();
+				this.collection.fetch(this.fetchOptions);
 			}
 			this.firstRender = false;
 		}
@@ -67,6 +68,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	onSync: function(){
-		this.collection.fetch();
+		this.collection.fetch(this.fetchOptions);
 	},
 });

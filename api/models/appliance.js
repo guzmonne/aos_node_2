@@ -21,9 +21,9 @@ var Appliance = new Schema({
 	},
 	//'model' : String,
 	//'brand' : String,
-	//'serial': String,
 	//'category': String,
 	//'subcategory' : String,
+	'serial': String,
 	'accessories' : [String],
 	'client_name' : String,
 	'client_id' : String,
@@ -100,6 +100,7 @@ function pickParams(params){
 		,'updatedBy' 
 		,'service_request_id'
 		,'accessories'
+		,'serial'
 	);
 	result.updatedAt = date;
 	if (!params['_id']){

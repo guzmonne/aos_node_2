@@ -5,7 +5,12 @@ var ClientModel = require('../models/client').ClientModel;
 var Client      = new ClientModel();
 
 exports.index = function(req, res){
-	Client.findAll(function(error, clients){
+	var fields;
+	console.log(req.query);
+	if (req.query.fields){
+		fields = req.query.fields;
+	}
+	Client.findAll(fields, function(error, clients){
 		res.send(clients);
 	});
 };

@@ -92,7 +92,10 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	serialize: function(){
-		return this.model.toJSON();
+		var result = this.model.toJSON();
+		_.extend(result, this.model.get('model_id'));
+		console.log(result);
+		return result;
 	},
 
 	saveModel: function(){

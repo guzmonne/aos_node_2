@@ -8,7 +8,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	showView: function(doc, id){
 		var docName  = this.titelize(doc);
 		var viewName = docName + 'ShowView';
-		var model    = new App.Models[docName]({_id: id});
+		var model    = this.setModel(doc, id);
 		var params   = {
 			model            : model,
 			viewName         : viewName,
@@ -25,6 +25,19 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			viewName: viewName,
 		};
 		this.showOrGoTo(params);
+	},
+
+	setModel: function(doc, id){
+		var model;
+		var collection = app[doc + 's'];
+		var docName    = this.titelize(doc);
+		if (App.defined(collection)){
+			model = collection.get(id);
+		} else {
+			model = new App.Models[docName]({_id: id});
+			model.fetch();
+		}
+		return model;
 	},
 
 	defaultComparator: function(view){
@@ -74,9 +87,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		}
 		params.view     = new App.Views[params.viewName](options);
 		var portletView = new App.Views.PortletView(params);
-		if(options.model){
-			portletView.view.model.fetch();
-		}
+		//if(options.model){
+		//	portletView.view.model.fetch();
+		//}
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
 	},

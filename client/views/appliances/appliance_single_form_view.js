@@ -50,11 +50,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('brand', this.$('[name=brand]').val());
-		this.model.set('model', this.$('[name=model]').val());
 		this.model.set('serial', this.$('[name=serial]').val());
-		this.model.set('category', this.$('[name=category]').val());
-		this.model.set('subcategory', this.$('[name=subcategory]').val());
 		this.model.set('observations', this.$('[name=observations]').val());
 		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
 		this.model.set('defect', this.$('[name=defect]').val());
