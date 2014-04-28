@@ -7,6 +7,10 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change', this.render);
 	},
 
+	afterRender: function(){
+		this.$el.tooltip();
+	},
+
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){

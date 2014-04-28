@@ -900,6 +900,10 @@ App.Views.ApplianceRowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change', this.render);
 	},
 
+	afterRender: function(){
+		this.$el.tooltip();
+	},
+
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
@@ -924,7 +928,7 @@ App.Views.ApplianceCarouselView = App.Views.CarouselView.extend({
 App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_edit_form_template, 
 
-	className: "row",
+	//className: "row",
 
 	events: {
 		'click #edit-appliance'                : "editAppliance",
@@ -996,7 +1000,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			success: function(){
 				var options = {
 					title  : 'Equipo Actualizado',
-					message: 'El equipos se ha actualizado con exito',
+					message: 'El equipo se ha actualizado con exito',
 					class  : 'success'
 				};
 				var view = new App.Views.BSCalloutView({
@@ -1017,7 +1021,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	serialize: function(){
 		var result = this.model.toJSON();
 		_.extend(result, this.model.get('model_id'));
-		console.log(result);
 		return result;
 	},
 
@@ -1049,6 +1052,39 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	modelView      : App.Views.ApplianceRowView,
 
 	appStorage: 'appliances',
+});
+App.Views.ApplianceShowView = App.Views.BaseView.extend({
+	template: HBS.appliance_show_template,
+	className: 'row',
+
+	name: function(){
+		return 'Equipo: #' + this.model.get('id');
+	},
+	
+	initialize: function(){
+		if (App.defined(this.model)){
+			this.listenToOnce(this.model, 'change', this.update);
+		}
+	},
+
+	afterRender: function(){
+		this.formView = new App.Views.ApplianceEditFormView({
+			model: this.model,
+		});
+		this.formView.attachTo(this.$('#form-' + this.cid), {method: 'html'});
+	},
+
+	update: function(){
+		this.parent.displayFlash();
+		this.parent.setHeader();
+		this.render();
+	},
+
+	serialize: function(){
+		var result = this.model.toJSON();
+		result.cid = this.cid;
+		return result;
+	},
 });
 App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_single_form_template,

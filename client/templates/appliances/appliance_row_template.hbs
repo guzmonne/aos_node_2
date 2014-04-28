@@ -7,7 +7,16 @@
 		<dd><i class="fa fa-barcode"></i> {{serial}}</dd>
 	{{/if}}
 </td>
-<td class="text-center">{{repairement_type}}</td>
+<td class="text-center">
+	{{#is repairement_type "Presupuesto"}}
+		<dt>{{repairement_type}}</dt>
+		{{#is cost "not" 0}}
+			<dd>${{cost}},00</dd>
+		{{/is}}
+	{{else}}
+		{{repairement_type}}
+	{{/is}}
+</td>
 <td class="text-center">{{status}}</td>
 <td>{{technician_name}}</td>
 <td>
@@ -21,7 +30,10 @@
 	{{/if}}
 </td>
 <td class="center-vh">
-	<button id="show-appliance" class="btn btn-green">
-		<i class="fa fa-ellipsis-h fa-lg"></i>
-	</button>
+	<a href="#render/appliance/show/{{_id}}" class="btn btn-green" data-toggle="tooltip" data-placement="top" title="Mas Información" style="margin: 3px;">
+		<i class="fa fa-ellipsis-h fa-fw"></i>
+	</a>
+	<a href="#render/service_request/show/{{service_request_id}}" class="btn btn-green" data-toggle="tooltip" data-placement="top" title="Orden de Servicio" style="margin: 3px;">
+		<i class="fa fa-clipboard fa-fw"></i>
+	</a>
 </td>

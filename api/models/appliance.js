@@ -76,8 +76,7 @@ ApplianceModel = function(){};
 function pickParams(params){
 	var date = new Date();
 	var result = _.pick(params, 
-		 'model_id'
-		,'client_name' 
+		 'client_name' 
 		,'client_id' 
 		,'repairement_type'
 		,'defect'
@@ -94,13 +93,18 @@ function pickParams(params){
 		,'technician_id' 
 		,'createdBy' 
 		,'updatedBy' 
-		,'service_request_id'
 		,'accessories'
 		,'serial'
 	);
 	result.updatedAt = date;
 	if (!params['_id']){
 		result.createdAt = date;
+	}
+	if (!_.isObject(params['model_id'])){
+		result.model_id = params['model_id'];
+	}
+	if (!_.isObject(params['service_request_id'])){
+		result.service_request_id = params['service_request_id'];
 	}
 	return result;
 }
@@ -141,11 +145,25 @@ ApplianceModel.prototype.findAll = function(callback){
 	});
 };
 // Update appliance by id
+// ----------------------
 ApplianceModel.prototype.updateById = function(id, params, callback){
 	var object = pickParams(params);
 	Appliance.findByIdAndUpdate(id, object, function(err, appliance){
 		if (err){return callback(err);}
 		callback(null, appliance);
+	});
+};
+// Show appliance
+// --------------
+ApplianceModel.prototype.show = function(id, callback){
+	Appliance.findById(id, function(err, appliance){
+		if (err){return callback(err);}
+		appliance.populate({
+			path  : 'model_id',
+			select: 'brand model category subcategory -_id'
+		}, function(err, appliance){
+			callback(null, appliance);
+		});
 	});
 };
 // =======

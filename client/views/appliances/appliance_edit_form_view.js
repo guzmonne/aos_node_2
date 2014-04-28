@@ -1,7 +1,7 @@
 App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	template: HBS.appliance_edit_form_template, 
 
-	className: "row",
+	//className: "row",
 
 	events: {
 		'click #edit-appliance'                : "editAppliance",
@@ -73,7 +73,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			success: function(){
 				var options = {
 					title  : 'Equipo Actualizado',
-					message: 'El equipos se ha actualizado con exito',
+					message: 'El equipo se ha actualizado con exito',
 					class  : 'success'
 				};
 				var view = new App.Views.BSCalloutView({
@@ -94,7 +94,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	serialize: function(){
 		var result = this.model.toJSON();
 		_.extend(result, this.model.get('model_id'));
-		console.log(result);
 		return result;
 	},
 
