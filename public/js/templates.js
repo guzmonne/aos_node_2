@@ -1380,11 +1380,11 @@ function program3(depth0,data) {
   return "<dd>Tecnico</dd>";
   }
 
-  buffer += "<td>\n	<dt>Nombre</dt>\n	<dd>";
+  buffer += "<td>\n	<dd><i class=\"fa fa-user fa-fw\"></i> ";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</dd>\n	<dt>Email</dt>\n	<dd>";
+    + "</dd>\n	<dd><i class=\"fa fa-envelope fa-fw\"></i> ";
   if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
