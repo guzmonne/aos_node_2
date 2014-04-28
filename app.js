@@ -97,6 +97,7 @@ var client          = require('./api/controllers/client');
 var service_request = require('./api/controllers/service_request'); 
 var appliance       = require('./api/controllers/appliance'); 
 var models          = require('./api/controllers/model');
+var users           = require('./api/controllers/user');
 
 // ======
 // ROUTES
@@ -128,6 +129,10 @@ app.put('/api/appliances/:id', appliance.update);
 // ------
 app.get('/api/models', models.index);
 app.post('/api/models', models.create);
+// Users
+// -----
+app.get('/api/users', users.index);
+app.post('/api/users', users.create);
 
 // =============
 // DEFAULT ROUTE

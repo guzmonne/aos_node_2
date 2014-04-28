@@ -122,10 +122,10 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'name'      : '',
-			'email'     : '',
-			'doc-type'  : '',
-			'doc-number': '',
+			'name'      : null,
+			'email'     : null,
+			'doc-type'  : null,
+			'doc-number': null,
 			'phones'    : new App.Collections.Phones(),
 			'addresses' : new App.Collections.Addresses(),
 			'createdBy' : 'Guzmán Monné',
@@ -262,6 +262,19 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		return attributes;
 	},
 });
+App.Models.User = App.Models.BaseModel.extend({
+	urlRoot: '/api/users',
+
+	defaults: function(){
+		return {
+			'name'       : null,
+			'email'      : null,
+			'createdBy'  : 'Guzmán Monné',
+			'updatedBy'  : 'Guzmán Monné',
+			'permissions': null,
+		};
+	},
+});
 App.Collections.Appliances = Giraffe.Collection.extend({
 	url: '/api/appliances',
 	model: App.Models.Appliance,
@@ -292,6 +305,10 @@ App.Collections.ServiceRequests = Giraffe.Collection.extend({
 	},
 
 	model: App.Models.ServiceRequest,
+});
+App.Collections.Users = Giraffe.Collection.extend({
+	url  : '/api/users',
+	model: App.Models.User,
 });
 App.Views.BaseView = Giraffe.View.extend({
 
@@ -514,6 +531,7 @@ App.Views.NewView = App.Views.BaseView.extend({
 	},
 
 	renderForm: function(){
+		if(!App.defined(this.formViewName)){return new Error('formViewName not defined');}
 		this.formView = new App.Views[this.formViewName]({
 			model: new App.Models[this.modelName]()
 		});
@@ -1788,7 +1806,7 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 App.Views.ModelIndexView = App.Views.TableView.extend({
 	template : HBS.model_index_template,
 	className: "row",
-	name     : "Modeles",
+	name     : "Modelos",
 	
 	tableEl        : '#models-table',
 	tableCollection: App.Collections.Models,
@@ -2192,6 +2210,74 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 		this.name = 'Orden de Servicio #' + this.model.get('id');
 		this.parent.setHeader();
 	},
+});
+App.Views.UserRowView = App.Views.RowView.extend({
+	template : HBS.user_row_template,
+	modelName: 'user',
+});
+App.Views.UserFormView = App.Views.BaseView.extend({
+	template: HBS.user_form_template,
+
+	events: {
+		'submit form': 'createModel',
+	},
+
+	createModel: function(e){
+		var self = this;
+		e.preventDefault();
+		this.saveModel();
+		this.model.save({}, {
+			success: function(){
+				self.displayPortletMessage({
+					viewCid: self.parent.cid,
+					title  : 'Usuario Creado',
+					message: 'El nuevo Usuario se ha creado con exito.',
+					class  : 'success',
+				});
+			},
+		});
+		this.model.dispose();
+		this.model = new App.Models.User();
+		this.cleanForm();
+	},
+
+	saveModel: function(){
+		this.model.set('name', this.$('[name=name]').val());
+		this.model.set('email', this.$('[name=email]').val());
+		this.model.set('permissions', this.getPermissions());
+	},
+
+	cleanForm: function(){
+		this.$('[name=name]').val('');
+		this.$('[name=email]').val('');
+		this.$('[name=admin]').removeAttr('checked');
+		this.$('[name=tech]').removeAttr('checked');
+	},
+
+	getPermissions: function(){
+		return {
+			roles: {
+				isAdmin: this.$('[name=admin]').is(':checked'),
+				isTech : this.$('[name=tech]').is(':checked'),
+			}
+		};
+	},
+});
+App.Views.UserIndexView = App.Views.TableView.extend({
+	template : HBS.user_index_template,
+	className: "row",
+	name     : "Usuarios",
+	
+	tableEl        : '#users-table',
+	tableCollection: App.Collections.Users,
+	modelView      : App.Views.UserRowView,
+
+	appStorage  : 'users',
+});
+App.Views.UserNewView = App.Views.NewView.extend({
+	name        : "Nuevo Usuario",
+	formViewName: "UserFormView",
+	modelName   : "User",
 });
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {

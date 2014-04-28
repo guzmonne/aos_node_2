@@ -6,6 +6,7 @@ App.Views.NewView = App.Views.BaseView.extend({
 	},
 
 	renderForm: function(){
+		if(!App.defined(this.formViewName)){return new Error('formViewName not defined');}
 		this.formView = new App.Views[this.formViewName]({
 			model: new App.Models[this.modelName]()
 		});
