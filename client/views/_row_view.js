@@ -2,7 +2,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 	tagName  : 'tr',
 	
 	activated  : false,
-	
 
 	events: {
 		'click #selected': 'selected',

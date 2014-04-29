@@ -19,10 +19,10 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		if (!App.defined(this.model)){
 			this.model = new App.Models.Appliance();
 		}
-		var col = this.model.collection;
-		if (App.defined(col)){
-			this.listenTo(col, 'appliance:deleted', this.saveAndDispose);
-			this.listenTo(col, 'service_request:create:success', this.dispose);
+		var collection = this.model.collection;
+		if (App.defined(collection)){
+			this.listenTo(collection, 'appliance:deleted', this.saveAndDispose);
+			this.listenTo(collection, 'service_request:create:success', this.dispose);
 		}
 	},
 

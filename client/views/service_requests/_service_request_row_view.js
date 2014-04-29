@@ -1,11 +1,6 @@
-App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
-	template: HBS.service_request_row_template,
-
-	tagName  : 'tr',
-
-	initialize: function(){
-		this.listenTo(this.model, 'change', this.render);
-	},
+App.Views.ServiceRequestRowView = App.Views.RowView.extend({
+	template : HBS.service_request_row_template,
+	modelName: "service_request",
 
 	serialize: function(){
 		var object = {};

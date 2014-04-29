@@ -8,6 +8,10 @@ App.Views.TabView = App.Views.BaseView.extend({
 	events: {},
 	
 	initialize: function(){
+		// Let the parent view call a 'beforeInitialize()' method if needed.
+		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
+			this.beforeInitialize();
+		}
 		if(!this.modelName){return new Error('View must have a modelName defined');}
 		if(!App.defined(this.model)){
 			var titelizeModelName = this.titelize(this.modelName);
@@ -19,7 +23,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
-		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
 		if (_.isFunction(this.bindEvents)){this.bindEvents();}
 		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
 		this.listenTo(this.model, 'sync', this.setHeader);
@@ -72,7 +75,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		if (_.isFunction(this.setName)){this.setName();}
 		if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
 		this.announce();
-		App.scrollTo(this.parent.el);
 	},
 
 	serialize: function(){
@@ -82,11 +84,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 	beforeDispose: function(){
 		if(!App.defined(this.model)){return;}
 		app.trigger(this.modelName + ':show:close', this.model.id);
-	},
-
-	announce: function(){
-		if(!App.defined(this.model)){return;}
-		app.trigger(this.modelName + ':show:active', this.model.id);
 	},
 
 	setHeader: function(){

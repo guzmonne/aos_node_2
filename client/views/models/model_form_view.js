@@ -10,13 +10,16 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		this.saveModel();
 		this.model.save({}, {
-			success: function(){
+			success: function(model){
 				self.displayPortletMessage({
 					viewCid: self.parent.cid,
 					title  : 'Modelo Creado',
 					message: 'El nuevo modelo se ha creado con exito.',
 					class  : 'success',
 				});
+				if (App.defined(app.models)){
+					app.models.add(model);
+				}
 			},
 		});
 		this.model.dispose();

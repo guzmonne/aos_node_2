@@ -1,4 +1,6 @@
 App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
+	className: "row",
+	
 	name: function(){
 		var clientName, clientID;
 		var result = "Nueva Orden de Servicio";
@@ -12,8 +14,6 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 		}
 	},
 
-	className: "row",
-
 	initialize: function(){
 		if (!App.defined(this.model)){
 			this.model = new App.Models.ServiceRequest();
@@ -25,14 +25,8 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	},
 
 	renderForm: function(){
-		var model;
-		if(App.defined(this.model)){
-			model = this.model;
-		} else {
-			model = new App.Models.ServiceRequest();
-		}
 		this.serviceRequestForm = new App.Views.ServiceRequestFormView({
-			model: model
+			model: this.model
 		});
 		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
 		this.listenTo(this.serviceRequestForm.model, 'change:client_name', this.updateName);

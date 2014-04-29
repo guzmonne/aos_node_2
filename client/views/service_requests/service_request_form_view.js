@@ -19,7 +19,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		this.$el.tooltip();
 	},
 
-	serviceRequestSuccessFlash: function(id){
+	serviceRequestSuccessFlash: function(){
 		return {
 			title   : 'Orden de Servicio Creada',
 			message : 'La Orden de Servicio se ha creado con exito!.',
@@ -109,6 +109,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		});
 		this.model.save(this.model.serialize(), {
 			success: function(model, response, options){
+				// This event serves to purposes:
+				// 1. It let the single appliance forms to close
+				// 2. If the client show view is opened and it is 
+				// managing a service request collection then we add
+				// this model to it.
 				app.trigger('service_request:create:success', model);
 				if(App.defined(app.serviceRequests)){
 					app.serviceRequests.add(model);
@@ -116,11 +121,13 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 				if(App.defined(app.appliances)){
 					app.appliances.add(model.appliances.models);
 				}
+				var route = 'service_request/show/' + model.id;
+				//Backbone.history.navigate(route, {trigger: true});
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
 					model            : model,
 					portletFrameClass: 'green',
-					flash            : self.serviceRequestSuccessFlash(model.id)
+					flash            : self.serviceRequestSuccessFlash()
 				});
 				grandpa.dispose();
 			},

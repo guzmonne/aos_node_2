@@ -10,10 +10,6 @@ App.Models.Model = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'model'      : null,
-			'brand'      : null,
-			'category'   : null,
-			'subcategory': null,
 			'createdBy'  : 'Guzmán Monné',
 			'updatedBy'  : 'Guzmán Monné'
 		};

@@ -4,6 +4,10 @@ App.Views.ModalController = App.Views.BaseView.extend({
 	tagName: 'section',
 	id     : 'modal-el',
 
+	events: {
+		'click .close-modal': 'closeModal',
+	},
+
 	displayModal: function(view){
 		if(!App.defined(this.currentModal) || this.currentModal.bodyView.cid !== view.cid){
 			this.setCurrentModal(view);

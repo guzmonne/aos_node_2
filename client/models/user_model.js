@@ -3,11 +3,8 @@ App.Models.User = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'name'       : null,
-			'email'      : null,
 			'createdBy'  : 'Guzmán Monné',
 			'updatedBy'  : 'Guzmán Monné',
-			'permissions': null,
 		};
 	},
 });

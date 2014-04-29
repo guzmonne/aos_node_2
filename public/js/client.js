@@ -93,27 +93,10 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'model_id'          : null,
-			'serial'            : null,
-			'accessories'       : [],
-			'client_name'       : null,
-			'client_id'         : null,
 			'repairment_type'   : 'Garantía',
-			'defect'            : null,
-			'observations'      : null,
 			'status'            : 'Pendiente',
-			'cost'              : 0,
-			'solution'          : null,
-			'diagnose'          : null,
-			'replacements'      : [],
-			'inStock'           : null,
-			'departuredAt'      : null,
-			'repairedAt'        : null,
-			'technician_name'   : null,
-			'technician_id'     : null,
 			'createdBy'         : 'Guzman Monne',
 			'updatedBy'         : 'Guzman Monne',
-			'service_request_id': null,
 		};
 	},
 });
@@ -122,10 +105,6 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'name'      : null,
-			'email'     : null,
-			'doc-type'  : null,
-			'doc-number': null,
 			'phones'    : new App.Collections.Phones(),
 			'addresses' : new App.Collections.Addresses(),
 			'createdBy' : 'Guzmán Monné',
@@ -204,10 +183,6 @@ App.Models.Model = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'model'      : null,
-			'brand'      : null,
-			'category'   : null,
-			'subcategory': null,
 			'createdBy'  : 'Guzmán Monné',
 			'updatedBy'  : 'Guzmán Monné'
 		};
@@ -227,15 +202,9 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'client_name'   : null,
-			'client_id'     : null,
 			'status'        : 'Pendiente',
-			'createdAt'     : null,
-			'updatedAt'     : null,
-			'invoiceNumber' : null,
 			'createdBy'     : 'Guzmán Monné',
 			'updatedBy'     : 'Guzmán Monné',
-			'closedAt'			: null,
 		};
 	},
 
@@ -267,11 +236,8 @@ App.Models.User = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'name'       : null,
-			'email'      : null,
 			'createdBy'  : 'Guzmán Monné',
 			'updatedBy'  : 'Guzmán Monné',
-			'permissions': null,
 		};
 	},
 });
@@ -311,7 +277,16 @@ App.Collections.Users = Giraffe.Collection.extend({
 	model: App.Models.User,
 });
 App.Views.BaseView = Giraffe.View.extend({
-
+	// !!!
+	// Type: Boolean
+	// -------------
+	// Description:
+	// ------------
+	// When the 'sync' button is pressed this function gets called to see if the 
+	// current portlet-child view has the 'onSync()' method needed to sync the 
+	// data.
+	// ------------
+	// !!!
 	canSync: function(){
 		if (App.defined(this.onSync)){
 			this.onSync();
@@ -321,10 +296,33 @@ App.Views.BaseView = Giraffe.View.extend({
 		}
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// This function should be called after the onSync() method ends to stop the portlet spinner
+	// ------------
+	// !!!
 	afterSync: function(){
 		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Checks if the 'value' is bigger than 1 and then sets the target text to plural or singular
+	// ------------ 
+	// Arguments:
+	// ----------
+	// value [Number]      : Value to check if its bigger than one
+	// target [DOM element]: Dom element to set the resulting text
+	// singular [String]   : Singular value to set the 'target' text
+	// plural [String]     : Plural value to set the 'target' text  
+	// ----------
+	// !!!
 	pluralize: function(value, target, singular, plural){
 		var el = $(target);
 		if (value > 1){
@@ -334,6 +332,19 @@ App.Views.BaseView = Giraffe.View.extend({
 		}
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Function called when clicket the portlet close button. It disposes the Portlet view 
+	// and adds a simple animation.
+	// ------------ 
+	// Arguments:
+	// ----------
+	// e [Event]: click event
+	// ----------
+	// !!!
 	closeView: function(e){
 		if(App.defined(e)){
 			e.preventDefault();
@@ -349,16 +360,51 @@ App.Views.BaseView = Giraffe.View.extend({
 		//});
 	},
 
+	// !!!
+	// Type: JSON
+	// -----
+	// Description:
+	// ------------
+	// Basic serialize functions for the views. It just calls the 'toJSON()' method if 
+	// the view has a model
+	// ------------ 
+	// !!!
 	serialize: function(){
 		if (App.defined(this.model)){
 			return this.model.toJSON();
 		}
 	},
 
+	// !!!
+	// Type: String
+	// -----
+	// Description:
+	// ------------
+	// Returns a string with the first character capitalizes
+	// ------------ 
+	// Arguments:
+	// ----------
+	// string [String]: String to be capitalized
+	// ----------
+	// !!!
 	capitaliseFirstLetter: function(string){
 		return string.charAt(0).toUpperCase() + string.slice(1);
 	},
 
+	// !!!
+	// Type: String
+	// -----
+	// Description:
+	// ------------
+	// Takes a string that can be a word or a collection of words separated by
+	// underscores and returns a sting with every word capitalized and no spaces
+	// ------------ 
+	// Arguments:
+	// ----------
+	// doc [String]: String to be titelized. Can only be a word or a group of words
+	// separated by an underscore.
+	// ----------
+	// !!!	
 	titelize: function(doc){
 		var docName = '';
 		if (doc.indexOf('_') === -1){
@@ -372,6 +418,20 @@ App.Views.BaseView = Giraffe.View.extend({
 		return docName;
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Trigers an event that is captured by the portlet view which will then display a 
+	// message based on the options passed
+	// ------------ 
+	// Arguments:
+	// ----------
+	// options [Object]: object with the necessary parameters to display a message on a Portlet
+	// View.
+	// ----------
+	// !!!
 	displayPortletMessage: function(options){
 		var defaultOptions = {
 			viewCid: this.parent.cid,
@@ -382,6 +442,14 @@ App.Views.BaseView = Giraffe.View.extend({
 		app.trigger('portlet:message', opts);
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Blocks almost all inputs on a form
+	// ------------ 
+	// !!!
 	blockForm: function(){
 		this.$('input').attr('readonly', true);
 		this.$('textarea').attr('readonly', true);
@@ -389,6 +457,14 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('span[data-role=remove]').attr('data-role', 'not-remove');
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Unblocks almost all inputs on a form
+	// ------------ 
+	// !!!
 	unblockForm: function(){
 		this.$('input').attr('readonly', false);
 		this.$('textarea').attr('readonly', false);
@@ -396,11 +472,35 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('span[data-role=not-remove]').attr('data-role', 'remove');
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Activates the tagsinput plugin depending on the passed event.
+	// ------------ 
+	// Arguments:
+	// ----------
+	// e [Event]: Ussualy a click event.
+	// ----------
+	// !!!
 	activateTags: function(e){
 		if (!e){return;}
 		this.$(e.currentTarget).closest('.bootstrap-tagsinput').addClass('active');
 	},
 
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Deactivates the tagsinput plugin on an element passed on the event.
+	// ------------ 
+	// Arguments:
+	// ----------
+	// e [Event]: Ussualy a click event.
+	// ----------
+	// !!!
 	deactivateTags: function(e){
 		if (!e){return;}
 		var input = this.$(e.target);
@@ -410,6 +510,20 @@ App.Views.BaseView = Giraffe.View.extend({
 			input.val('');
 		}
 		this.$('.bootstrap-tagsinput').removeClass('active');
+	},
+
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Function called to announce that a show view is active. It triggers an event
+	// that is ussualy caught by the row views to mark the row as active
+	// ------------ 
+	// !!!
+	announce: function(){
+		if(!App.defined(this.model)){return;}
+		app.trigger(this.modelName + ':show:active', this.model.id);
 	},
 });
 App.Views.CarouselView = App.Views.BaseView.extend({
@@ -542,7 +656,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 	tagName  : 'tr',
 	
 	activated  : false,
-	
 
 	events: {
 		'click #selected': 'selected',
@@ -620,6 +733,10 @@ App.Views.TabView = App.Views.BaseView.extend({
 	events: {},
 	
 	initialize: function(){
+		// Let the parent view call a 'beforeInitialize()' method if needed.
+		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
+			this.beforeInitialize();
+		}
 		if(!this.modelName){return new Error('View must have a modelName defined');}
 		if(!App.defined(this.model)){
 			var titelizeModelName = this.titelize(this.modelName);
@@ -631,7 +748,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
-		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
 		if (_.isFunction(this.bindEvents)){this.bindEvents();}
 		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
 		this.listenTo(this.model, 'sync', this.setHeader);
@@ -684,7 +800,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		if (_.isFunction(this.setName)){this.setName();}
 		if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
 		this.announce();
-		App.scrollTo(this.parent.el);
 	},
 
 	serialize: function(){
@@ -694,11 +809,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 	beforeDispose: function(){
 		if(!App.defined(this.model)){return;}
 		app.trigger(this.modelName + ':show:close', this.model.id);
-	},
-
-	announce: function(){
-		if(!App.defined(this.model)){return;}
-		app.trigger(this.modelName + ':show:active', this.model.id);
 	},
 
 	setHeader: function(){
@@ -714,13 +824,19 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		var self = this;
+		// Let the parent view run some commands before the tableView initializes
 		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
 			this.beforeInitialize();
 		}
 		if (!App.defined(this.collection)){
+			// If a collection was passed then we check if there is a custom 'setCollection()'
+			// method or we have to instantiate a new one based on the 'tableCollection' defined
 			if(_.isFunction(this.setCollection)){
 				this.collection = this.setCollection();
 			} else {
+				if (!App.defined(this.tableCollection)){
+					return new Error('A tableCollection must be defined on the view');
+				}
 				this.collection = new this.tableCollection();
 			}
 		}
@@ -869,9 +985,6 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		}
 		params.view     = new App.Views[params.viewName](options);
 		var portletView = new App.Views.PortletView(params);
-		//if(options.model){
-		//	portletView.view.model.fetch();
-		//}
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
 	},
@@ -891,18 +1004,18 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		app.attach(view, {el: '#content-el', method: 'prepend'});
 	},
 });
-App.Views.ApplianceRowView = App.Views.BaseView.extend({
+App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
+	modelName: 'appliance',
+	//tagName  : 'tr',
 
-	tagName  : 'tr',
+	//initialize: function(){
+	//	this.listenTo(this.model, 'change', this.render);
+	//},
 
-	initialize: function(){
-		this.listenTo(this.model, 'change', this.render);
-	},
-
-	afterRender: function(){
-		this.$el.tooltip();
-	},
+	//afterRender: function(){
+	//	this.$el.tooltip();
+	//},
 
 	serialize: function(){
 		var object = {};
@@ -1056,6 +1169,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 App.Views.ApplianceShowView = App.Views.BaseView.extend({
 	template: HBS.appliance_show_template,
 	className: 'row',
+	modelName: 'appliance',
 
 	name: function(){
 		return 'Equipo: #' + this.model.get('id');
@@ -1065,6 +1179,7 @@ App.Views.ApplianceShowView = App.Views.BaseView.extend({
 		if (App.defined(this.model)){
 			this.listenToOnce(this.model, 'change', this.update);
 		}
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
 	},
 
 	afterRender: function(){
@@ -1072,6 +1187,7 @@ App.Views.ApplianceShowView = App.Views.BaseView.extend({
 			model: this.model,
 		});
 		this.formView.attachTo(this.$('#form-' + this.cid), {method: 'html'});
+		this.announce();
 	},
 
 	update: function(){
@@ -1107,10 +1223,10 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		if (!App.defined(this.model)){
 			this.model = new App.Models.Appliance();
 		}
-		var col = this.model.collection;
-		if (App.defined(col)){
-			this.listenTo(col, 'appliance:deleted', this.saveAndDispose);
-			this.listenTo(col, 'service_request:create:success', this.dispose);
+		var collection = this.model.collection;
+		if (App.defined(collection)){
+			this.listenTo(collection, 'appliance:deleted', this.saveAndDispose);
+			this.listenTo(collection, 'service_request:create:success', this.dispose);
 		}
 	},
 
@@ -1370,13 +1486,12 @@ App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 	},
 });
 App.Views.ClientShowView = App.Views.TabView.extend({
+	modelId  : null,
+	modelName: 'client',
 	
 	name: function(){
 		return 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
-
-	modelId  : null,
-	modelName: 'client',
 
 	tabs: [
 		{
@@ -1403,6 +1518,8 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 
 	bindEvents: function(){
 		this.listenTo(this.model, 'updated', this.update);
+		// Interacts with Row View to activate it
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
 	},
 
 	onSync: function(){
@@ -1551,6 +1668,10 @@ App.Views.ModalController = App.Views.BaseView.extend({
 
 	tagName: 'section',
 	id     : 'modal-el',
+
+	events: {
+		'click .close-modal': 'closeModal',
+	},
 
 	displayModal: function(view){
 		if(!App.defined(this.currentModal) || this.currentModal.bodyView.cid !== view.cid){
@@ -1811,13 +1932,16 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		this.saveModel();
 		this.model.save({}, {
-			success: function(){
+			success: function(model){
 				self.displayPortletMessage({
 					viewCid: self.parent.cid,
 					title  : 'Modelo Creado',
 					message: 'El nuevo modelo se ha creado con exito.',
 					class  : 'success',
 				});
+				if (App.defined(app.models)){
+					app.models.add(model);
+				}
 			},
 		});
 		this.model.dispose();
@@ -1878,14 +2002,9 @@ App.Views.ModelSelectModalView = App.Views.BaseView.extend({
 		this.modelIndex.attachTo('#model-index');
 	},
 });
-App.Views.ServiceRequestRowView = App.Views.BaseView.extend({
-	template: HBS.service_request_row_template,
-
-	tagName  : 'tr',
-
-	initialize: function(){
-		this.listenTo(this.model, 'change', this.render);
-	},
+App.Views.ServiceRequestRowView = App.Views.RowView.extend({
+	template : HBS.service_request_row_template,
+	modelName: "service_request",
 
 	serialize: function(){
 		var object = {};
@@ -1909,11 +2028,14 @@ App.Views.ServiceRequestDetailsView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		if (this.model){
-			this.listenTo(this.model, 'sync', this.render);
+			this.listenTo(this.model, 'change', this.render);
 		}
+		this.counter = 0;
 	},
 
 	afterRender: function(){
+		this.counter = this.counter + 1;
+		console.log(this.counter);
 		if(
 				!App.defined(this.appliancesIndex)	&& 
 				App.defined(this.model)							&&
@@ -1980,7 +2102,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		this.$el.tooltip();
 	},
 
-	serviceRequestSuccessFlash: function(id){
+	serviceRequestSuccessFlash: function(){
 		return {
 			title   : 'Orden de Servicio Creada',
 			message : 'La Orden de Servicio se ha creado con exito!.',
@@ -2070,6 +2192,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		});
 		this.model.save(this.model.serialize(), {
 			success: function(model, response, options){
+				// This event serves to purposes:
+				// 1. It let the single appliance forms to close
+				// 2. If the client show view is opened and it is 
+				// managing a service request collection then we add
+				// this model to it.
 				app.trigger('service_request:create:success', model);
 				if(App.defined(app.serviceRequests)){
 					app.serviceRequests.add(model);
@@ -2077,11 +2204,13 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 				if(App.defined(app.appliances)){
 					app.appliances.add(model.appliances.models);
 				}
+				var route = 'service_request/show/' + model.id;
+				//Backbone.history.navigate(route, {trigger: true});
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
 					model            : model,
 					portletFrameClass: 'green',
-					flash            : self.serviceRequestSuccessFlash(model.id)
+					flash            : self.serviceRequestSuccessFlash()
 				});
 				grandpa.dispose();
 			},
@@ -2157,6 +2286,8 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	},
 });
 App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
+	className: "row",
+	
 	name: function(){
 		var clientName, clientID;
 		var result = "Nueva Orden de Servicio";
@@ -2170,8 +2301,6 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 		}
 	},
 
-	className: "row",
-
 	initialize: function(){
 		if (!App.defined(this.model)){
 			this.model = new App.Models.ServiceRequest();
@@ -2183,14 +2312,8 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	},
 
 	renderForm: function(){
-		var model;
-		if(App.defined(this.model)){
-			model = this.model;
-		} else {
-			model = new App.Models.ServiceRequest();
-		}
 		this.serviceRequestForm = new App.Views.ServiceRequestFormView({
-			model: model
+			model: this.model
 		});
 		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
 		this.listenTo(this.serviceRequestForm.model, 'change:client_name', this.updateName);
@@ -2222,6 +2345,11 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 			},
 		}
 	],
+
+	bindEvents: function(){
+		// Interacts with Row View to activate it
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
+	},
 
 	renderAppliancesCarousel: function(){
 		if (!this.appliancesCarousel){

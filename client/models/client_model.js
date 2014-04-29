@@ -3,10 +3,6 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'name'      : null,
-			'email'     : null,
-			'doc-type'  : null,
-			'doc-number': null,
 			'phones'    : new App.Collections.Phones(),
 			'addresses' : new App.Collections.Addresses(),
 			'createdBy' : 'Guzmán Monné',

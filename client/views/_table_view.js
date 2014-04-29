@@ -5,13 +5,19 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		var self = this;
+		// Let the parent view run some commands before the tableView initializes
 		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
 			this.beforeInitialize();
 		}
 		if (!App.defined(this.collection)){
+			// If a collection was passed then we check if there is a custom 'setCollection()'
+			// method or we have to instantiate a new one based on the 'tableCollection' defined
 			if(_.isFunction(this.setCollection)){
 				this.collection = this.setCollection();
 			} else {
+				if (!App.defined(this.tableCollection)){
+					return new Error('A tableCollection must be defined on the view');
+				}
 				this.collection = new this.tableCollection();
 			}
 		}

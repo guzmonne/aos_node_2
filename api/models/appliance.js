@@ -95,16 +95,14 @@ function pickParams(params){
 		,'updatedBy' 
 		,'accessories'
 		,'serial'
+		,'service_request_id'
 	);
 	result.updatedAt = date;
 	if (!params['_id']){
 		result.createdAt = date;
 	}
-	if (!_.isObject(params['model_id'])){
+	if (params['model_id'] && !_.isObject(params['model_id'])){
 		result.model_id = params['model_id'];
-	}
-	if (!_.isObject(params['service_request_id'])){
-		result.service_request_id = params['service_request_id'];
 	}
 	return result;
 }
@@ -113,6 +111,7 @@ function pickParams(params){
 ApplianceModel.prototype.create = function(params, callback){
 	var applianceParams = pickParams(params);
 	var appliance       = new Appliance(applianceParams);
+	console.log(params, applianceParams);
 	appliance.save(function(err, appliance){
 		if (err){return callback(err);}
 		Model.findById(appliance.model_id, function(err, model){

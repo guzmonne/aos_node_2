@@ -1,6 +1,7 @@
 App.Views.ApplianceShowView = App.Views.BaseView.extend({
 	template: HBS.appliance_show_template,
 	className: 'row',
+	modelName: 'appliance',
 
 	name: function(){
 		return 'Equipo: #' + this.model.get('id');
@@ -10,6 +11,7 @@ App.Views.ApplianceShowView = App.Views.BaseView.extend({
 		if (App.defined(this.model)){
 			this.listenToOnce(this.model, 'change', this.update);
 		}
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
 	},
 
 	afterRender: function(){
@@ -17,6 +19,7 @@ App.Views.ApplianceShowView = App.Views.BaseView.extend({
 			model: this.model,
 		});
 		this.formView.attachTo(this.$('#form-' + this.cid), {method: 'html'});
+		this.announce();
 	},
 
 	update: function(){

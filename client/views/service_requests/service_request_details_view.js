@@ -4,11 +4,14 @@ App.Views.ServiceRequestDetailsView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		if (this.model){
-			this.listenTo(this.model, 'sync', this.render);
+			this.listenTo(this.model, 'change', this.render);
 		}
+		this.counter = 0;
 	},
 
 	afterRender: function(){
+		this.counter = this.counter + 1;
+		console.log(this.counter);
 		if(
 				!App.defined(this.appliancesIndex)	&& 
 				App.defined(this.model)							&&

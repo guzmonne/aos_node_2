@@ -12,15 +12,9 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'client_name'   : null,
-			'client_id'     : null,
 			'status'        : 'Pendiente',
-			'createdAt'     : null,
-			'updatedAt'     : null,
-			'invoiceNumber' : null,
 			'createdBy'     : 'Guzmán Monné',
 			'updatedBy'     : 'Guzmán Monné',
-			'closedAt'			: null,
 		};
 	},
 

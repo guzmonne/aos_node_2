@@ -1,11 +1,10 @@
 App.Views.ClientShowView = App.Views.TabView.extend({
+	modelId  : null,
+	modelName: 'client',
 	
 	name: function(){
 		return 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
-
-	modelId  : null,
-	modelName: 'client',
 
 	tabs: [
 		{
@@ -32,6 +31,8 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 
 	bindEvents: function(){
 		this.listenTo(this.model, 'updated', this.update);
+		// Interacts with Row View to activate it
+		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
 	},
 
 	onSync: function(){
