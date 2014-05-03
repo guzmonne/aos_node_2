@@ -28,36 +28,11 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			this.blockForm();
 			this.toggleButtons();
 		}
-		this.changeStatus();
 		this.changeRepairementType();
 	},
 
 	toggleButtons: function(){
 		this.$('button').toggleClass('hide');
-	},
-
-	changeStatus: function(){
-		var statusSelect = this.$('[name=status]');
-		var viewStatus = statusSelect.val();
-		var statusClass;
-		switch (viewStatus){
-			case "Pendiente":
-				statusClass = "status-pending";
-				break;
-			case "Atrasado":
-				statusClass = "status-late";
-				break;
-			case "Abierto":
-				statusClass = "status-opened";
-				break;
-			case "Cerrado":
-				statusClass = "status-closed";
-				break;
-			default:
-				statusClass = "status-pending";
-				break;
-		}
-		this.$('[name=status]').closest('.form-group').removeClass().addClass("form-group " + statusClass);
 	},
 
 	changeRepairementType: function(){

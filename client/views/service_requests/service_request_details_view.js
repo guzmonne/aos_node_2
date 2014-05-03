@@ -30,26 +30,6 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
 		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
 		result.timestamp = this.timestamp;
-		if(result.status){
-			var label;
-			switch (result.status){
-				case "Pendiente":
-					label = "label-primary";
-					break;
-				case "Abierto":
-					label = "label-info";
-					break;
-				case "Atrasaodo":
-					label = "label-danger";
-					break;
-				case "Cerrado":
-					label = "label-success";
-					break;
-				default:
-					label = "label-default";
-			}
-			result.label = label;
-		}
 		return result;
 	},
 });

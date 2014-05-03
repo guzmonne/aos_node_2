@@ -58,11 +58,11 @@
     });
 
     var isHelper = function() {
-        var args = arguments
-        ,   left = args[0]
+        var args     = arguments
+        ,   left     = args[0]
         ,   operator = args[1]
-        ,   right = args[2]
-        ,   options = args[3]
+        ,   right    = args[2]
+        ,   options  = args[3]
         ;
 
         if (args.length == 2) {
@@ -119,6 +119,49 @@
         } else {
             return null;
         }
+    });
+
+    Handlebars.registerHelper('statusClass', function(status, model){
+        var className;
+        model = (model) ? model : "serviceRequest";
+        if (model !== "appliance"){
+            switch (status){
+                case "Pendiente":
+                    className = "label-primary";
+                    break;
+                case "Abierto":
+                    className = "label-info";
+                    break;
+                case "Atrasaodo":
+                    className = "label-danger";
+                    break;
+                case "Cerrado":
+                    className = "label-success";
+                    break;
+                default:
+                    className = "label-default";
+                    break;
+            }
+        } else {
+            switch (status){
+                case "Pendiente":
+                    className = "status-pending";
+                    break;
+                case "Atrasado":
+                    className = "status-late";
+                    break;
+                case "Abierto":
+                    className = "status-opened";
+                    break;
+                case "Cerrado":
+                    className = "status-closed";
+                    break;
+                default:
+                    className = "status-pending";
+                    break;
+            }
+        }
+        return className;
     });
 
     return eR;
