@@ -5,8 +5,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	className: 'col-md-12 col-lg-offset-1 col-lg-9',
 
-	cloneModel: null,
-
 	events: {
 		'click #add-phone-number'        : 'reRender',
 		'click button.del-phone-number'  : 'delPhoneNumber',
@@ -17,6 +15,10 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'click #reset-form'              : 'render',
 		'click #update-form'             : 'updateForm',
 		'submit form'                    : 'submitForm',
+	},
+
+	afterRender: function(){
+		console.log('rendered');
 	},
 
 	serialize: function(){
@@ -71,7 +73,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
 		var addresses = this.model.get('addresses');
 		var model     = addresses.models[index];
-		console.log(model);
 		addresses.remove(model);
 		this.reRender('[name=street]');
 		this.$('[name=street]').val(model.get('street'));
@@ -80,10 +81,10 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	setModel: function(){
-		this.model.set('name', this.$('[name=name]').val());
-		this.model.set('doc-type', this.$('[name=doc-type]').val());
+		this.model.set('name'      , this.$('[name=name]').val());
+		this.model.set('doc-type'  , this.$('[name=doc-type]').val());
 		this.model.set('doc-number', this.$('[name=doc-number]').val());
-		this.model.set('email', this.$('[name=email]').val());
+		this.model.set('email'     , this.$('[name=email]').val());
 		var phone  = this.$('[name=phone]').val();
 		var street = this.$('[name=street]').val();
 		if (phone !== ''){
@@ -136,6 +137,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 					message: 'El cliente se han actualizado correctamente',
 					class  : 'success',
 				});
+				self.render();
 			},
 		});
 	},
@@ -144,9 +146,9 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.setModel();
 		this.render();
 		if (
-			_.isObject(elToFocus) && 
-			elToFocus.currentTarget !== undefined &&
-			elToFocus.currentTarget.dataset !== undefined &&
+			_.isObject(elToFocus)                             && 
+			elToFocus.currentTarget !== undefined             &&
+			elToFocus.currentTarget.dataset !== undefined     &&
 			elToFocus.currentTarget.dataset.for !== undefined
 		){
 			this.$('[name='+ elToFocus.currentTarget.dataset.for +']').focus();
