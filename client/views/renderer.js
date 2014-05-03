@@ -8,11 +8,13 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	showView: function(doc, id){
 		var docName  = this.titelize(doc);
 		var viewName = docName + 'ShowView';
-		var model    = this.setModel(doc, id);
 		var params   = {
-			model            : model,
+			model            : docName,
 			viewName         : viewName,
 			portletFrameClass: 'green',
+			options          : {
+				_id: id,
+			},
 		};
 		this.showOrGoTo(params, this.showComparator);
 	},
@@ -25,23 +27,6 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			viewName: viewName,
 		};
 		this.showOrGoTo(params);
-	},
-
-	setModel: function(doc, id){
-		var model, collection;
-		var docName        = this.titelize(doc);
-		var collectionName = docName + 's';
-		if (App.defined(app[collectionName])){
-			model = app[collectionName].get(id);
-		} else {
-			model      = new App.Models[docName]({_id: id});
-			collection = app.getAppStorage(collectionName);
-			collection.add(model);
-			if (!this.viewIsRendered(this.showComparator, {model: model})){
-				model.fetch();
-			}
-		}
-		return model;
 	},
 
 	defaultComparator: function(view){
@@ -57,7 +42,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			portletView instanceof(App.Views.PortletView)	&&
 			App.defined(portletView.view)									&&
 			App.defined(portletView.view.model)						&&
-			portletView.view.model.id === this.model.id
+			portletView.view.model.id === this.options._id
 		);
 	},
 
@@ -81,16 +66,31 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	show: function(params){
-		if(!App.defined(params) || !params.viewName){
+		var portletView, fetchOptions;
+		var viewOptions = {};
+		// If no params object is passed or the viewName is not defined then return
+		if(!_.isObject(params) || !App.defined(params.viewName)){
 			return new Error('The viewName option must be set');
 		}
-		var options = {};
+		// If a model is necessary then instantiate it, then check the view for any
+		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
-			options.model = params.model;
+			var modelOptions  = (params.options) ? (params.options) : {}; 
+			viewOptions.model = new App.Models[params.model](modelOptions);
 			delete params.model;
+			delete params.options;
+		}	
+		// We create the correct view
+		params.view = new App.Views[params.viewName](viewOptions);
+		// Grab the fetchOptions from the new view and fetch the model if it exists
+		if (params.view.model){
+			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
+			fetchOptions.silent = true;
+			params.view.model.fetch(fetchOptions);
 		}
-		params.view     = new App.Views[params.viewName](options);
-		var portletView = new App.Views.PortletView(params);
+		// Instantiate the portletView with the necessary params and append it to the
+		// main content.
+		portletView = new App.Views.PortletView(params);
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
 	},

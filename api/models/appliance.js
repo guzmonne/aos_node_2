@@ -160,12 +160,7 @@ ApplianceModel.prototype.updateById = function(id, params, callback){
 		}
 		appliance.update(object, function(err, result){
 			if (err){return callback(err);}
-			appliance.populate({
-				path  : 'model_id',
-				select: 'brand model category subcategory -_id'
-			}, function(err, appliance){
-				callback(null, appliance);
-			});
+			callback(null, null);
 		});
 	});
 };

@@ -6,7 +6,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	events: {
 		'click #edit-appliance'                : "editAppliance",
 		'click #save-appliance'                : "saveAppliance",
-		'click #render-appliance'              : "rerender",
+		'click #render-appliance'              : "reRender",
 		'focus .bootstrap-tagsinput input'     : 'activateTags',
 		'focusout .bootstrap-tagsinput input'  : 'deactivateTags',
 		'change select[name=status]'           : 'changeStatus',
@@ -14,10 +14,11 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
+		this.listenTo(this.model, 'updated', this.render);
+		this.listenTo(this.model, 'sync'   , this.render);
 		_.extend(this, App.Mixins.SelectModel);
 		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize');
 		this.$el.on('click', 'button#select-model', this.selectModel);
-		console.log(this.model.cid);
 	},
 
 	afterRender: function(){
@@ -81,50 +82,45 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.saveModel();
 		this.model.save({}, {
 			success: function(){
-				var options = {
+				self.invoke('showMessage', {
 					title  : 'Equipo Actualizado',
 					message: 'El equipo se ha actualizado con exito',
-					class  : 'success'
-				};
-				var view = new App.Views.BSCalloutView({
-					model: new Giraffe.Model(options)
+					class  : 'success',
 				});
-				view.attachTo(self.$('#message'), {method: 'html'});
 			}
 		});
-		this.blockForm();
-		this.toggleButtons();
+		this.editMode = false;
 	},
 
-	rerender: function(e){
+	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
 		this.render();
 	},
 
 	saveModel: function(){
-		this.model.set('serial', this.$('[name=serial]').val());
-		this.model.set('observations', this.$('[name=observations]').val());
+		this.model.set('serial'      , this.$('[name=serial]').val()      , {silent: true});
+		this.model.set('observations', this.$('[name=observations]').val(), {silent: true});
 		// If the repairement type has change and equals "Garantía" then the cost = 0
 		if(
 			this.model.get('repairement_type') !== this.$('[name=repairement_type]').val() &&
 			this.$('[name=repairement_type]').val() === 'Garantía'
 		){
-			this.model.set('cost', 0);
+			this.model.set('cost', 0, {silent: true});
 		} else {
-			this.model.set('cost', this.$('[name=cost]').val());
+			this.model.set('cost', this.$('[name=cost]').val(), {silent: true});
 		}
-		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
-		this.model.set('defect', this.$('[name=defect]').val());
-		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
-		this.model.set('status', this.$('[name=status]').val());
-		this.model.set('replacements', this.$('[name=replacements]').val());
-		this.model.set('diagnose', this.$('[name=diagnose]').val());
-		this.model.set('solution', this.$('[name=solution]').val());
-		this.model.set('technician_id', this.$('[name=technician_id]').val());
+		this.model.set('repairement_type', this.$('[name=repairement_type]').val()        , {silent: true});
+		this.model.set('defect'          , this.$('[name=defect]').val()                  , {silent: true});
+		this.model.set('accessories'     , this.$('[name=accessories]').tagsinput('items'), {silent: true});
+		this.model.set('status'          , this.$('[name=status]').val()                  , {silent: true});
+		this.model.set('replacements'    , this.$('[name=replacements]').val()            , {silent: true});
+		this.model.set('diagnose'        , this.$('[name=diagnose]').val()                , {silent: true});
+		this.model.set('solution'        , this.$('[name=solution]').val()                , {silent: true});
+		this.model.set('technician_id'   , this.$('[name=technician_id]').val()           , {silent: true});
 	},
 
 	beforeDispose: function(){
-		this.$el.on('click', 'button#select-model');
+		this.$el.off('click', 'button#select-model');
 	},
 });

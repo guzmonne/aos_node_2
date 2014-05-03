@@ -1,5 +1,6 @@
 App.Models.Client = App.Models.BaseModel.extend({
 	urlRoot: '/api/clients',
+	name   : 'client',
 
 	defaults: function(){
 		return {
@@ -10,7 +11,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 		};
 	},
 
-	initialize: function(attributes, options){
+	beforeInitialize: function(attributes, options){
 		if (attributes !== undefined && attributes !== null){
 			this.parseAttributes(attributes);
 		}

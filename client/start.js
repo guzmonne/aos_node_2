@@ -13,7 +13,6 @@ App.GiraffeApp = Giraffe.App.extend({
 	},
 
 	pushToStorage: function(collectionName, object){
-		console.log(object);
 		var collection, model, id;
 		collection = this.getAppStorage(collectionName);
 		if (object instanceof collection.model){

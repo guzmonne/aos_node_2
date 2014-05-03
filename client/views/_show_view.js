@@ -1,8 +1,11 @@
 App.Views.ShowView = App.Views.BaseView.extend({
+	sync  : true,
+
 	initialize: function(){
 		if (!this.model){return;}
-		this.listenTo(this.model, 'sync', this.update);
-		this.listenTo(this.model, 'row:rendered', this.modelShowActive);
+		if (this.sync)  {this.listenTo(this.model, 'sync'   , this.update);}
+		if (this.change){this.listenTo(this.model, 'updated', this.render);}
+		this.listenTo(app, 'row:rendered', this.checkEventCaller);
 		this.modelShowActive();
 		if(_.isFunction(this.afterInitialize)){this.afterInitialize();}
 	},
@@ -21,8 +24,8 @@ App.Views.ShowView = App.Views.BaseView.extend({
 	// ------------ 
 	// !!!
 	modelShowActive: function(){
-		if (!this.model){return;}
-		this.model.trigger('model:show:active');
+		if(!this.model){return;}
+		app.trigger('model:show:active', this.model.id);
 	},
 
 	// !!!
@@ -35,12 +38,30 @@ App.Views.ShowView = App.Views.BaseView.extend({
 	// ------------ 
 	// !!!
 	modelShowInactive: function(){
-		if (!this.model){return;}
-		this.model.trigger('model:show:inactive');
+		if(!this.model){return;}
+		app.trigger('model:show:inactive', this.model.id);
+	},
+
+	// !!!
+	// Type: Void
+	// -----
+	// Description:
+	// ------------
+	// Checks if the event emitter has the same model as we do
+	// ------------ 
+	// Arguments:
+	// ----------
+	// id [String]: id of the model handled by the event emmiter. If it is the same
+	// as ours then we emit the show active event.
+	// ----------
+	// !!!
+	checkEventCaller: function(id){
+		if (id === this.model.id){
+			this.modelShowActive();
+		}
 	},
 
 	beforeDispose: function(){
-		if (!this.model){return;}
 		this.modelShowInactive();
 	},
 });

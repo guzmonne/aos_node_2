@@ -8,16 +8,17 @@ App.Views.RowView = App.Views.BaseView.extend({
 	},
 	
 	initialize: function(){
+		this.listenTo(this.model, 'change' , this.render);
+		this.listenTo(this.model, 'sync'   , this.render);
 		this.listenTo(this.model, 'updated', this.render);
-		this.listenTo(this.model, 'sync', this.render);
-		this.listenTo(this.model, 'model:show:active',   this.activate);
-		this.listenTo(this.model, 'model:show:inactive', this.deactivate);
+		this.listenTo(app, 'model:show:active',   this.activate);
+		this.listenTo(app, 'model:show:inactive', this.deactivate);
 		_.debounce(this.render, 100);
 	},
 
 	afterRender: function(){
 		if (this.active){this.activate();}
-		this.model.trigger('row:rendered');
+		app.trigger('row:rendered', this.model.id);
 		this.$el.tooltip();
 		if(this.parent.selection){
 			this.$('a#show').remove();
@@ -40,12 +41,14 @@ App.Views.RowView = App.Views.BaseView.extend({
 		}
 	},
 
-	activate: function(cid){
+	activate: function(id){
+		if(this.model && this.model.id !== id){return;}
 		this.activated = true;
 		this.$el.addClass('selected');
 	},
 
-	deactivate: function(cid){
+	deactivate: function(id){
+		if(this.model && this.model.id !== id){return;}
 		if(this.$el.hasClass('selected')){
 			this.activated = false;
 			this.$el.removeClass('selected');

@@ -117,8 +117,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		){
 			app.clients.add(newModel);
 		}
-		context.displayPortletMessage({
-			viewCid: context.parent.cid,
+		context.invoke('showMessage', {
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
 			class  : 'success',
@@ -132,7 +131,11 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.model.save({}, {
 			success: function(model, response, options){
 				self.model.parseAttributes(self.model.attributes);
-				self.model.trigger('updated');
+				self.invoke('showMessage', {
+					title  : 'Datos Actualizados',
+					message: 'El cliente se han actualizado correctamente',
+					class  : 'success',
+				});
 			},
 		});
 	},

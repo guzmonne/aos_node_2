@@ -3,6 +3,10 @@ App.Views.ClientDetailsView = App.Views.ShowView.extend({
 
 	className: 'row',
 
+	afterRender: function(){
+		this.invoke('setHeader');
+	},
+
 	serialize: function(){
 		var result       = (App.defined(this.model)) ? this.model.serialize() : {};
 		var createdAt    = this.model.get('createdAt');

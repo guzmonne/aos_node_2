@@ -927,6 +927,8 @@ td.center-vh{
   padding: 20px;
   border-left: 3px solid #ddd;
   background-color: #eee;
+  position: absolute;
+  z-index: 9999;
 }
 
 .bs-callout:hover {

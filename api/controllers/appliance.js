@@ -15,7 +15,7 @@ exports.update = function(req, res){
 	var id = req.params.id;
 	Appliance.updateById(id, req.body, function(error, appliance){
 		if(error){return res.send(error);}
-		res.send(appliance);
+		res.send(200, {});
 	});
 };
 

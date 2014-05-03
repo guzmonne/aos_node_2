@@ -74,10 +74,7 @@ ClientModel.prototype.findAll = function(fields, callback){
 	query.exec(function(err, clients){
 		if (err){return callback(err);}
 		callback(null, clients);
-	}); 
-	//Client.find({}, function(err, clients){
-	//	callback(null, clients);
-	//});
+	});
 };
 // Create Client
 // -------------
@@ -124,8 +121,12 @@ ClientModel.prototype.update = function(id, params, callback){
 };
 // Show Client
 // -----------
-ClientModel.prototype.show = function(id, callback){
-	Client.findOne({"_id": id}, function(err, client){
+ClientModel.prototype.show = function(id, fields, callback){
+	var query = Client.findOne({'_id': id});
+	if (fields){
+		query.select(fields);
+	}
+	query.exec(function(err, client){
 		if (err){return callback(err);}
 		callback(null, client);
 	});

@@ -6,7 +6,6 @@ var Client      = new ClientModel();
 
 exports.index = function(req, res){
 	var fields;
-	console.log(req.query);
 	if (req.query.fields){
 		fields = req.query.fields;
 	}
@@ -35,10 +34,14 @@ exports.update = function(req, res){
 };
 
 exports.show = function(req, res){
+	var fields;
 	if (!req.params.id){return res.send(400, {err: {
 		msg: 'No ID was passed'
 	}});}
-	Client.show(req.params.id, function(error, client){
+	if (req.query.fields){
+		fields = req.query.fields;
+	}
+	Client.show(req.params.id, fields, function(error, client){
 		if (error) {return res.send(400, {err: error});}
 		res.send(200, client);
 	});

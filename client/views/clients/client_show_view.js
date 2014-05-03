@@ -1,6 +1,11 @@
 App.Views.ClientShowView = App.Views.TabView.extend({
-	modelId  : null,
-	modelName: 'client',
+	modelId     : null,
+	modelName   : 'client',
+	fetchOptions: {
+		data: {
+			fields: '-service_requests',
+		}
+	},
 	
 	name: function(){
 		return 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
