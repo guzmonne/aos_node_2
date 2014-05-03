@@ -243,8 +243,8 @@ App.Views.BaseView = Giraffe.View.extend({
 	// that is ussualy caught by the row views to mark the row as active
 	// ------------ 
 	// !!!
-	announce: function(){
-		if(!App.defined(this.model)){return;}
-		app.trigger(this.modelName + ':show:active', this.model.id);
-	},
+	//announce: function(){
+	//	if(!App.defined(this.model)){return;}
+	//	app.trigger(this.modelName + ':show:active', this.model.id);
+	//},
 });

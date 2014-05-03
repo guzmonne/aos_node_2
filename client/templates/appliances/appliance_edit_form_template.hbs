@@ -43,13 +43,13 @@
 			<div class="form-group">
 				<label for="brand" class="col-sm-3 control-label">Marca</label>
 				<div class="col-sm-9">
-					<input type="text" class="form-control" name="brand" placeholder="e.j: Punktal" value="{{brand}}">
+					<input type="text" class="form-control" name="brand" placeholder="e.j: Punktal" value="{{brand}}" disabled>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="model" class="col-sm-3 control-label">Modelo</label>
 				<div class="col-sm-9">
-					<input type="text" class="form-control" name="model" placeholder="e.j: PKT1020" value="{{model}}">
+					<input type="text" class="form-control" name="model" placeholder="e.j: PKT1020" value="{{model}}" disabled>
 				</div>
 			</div>
 			<div class="form-group">
@@ -63,13 +63,20 @@
 			<div class="form-group">
 				<label for="category" class="col-sm-4 control-label">Categoría</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" name="category" placeholder="e.j: Electrodomestico" value="{{category}}">
+					<input type="text" class="form-control" name="category" placeholder="e.j: Electrodomestico" value="{{category}}" disabled>
 				</div>
 			</div>
 			<div class="form-group">
 				<label for="subcategory" class="col-sm-4 control-label">Subcategoría</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" name="subcategory" placeholder="e.j: Plancha" value="{{subcategory}}">
+					<input type="text" class="form-control" name="subcategory" placeholder="e.j: Plancha" value="{{subcategory}}" disabled>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-4 col-sm-8">
+					<button class="btn btn-info btn-block" tabindex="-1" id="select-model">
+						<i class="fa fa-search"></i> Buscar Equipo
+					</button>
 				</div>
 			</div>
 		</div>

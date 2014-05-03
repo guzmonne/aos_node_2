@@ -74,16 +74,10 @@ App.Views.TabView = App.Views.BaseView.extend({
 		if (_.isFunction(this.activeView)){this.activeView();}
 		if (_.isFunction(this.setName)){this.setName();}
 		if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
-		this.announce();
 	},
 
 	serialize: function(){
 		return this.tabDetails;
-	},
-
-	beforeDispose: function(){
-		if(!App.defined(this.model)){return;}
-		app.trigger(this.modelName + ':show:close', this.model.id);
 	},
 
 	setHeader: function(){

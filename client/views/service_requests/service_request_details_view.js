@@ -1,32 +1,28 @@
-App.Views.ServiceRequestDetailsView = App.Views.BaseView.extend({
+App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	template: HBS.service_request_details_template,
 	className: 'row',
 
-	initialize: function(){
+	afterInitialize: function(){
 		if (this.model){
-			this.listenTo(this.model, 'change', this.render);
+			this.model.fetch();
 		}
-		this.counter = 0;
+		_.once(this.renderApplianceIndex);
 	},
 
 	afterRender: function(){
-		this.counter = this.counter + 1;
-		console.log(this.counter);
-		if(
-				!App.defined(this.appliancesIndex)	&& 
-				App.defined(this.model)							&&
-				App.defined(this.model.appliances)	&&
-				this.model.appliances.length > 0
-		){
-			this.model.appliances.client_id = this.model.id;
-			this.appliancesIndex = new App.Views.ApplianceIndexView({
-				collection: this.model.appliances,
-			});
-			this.appliancesIndex.attachTo(this.$('#service-request-appliances'), {
-				method: 'html'
-			});
-		}
+		this.renderApplianceIndex();
 		this.parent.setName();
+		//console.log(this.model.cid);
+	},
+
+	renderApplianceIndex: function(){
+		if (!App.defined(this.model)){return;}
+		var el = this.$('#service-request-appliances');
+		this.appliancesIndex = new App.Views.ApplianceIndexView({
+			collection   : this.model.appliances,
+			fetchOnRender: false
+		});
+		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
 
 	serialize: function(){

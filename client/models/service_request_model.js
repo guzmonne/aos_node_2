@@ -5,9 +5,6 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}
-		if(App.defined(attributes) && App.defined(attributes.appliances)){
-			this.appliances.reset(attributes.appliances);
-		} 
 	},
 
 	defaults: function(){
@@ -29,8 +26,14 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	},
 
 	setAppliances: function(array){
-		if (App.defined(array) && _.isArray(array)){
-			this.appliances.reset(array);
+		var self = this;
+		if (_.isArray(array)){
+			this.set('appliancesCount', array.length);
+			if(!_.isString(array[0])){
+				_.each(array, function(appliance){
+					self.appliances.add(app.pushToStorage('Appliances', appliance));
+				});
+			}
 		}
 		return this;
 	},

@@ -96,13 +96,18 @@ function pickParams(params){
 		,'accessories'
 		,'serial'
 		,'service_request_id'
+		,'model_id'
 	);
 	result.updatedAt = date;
 	if (!params['_id']){
 		result.createdAt = date;
 	}
-	if (params['model_id'] && !_.isObject(params['model_id'])){
-		result.model_id = params['model_id'];
+	if(result.model_id && _.isObject(result.model_id)){
+		if (result.model_id['_id']){
+			result.model_id = result.model_id['_id'];
+		} else {
+			delete result.model_id;
+		}
 	}
 	return result;
 }
@@ -111,7 +116,6 @@ function pickParams(params){
 ApplianceModel.prototype.create = function(params, callback){
 	var applianceParams = pickParams(params);
 	var appliance       = new Appliance(applianceParams);
-	console.log(params, applianceParams);
 	appliance.save(function(err, appliance){
 		if (err){return callback(err);}
 		Model.findById(appliance.model_id, function(err, model){
@@ -147,9 +151,22 @@ ApplianceModel.prototype.findAll = function(callback){
 // ----------------------
 ApplianceModel.prototype.updateById = function(id, params, callback){
 	var object = pickParams(params);
-	Appliance.findByIdAndUpdate(id, object, function(err, appliance){
+	Appliance.findById(id, function(err, appliance){
 		if (err){return callback(err);}
-		callback(null, appliance);
+		var oldModel = appliance.model_id;
+		var newModel = object.model_id;
+		if (oldModel !== newModel){
+			Model.switchAppliancesId(oldModel, newModel, appliance._id);
+		}
+		appliance.update(object, function(err, result){
+			if (err){return callback(err);}
+			appliance.populate({
+				path  : 'model_id',
+				select: 'brand model category subcategory -_id'
+			}, function(err, appliance){
+				callback(null, appliance);
+			});
+		});
 	});
 };
 // Show appliance

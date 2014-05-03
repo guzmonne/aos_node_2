@@ -28,14 +28,18 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	setModel: function(doc, id){
-		var model;
-		var collection = app[doc + 's'];
-		var docName    = this.titelize(doc);
-		if (App.defined(collection)){
-			model = collection.get(id);
+		var model, collection;
+		var docName        = this.titelize(doc);
+		var collectionName = docName + 's';
+		if (App.defined(app[collectionName])){
+			model = app[collectionName].get(id);
 		} else {
-			model = new App.Models[docName]({_id: id});
-			model.fetch();
+			model      = new App.Models[docName]({_id: id});
+			collection = app.getAppStorage(collectionName);
+			collection.add(model);
+			if (!this.viewIsRendered(this.showComparator, {model: model})){
+				model.fetch();
+			}
 		}
 		return model;
 	},
@@ -48,12 +52,12 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		);
 	},
 
-	showComparator: function(view){
+	showComparator: function(portletView){
 		return (
-			view instanceof(App.Views.PortletView)	&&
-			App.defined(view.view)									&&
-			App.defined(view.view.model)						&&
-			view.view.model.id === this.model.id
+			portletView instanceof(App.Views.PortletView)	&&
+			App.defined(portletView.view)									&&
+			App.defined(portletView.view.model)						&&
+			portletView.view.model.id === this.model.id
 		);
 	},
 

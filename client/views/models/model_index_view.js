@@ -4,7 +4,7 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 	name     : "Modelos",
 	
 	tableEl        : '#models-table',
-	tableCollection: App.Collections.Models,
+	tableCollection: 'Models',
 	modelView      : App.Views.ModelRowView,
 
 	appStorage  : 'models',

@@ -10,11 +10,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button[type=submit]'    : 'createServiceRequest',
 		'click button#select-client'   : 'selectClient',
 	},
-
-	appEvents: {
-		'client:selected': 'setClient',
-	},
-
+	
 	afterRequest: function(){
 		this.$el.tooltip();
 	},
@@ -39,10 +35,10 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		if(!this.clientSelectModalView){
 			this.clientSelectModalView = new App.Views.ClientSelectModalView();
 		}
-		app.modalController.displayModal(this.clientSelectModalView);
+		app.modalController.displayModal(this.clientSelectModalView, this, 'clientSelected');
 	},
 
-	setClient: function(model){
+	clientSelected: function(model){
 		this.model.set('client_id', model.get('_id'));
 		this.model.set('client_name', model.get('name'));
 		this.render();

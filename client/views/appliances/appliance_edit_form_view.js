@@ -1,7 +1,7 @@
 App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
-	template: HBS.appliance_edit_form_template, 
+	template: HBS.appliance_edit_form_template,
 
-	//className: "row",
+	editMode: false, 
 
 	events: {
 		'click #edit-appliance'                : "editAppliance",
@@ -13,11 +13,20 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		'change select[name=repairement_type]' : 'changeRepairementType',
 	},
 
+	initialize: function(){
+		_.extend(this, App.Mixins.SelectModel);
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize');
+		this.$el.on('click', 'button#select-model', this.selectModel);
+		console.log(this.model.cid);
+	},
+
 	afterRender: function(){
 		this.$('[name=accessories]').tagsinput();
 		this.$('[name=replacements]').tagsinput();
-		this.blockForm();
-		this.toggleButtons();
+		if(!this.editMode){
+			this.blockForm();
+			this.toggleButtons();
+		}
 		this.changeStatus();
 		this.changeRepairementType();
 	},
@@ -63,6 +72,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		this.unblockForm();
 		this.toggleButtons();
+		this.editMode = true;
 	},
 
 	saveAppliance: function(e){
@@ -88,30 +98,33 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 
 	rerender: function(e){
 		e.preventDefault();
+		this.editMode = false;
 		this.render();
 	},
 
-	serialize: function(){
-		var result = this.model.toJSON();
-		_.extend(result, this.model.get('model_id'));
-		return result;
-	},
-
 	saveModel: function(){
-		this.model.set('brand', this.$('[name=brand]').val());
-		this.model.set('model', this.$('[name=model]').val());
 		this.model.set('serial', this.$('[name=serial]').val());
-		this.model.set('category', this.$('[name=category]').val());
-		this.model.set('subcategory', this.$('[name=subcategory]').val());
 		this.model.set('observations', this.$('[name=observations]').val());
+		// If the repairement type has change and equals "Garantía" then the cost = 0
+		if(
+			this.model.get('repairement_type') !== this.$('[name=repairement_type]').val() &&
+			this.$('[name=repairement_type]').val() === 'Garantía'
+		){
+			this.model.set('cost', 0);
+		} else {
+			this.model.set('cost', this.$('[name=cost]').val());
+		}
 		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
 		this.model.set('defect', this.$('[name=defect]').val());
 		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
 		this.model.set('status', this.$('[name=status]').val());
-		this.model.set('cost', this.$('[name=cost]').val());
 		this.model.set('replacements', this.$('[name=replacements]').val());
 		this.model.set('diagnose', this.$('[name=diagnose]').val());
 		this.model.set('solution', this.$('[name=solution]').val());
 		this.model.set('technician_id', this.$('[name=technician_id]').val());
+	},
+
+	beforeDispose: function(){
+		this.$el.on('click', 'button#select-model');
 	},
 });

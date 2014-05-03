@@ -1,14 +1,18 @@
 App.Views.ModalController = App.Views.BaseView.extend({
 	currentModal: null,
+	callerView  : null,
+	callerMethod: null,
 
-	tagName: 'section',
-	id     : 'modal-el',
-
+	tagName     : 'section',
+	id          : 'modal-el',
+	
 	events: {
 		'click .close-modal': 'closeModal',
 	},
 
-	displayModal: function(view){
+	displayModal: function(view, callerView, callerMethod){
+		if (callerView)   {this.callerView   = callerView;}
+		if (callerMethod) {this.callerMethod = callerMethod;}
 		if(!App.defined(this.currentModal) || this.currentModal.bodyView.cid !== view.cid){
 			this.setCurrentModal(view);
 		}	
@@ -23,5 +27,15 @@ App.Views.ModalController = App.Views.BaseView.extend({
 
 	closeModal: function(){
 		this.$('#modalContainer').modal('hide');
-	}
+		this.callerView   = null;
+		this.callerMethod = null;
+	},
+
+	runCallerMethod: function(data){
+		if(!App.defined(this.callerView) || !App.defined(this.callerMethod)){return;}
+		var method = this.callerView[this.callerMethod];
+		if(!_.isFunction(method)){return;}
+		method.call(this.callerView, data);
+		this.closeModal();
+	},
 });

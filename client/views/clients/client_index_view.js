@@ -4,7 +4,7 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	name     : "Clientes",
 	
 	tableEl        : '#clients-table',
-	tableCollection: App.Collections.Clients,
+	tableCollection: 'Clients',
 	modelView      : App.Views.ClientRowView,
 
 	appStorage      : 'clients',

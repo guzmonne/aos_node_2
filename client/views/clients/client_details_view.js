@@ -1,13 +1,7 @@
-App.Views.ClientDetailsView = App.Views.BaseView.extend({
+App.Views.ClientDetailsView = App.Views.ShowView.extend({
 	template: HBS.client_details_template,
 
 	className: 'row',
-
-	initialize: function(){
-		if(this.model){
-			this.listenTo(this.model, 'sync', this.render);
-		}
-	},
 
 	serialize: function(){
 		var result       = (App.defined(this.model)) ? this.model.serialize() : {};

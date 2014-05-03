@@ -29,12 +29,6 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 		}
 	],
 
-	bindEvents: function(){
-		this.listenTo(this.model, 'updated', this.update);
-		// Interacts with Row View to activate it
-		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
-	},
-
 	onSync: function(){
 		var self = this;
 		this.model.fetch({

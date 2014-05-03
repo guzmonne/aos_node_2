@@ -9,16 +9,15 @@ App.Views.RowView = App.Views.BaseView.extend({
 	
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
-		this.listenTo(this.model, 'change', this.render);
-		this.listenTo(app, this.modelName + ":show:close", this.deactivate);
-		this.listenTo(app, this.modelName + ":show:active", this.activateRenderedViews);
+		this.listenTo(this.model, 'sync', this.render);
+		this.listenTo(this.model, 'model:show:active',   this.activate);
+		this.listenTo(this.model, 'model:show:inactive', this.deactivate);
+		_.debounce(this.render, 100);
 	},
 
 	afterRender: function(){
-		if(this.activated){
-			this.activate();
-		}
-		app.trigger(this.modelName + ':row:rendered');
+		if (this.active){this.activate();}
+		this.model.trigger('row:rendered');
 		this.$el.tooltip();
 		if(this.parent.selection){
 			this.$('a#show').remove();
@@ -28,17 +27,8 @@ App.Views.RowView = App.Views.BaseView.extend({
 	},
 
 	selected: function(){
-		var data;
-		if(this.parent.parentView){
-			data = {
-				model     : this.model,
-				parentView: this.parent.parentView
-			};
-		} else {
-			data = this.model;
-		}
-		app.trigger(this.modelName + ':selected', data);
-		app.modalController.closeModal();
+		if(!App.defined(this.model)){return;}
+		app.modalController.runCallerMethod(this.model);
 	},
 
 	serialize: function(){
@@ -50,19 +40,13 @@ App.Views.RowView = App.Views.BaseView.extend({
 		}
 	},
 
-	activate: function(e){
+	activate: function(cid){
 		this.activated = true;
 		this.$el.addClass('selected');
 	},
 
-	activateRenderedViews: function(id){
-		if(this.model.id === id){
-			this.activate();
-		}
-	},
-
-	deactivate: function(id){
-		if(id === this.model.id && this.$el.hasClass('selected')){
+	deactivate: function(cid){
+		if(this.$el.hasClass('selected')){
 			this.activated = false;
 			this.$el.removeClass('selected');
 			this.className = '';

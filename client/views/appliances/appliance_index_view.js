@@ -4,7 +4,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	name     : "Equipos",
 	
 	tableEl        : '#appliances-table',
-	tableCollection: App.Collections.Appliances,
+	tableCollection: 'Appliances',
 	modelView      : App.Views.ApplianceRowView,
 
 	appStorage: 'appliances',

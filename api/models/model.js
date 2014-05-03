@@ -108,6 +108,15 @@ ModelModel.prototype.findById = function(id, fields, callback){
 		callback(null, model);
 	});
 };
+// Changes an appliance from one model to another.
+ModelModel.prototype.switchAppliancesId = function(oldModel, newModel, appliance_id){
+	Model.update({_id: oldModel}, {$pull: {appliances: appliance_id}}, function(err, result){
+		if(err){callback(err);}
+	});
+	Model.update({_id: newModel}, {$push: {appliances: appliance_id}}, function(err, result){
+		if(err){callback(err);}
+	});
+};
 
 // =======
 // EXPORTS

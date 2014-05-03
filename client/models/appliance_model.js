@@ -3,7 +3,6 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'repairment_type'   : 'Garantía',
 			'status'            : 'Pendiente',
 			'createdBy'         : 'Guzman Monne',
 			'updatedBy'         : 'Guzman Monne',

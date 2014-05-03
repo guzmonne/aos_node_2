@@ -4,7 +4,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	name     : "Ordenes de Servicio",
 	
 	tableEl        : '#service_requests-table',
-	tableCollection: App.Collections.ServiceRequests,
+	tableCollection: 'ServiceRequests',
 	modelView      : App.Views.ServiceRequestRowView,
 
 	appStorage: 'serviceRequests',

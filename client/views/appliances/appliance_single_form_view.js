@@ -8,11 +8,6 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	events: {
 		'focus .bootstrap-tagsinput input'   : 'activateTags',
 		'focusout .bootstrap-tagsinput input': 'deactivateTags',
-		'click button#select-model'          : 'selectModel',
-	},
-
-	appEvents: {
-		'model:selected': 'modelSelected',
 	},
 
 	initialize: function(){
@@ -24,24 +19,15 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 			this.listenTo(collection, 'appliance:deleted', this.saveAndDispose);
 			this.listenTo(collection, 'service_request:create:success', this.dispose);
 		}
+		_.extend(this, App.Mixins.SelectModel);
+		_.extend(this, App.Mixins.SelectModel);
+		_.bindAll(this, 'selectModel', 'modelSelected');
+		this.$el.on('click', 'button#select-model', this.selectModel);
 	},
 
 	afterRender: function(){
 		this.$('[name=accessories]').tagsinput();
 		this.$('[name=serial]').focus();
-	},
-
-	modelSelected: function(data){
-		if(data.parentView !== this.cid){return;}
-		var attrs = _.pick(data.model.attributes,  
-			'brand', 
-			'model', 
-			'category', 
-			'subcategory'
-		);
-		attrs.model_id = data.model.get('_id'); 
-		this.model.set(attrs);
-		this.render();
 	},
 
 	saveAndDispose: function(){
@@ -55,13 +41,9 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
 		this.model.set('defect', this.$('[name=defect]').val());
 		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
-	}, 
+	},
 
-	selectModel: function(){
-		if(!this.modelSelectModalView){
-			this.modelSelectModalView = new App.Views.ModelSelectModalView();
-			this.modelSelectModalView.parentView = this.cid;
-		}
-		app.modalController.displayModal(this.modelSelectModalView);
+	beforeDispose: function(){
+		this.$el.on('click', 'button#select-model');
 	},
 });

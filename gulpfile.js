@@ -10,6 +10,7 @@ var declare		 = require('gulp-declare');
 
 var jsFiles = [
 								'./client/app.js',
+								'./client/mixins/*.js',
 								'./client/models/*.js',
 								'./client/collections/*.js',
 								'./client/views/**/*.js',

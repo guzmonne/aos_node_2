@@ -6,7 +6,7 @@ window.App = {
 	Collections: {},
 	Routers    : {},
 	Views      : {},
-	Regions    : {},
+	Mixins     : {},
 
 	vent: _.extend({}, Backbone.Events),
 

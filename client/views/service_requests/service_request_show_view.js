@@ -21,7 +21,7 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 
 	bindEvents: function(){
 		// Interacts with Row View to activate it
-		this.listenTo(app, this.modelName + ':row:rendered', this.announce);
+		this.listenTo(app, this.modelName + ':row:rendered', this.announceEntrance);
 	},
 
 	renderAppliancesCarousel: function(){

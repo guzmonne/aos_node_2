@@ -1,15 +1,6 @@
 App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
-	//tagName  : 'tr',
-
-	//initialize: function(){
-	//	this.listenTo(this.model, 'change', this.render);
-	//},
-
-	//afterRender: function(){
-	//	this.$el.tooltip();
-	//},
 
 	serialize: function(){
 		var object = {};
