@@ -20,7 +20,6 @@ App.Views.ModalController = App.Views.BaseView.extend({
 	},
 
 	setCurrentModal: function(view){
-		if(this.currentModal){this.currentModal.dispose();}
 		this.currentModal = new App.Views.ModalView({bodyView: view});
 		this.attach(this.currentModal, {el: this.el, method: 'html'});
 	},

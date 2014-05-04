@@ -1,11 +1,7 @@
 App.Views.ServiceRequestRowView = App.Views.RowView.extend({
 	template : HBS.service_request_row_template,
 	modelName: "service_request",
-
-	beforeRender: function(){
-		//console.log(this.model.cid);
-	},
-
+	
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){

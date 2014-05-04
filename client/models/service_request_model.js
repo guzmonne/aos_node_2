@@ -1,7 +1,7 @@
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	initialize: function(attributes, options){
+	beforeInitialize: function(attributes, options){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}
@@ -20,22 +20,10 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 			this.appliances = new App.Collections.Appliances();
 		}
 		if (App.defined(response.appliances)){
-			this.setAppliances(response.appliances);
+			this.set('appliancesCount', response.appliances.length);
+			this.appliances.reset(response.appliances);
 		}
 		return response;
-	},
-
-	setAppliances: function(array){
-		var self = this;
-		if (_.isArray(array)){
-			this.set('appliancesCount', array.length);
-			if(!_.isString(array[0])){
-				_.each(array, function(appliance){
-					self.appliances.add(app.pushToStorage('Appliances', appliance));
-				});
-			}
-		}
-		return this;
 	},
 
 	serialize: function(){

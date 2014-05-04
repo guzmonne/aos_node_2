@@ -16,7 +16,8 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		var el = this.$('#model-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
 			collection   : this.model.appliances,
-			fetchOnRender: false
+			fetchOnRender: false,
+			baseModel    : this.model,
 		});
 		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
@@ -27,11 +28,5 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
 		result.timestamp = this.timestamp;
 		return result;
-	},
-
-	// This function passes the current model attributes when invoked. 
-	// Used by the appliance row view to fill in the model info
-	requestModel: function(){
-		return this.model.attributes;
 	},
 });

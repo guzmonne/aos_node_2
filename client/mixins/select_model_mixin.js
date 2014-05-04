@@ -34,17 +34,15 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
-		var attrs = _.pick(model.attributes,  
-			'brand', 
-			'model', 
-			'category', 
-			'subcategory',
-			'_id'
-		);
-		this.model.set('model_id', attrs);
+		this.model.tempModel = this.model.model.clone();
+		this.exchangeModel(model);
 		this.render();
 	},
 
+	exchangeModel: function(model){
+		this.model.model = model;
+		this.model.set('model_id', model.id);
+	},
 	// !!!
 	// Type: Object
 	// -----
@@ -55,8 +53,11 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	serialize: function(){
-		var result = this.model.toJSON();
-		_.extend(result, this.model.get('model_id'));
-		return result;
+		var object = this.model.toJSON();
+		var model  = this.model.model;
+		if (model){
+			_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
+		}
+		return object;
 	},
 };

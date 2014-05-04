@@ -17,7 +17,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(this.model, 'sync'   , this.render);
 		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
 	},
 
@@ -64,12 +64,17 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
+		this.model.modelUpdated();
 		this.editMode = false;
 	},
 
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
+		if (this.tempModel){
+			this.exchangeModel(this.tempModel);
+			this.tempModel.dispose();
+		}
 		this.render();
 	},
 

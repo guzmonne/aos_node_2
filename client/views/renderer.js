@@ -66,7 +66,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	show: function(params){
-		var portletView, fetchOptions;
+		var portletView, fetchOptions, fetch;
 		var viewOptions = {};
 		// If no params object is passed or the viewName is not defined then return
 		if(!_.isObject(params) || !App.defined(params.viewName)){
@@ -76,14 +76,19 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
 			var modelOptions  = (params.options) ? (params.options) : {}; 
-			viewOptions.model = (_.isString(params.model)) ? new App.Models[params.model](modelOptions) : params.model;
+			if (_.isString(params.model)){
+				viewOptions.model = new App.Models[params.model](modelOptions);
+				fetch = true;
+			} else {
+				viewOptions.model = params.model;
+			}
 			delete params.model;
 			delete params.options;
 		}	
 		// We create the correct view
 		params.view = new App.Views[params.viewName](viewOptions);
 		// Grab the fetchOptions from the new view and fetch the model if it exists
-		if (params.view.model){
+		if (fetch){
 			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
 			fetchOptions.silent = true;
 			params.view.model.fetch(fetchOptions);

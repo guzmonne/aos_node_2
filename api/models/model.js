@@ -134,6 +134,7 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 			}
 			break;
 	}
+	console.log(id, fields, callback, options);
 	//if (arguments.length > 2 && _.isString(fields)){
 	//	query.select(fields);
 	//} else if (arguments.length === 2 && _.isFunction(fields)){

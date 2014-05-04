@@ -21,6 +21,7 @@ exports.update = function(req, res){
 
 exports.show = function(req, res){
 	var id = req.params.id;
+	console.log(id);
 	Appliance.show(id, function(error, appliance){
 		if(error){return res.send(error);}
 		res.send(appliance);

@@ -3,9 +3,11 @@
 // ======================
 var ModelModel = require('../models/model').ModelModel;
 var Model      = new ModelModel();
+var _          = require('underscore');
 
 exports.index = function(req, res){
-	var fields = req.query.fields;
+	//var fields = req.query.fields;
+	var fields = (_.isString(req.query.fields)) ? req.query.fields : null;
 	Model.findAll(fields, function(error, models){
 		if (error){return res.send(400, error);}
 		res.send(models);

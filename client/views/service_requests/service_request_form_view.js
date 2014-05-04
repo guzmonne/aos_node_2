@@ -94,10 +94,8 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	createServiceRequest: function(e){
 		e.preventDefault();
 		var self = this;
-		var grandpa = this.parent.parent;
-		if (this.model.appliances.length === 0 && App.defined(grandpa)){
-			grandpa.flash = this.zeroAppliancesFlash;
-			grandpa.displayFlash();
+		if (this.model.appliances.length === 0){
+			return this.invoke('showMessage', this.zeroAppliancesFlash);
 		}
 		this.saveModel();
 		_.each(this.children, function(child){
@@ -111,12 +109,6 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 				// managing a service request collection then we add
 				// this model to it.
 				app.trigger('service_request:create:success', model);
-				if(App.defined(app.serviceRequests)){
-					app.serviceRequests.add(model);
-				}
-				if(App.defined(app.appliances)){
-					app.appliances.add(model.appliances.models);
-				}
 				var route = 'service_request/show/' + model.id;
 				//Backbone.history.navigate(route, {trigger: true});
 				app.Renderer.show({
@@ -125,7 +117,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 					portletFrameClass: 'green',
 					flash            : self.serviceRequestSuccessFlash()
 				});
-				grandpa.dispose();
+				self.invoke('closePortletView');
 			},
 		});
 	},

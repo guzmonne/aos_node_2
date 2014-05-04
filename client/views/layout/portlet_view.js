@@ -122,4 +122,8 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			cid: this.cid,
 		};
 	},
+
+	closePortletView: function(){
+		this.dispose();
+	},
 });

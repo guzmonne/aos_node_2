@@ -21,7 +21,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		}
 		_.extend(this, App.Mixins.SelectModel);
 		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
 	},
 

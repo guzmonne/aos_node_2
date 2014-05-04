@@ -3,10 +3,11 @@
 // ======================
 var UserModel = require('../models/user').UserModel;
 var User      = new UserModel();
+var _         = require('underscore');
 
 exports.index = function(req, res){
 	var id     = req.params.id;
-	var fields = req.query.fields;
+	var fields = (_.isString(req.query.fields)) ? req.query.fields : null;
 	if (id){
 		User.findByClientId(id, fields, function(error, models){
 			res.send(models);

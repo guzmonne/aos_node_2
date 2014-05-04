@@ -136,7 +136,7 @@ ApplianceModel.prototype.findAll = function(callback){
 		async.each(appliances, function(appliance, cb){
 			appliance.populate({
 				path  : 'model_id',
-				select: 'brand model category subcategory -_id'
+				select: 'brand model category subcategory _id'
 			}, function(err, appliance){
 				cb(null, appliance);
 			});
@@ -167,11 +167,13 @@ ApplianceModel.prototype.updateById = function(id, params, callback){
 // Show appliance
 // --------------
 ApplianceModel.prototype.show = function(id, callback){
+	console.log(id);
 	Appliance.findById(id, function(err, appliance){
 		if (err){return callback(err);}
+		if (appliance === null){return callback();}
 		appliance.populate({
 			path  : 'model_id',
-			select: 'brand model category subcategory -_id'
+			select: 'brand model category subcategory _id'
 		}, function(err, appliance){
 			callback(null, appliance);
 		});

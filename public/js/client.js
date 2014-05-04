@@ -109,17 +109,15 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
-		var attrs = _.pick(model.attributes,  
-			'brand', 
-			'model', 
-			'category', 
-			'subcategory',
-			'_id'
-		);
-		this.model.set('model_id', attrs);
+		this.model.tempModel = this.model.model.clone();
+		this.exchangeModel(model);
 		this.render();
 	},
 
+	exchangeModel: function(model){
+		this.model.model = model;
+		this.model.set('model_id', model.id);
+	},
 	// !!!
 	// Type: Object
 	// -----
@@ -130,9 +128,12 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	serialize: function(){
-		var result = this.model.toJSON();
-		_.extend(result, this.model.get('model_id'));
-		return result;
+		var object = this.model.toJSON();
+		var model  = this.model.model;
+		if (model){
+			_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
+		}
+		return object;
 	},
 };
 // !!!
@@ -193,7 +194,11 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// cutom event to let the views know that some changes occured.
 	updateModel: function(otherModel){
 		if (otherModel.cid !== this.cid && otherModel.id === this.id){
-			this.set(otherModel.attributes, {silent: true});
+			if (_.isFunction(this.customUpdate)){
+				this.customUpdate(otherModel);
+			} else {
+				this.set(otherModel.attributes, {silent: true});
+			}
 			this.trigger('updated');
 		}
 	},
@@ -206,7 +211,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		} else {
 			parsedDate = new Date(date);
 		}
-		return parsedDate.getDate() +
+		return  parsedDate.getDate() +
 			"/" + parsedDate.getMonth() + 
 			"/" + parsedDate.getFullYear();
 	},
@@ -221,6 +226,45 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 			'createdBy'         : 'Guzman Monne',
 			'updatedBy'         : 'Guzman Monne',
 		};
+	},
+
+	beforeInitialize: function(options){
+		this.setModel(options);
+	},
+
+	customUpdate: function(otherModel){
+		this.set(otherModel.attributes, {silent: true});
+		this.model = otherModel.model;
+	},
+
+	parse: function(response){
+		var result = this.setModel(response);
+		return result;
+	},
+
+	childUpdated: function(){
+		this.trigger('updated');
+	},
+
+	setModel: function(response){
+		var result      = (response) ? response : null;
+		var modelParams = {};
+		if (result){
+			if (_.isObject(result.model_id)){
+				modelParams = result.model_id;
+				if (result.model_id._id){
+					result.model_id = result.model_id._id;
+				}
+			}
+		}		
+		if (this.model){
+			this.model.set(modelParams);
+		} else {
+			var model  = new App.Models.Model(modelParams);
+			this.model = model;
+			this.listenTo(this.model, 'updated', this.childUpdated);
+		}
+		return result;
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
@@ -311,6 +355,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 		}
 	},
 
+	// This function gets called when the model is being synced with the server
 	parse: function(response){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
@@ -344,7 +389,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	initialize: function(attributes, options){
+	beforeInitialize: function(attributes, options){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}
@@ -363,22 +408,10 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 			this.appliances = new App.Collections.Appliances();
 		}
 		if (App.defined(response.appliances)){
-			this.setAppliances(response.appliances);
+			this.set('appliancesCount', response.appliances.length);
+			this.appliances.reset(response.appliances);
 		}
 		return response;
-	},
-
-	setAppliances: function(array){
-		var self = this;
-		if (_.isArray(array)){
-			this.set('appliancesCount', array.length);
-			if(!_.isString(array[0])){
-				_.each(array, function(appliance){
-					self.appliances.add(app.pushToStorage('Appliances', appliance));
-				});
-			}
-		}
-		return this;
 	},
 
 	serialize: function(){
@@ -1172,7 +1205,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	show: function(params){
-		var portletView, fetchOptions;
+		var portletView, fetchOptions, fetch;
 		var viewOptions = {};
 		// If no params object is passed or the viewName is not defined then return
 		if(!_.isObject(params) || !App.defined(params.viewName)){
@@ -1182,14 +1215,19 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
 			var modelOptions  = (params.options) ? (params.options) : {}; 
-			viewOptions.model = (_.isString(params.model)) ? new App.Models[params.model](modelOptions) : params.model;
+			if (_.isString(params.model)){
+				viewOptions.model = new App.Models[params.model](modelOptions);
+				fetch = true;
+			} else {
+				viewOptions.model = params.model;
+			}
 			delete params.model;
 			delete params.options;
 		}	
 		// We create the correct view
 		params.view = new App.Views[params.viewName](viewOptions);
 		// Grab the fetchOptions from the new view and fetch the model if it exists
-		if (params.view.model){
+		if (fetch){
 			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
 			fetchOptions.silent = true;
 			params.view.model.fetch(fetchOptions);
@@ -1221,19 +1259,22 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 	modelName: 'appliance',
 
 	beforeRender: function(){
-		if (_.isString(this.model.get('model_id'))){
-			this.model.set('model_id', this.invoke('requestModel'));
+		if (!this.model.get('model') && this.parent.baseModel){
+			this.model.model = this.parent.baseModel;
 		}
 	},
 
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
-			var createdAt    = this.model.get('createdAt');
-			var updatedAt    = this.model.get('updatedAt');
-			var closedAt     = this.model.get('closedAt');
-			object           = this.model.toJSON();
-			_.extend(object, this.model.get('model_id'));
+			object        = this.model.toJSON();
+			var createdAt = this.model.get('createdAt');
+			var updatedAt = this.model.get('updatedAt');
+			var closedAt  = this.model.get('closedAt');
+			var model     = this.model.model;
+			if (model){
+				_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
+			}
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
@@ -1266,7 +1307,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(this.model, 'sync'   , this.render);
 		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
 	},
 
@@ -1313,12 +1354,17 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
+		this.model.modelUpdated();
 		this.editMode = false;
 	},
 
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
+		if (this.tempModel){
+			this.exchangeModel(this.tempModel);
+			this.tempModel.dispose();
+		}
 		this.render();
 	},
 
@@ -1412,7 +1458,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		}
 		_.extend(this, App.Mixins.SelectModel);
 		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
 	},
 
@@ -1852,7 +1898,6 @@ App.Views.ModalController = App.Views.BaseView.extend({
 	},
 
 	setCurrentModal: function(view){
-		if(this.currentModal){this.currentModal.dispose();}
 		this.currentModal = new App.Views.ModalView({bodyView: view});
 		this.attach(this.currentModal, {el: this.el, method: 'html'});
 	},
@@ -2036,6 +2081,10 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			cid: this.cid,
 		};
 	},
+
+	closePortletView: function(){
+		this.dispose();
+	},
 });
 App.Views.SearchView = App.Views.BaseView.extend({
 	template: HBS.search_template,
@@ -2102,10 +2151,6 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 App.Views.ModelRowView = App.Views.RowView.extend({
 	template : HBS.model_row_template,
 	modelName: 'model',
-
-	beforeRender: function(){
-		console.log(this.model);
-	}
 });
 App.Views.ModelDetailsView = App.Views.ShowView.extend({
 	template: HBS.model_details_template,
@@ -2125,7 +2170,8 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		var el = this.$('#model-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
 			collection   : this.model.appliances,
-			fetchOnRender: false
+			fetchOnRender: false,
+			baseModel    : this.model,
 		});
 		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
@@ -2136,12 +2182,6 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
 		result.timestamp = this.timestamp;
 		return result;
-	},
-
-	// This function passes the current model attributes when invoked. 
-	// Used by the appliance row view to fill in the model info
-	requestModel: function(){
-		return this.model.attributes;
 	},
 });
 App.Views.ModelFormView = App.Views.BaseView.extend({
@@ -2271,7 +2311,7 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 	appStorage  : 'models',
 	fetchOptions		: {
 		data: {
-			fields: 'brand model category subcategory'
+			fields: 'brand model category subcategory _id'
 		}
 	},
 });
@@ -2345,11 +2385,7 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 App.Views.ServiceRequestRowView = App.Views.RowView.extend({
 	template : HBS.service_request_row_template,
 	modelName: "service_request",
-
-	beforeRender: function(){
-		//console.log(this.model.cid);
-	},
-
+	
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
@@ -2490,10 +2526,8 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	createServiceRequest: function(e){
 		e.preventDefault();
 		var self = this;
-		var grandpa = this.parent.parent;
-		if (this.model.appliances.length === 0 && App.defined(grandpa)){
-			grandpa.flash = this.zeroAppliancesFlash;
-			grandpa.displayFlash();
+		if (this.model.appliances.length === 0){
+			return this.invoke('showMessage', this.zeroAppliancesFlash);
 		}
 		this.saveModel();
 		_.each(this.children, function(child){
@@ -2507,12 +2541,6 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 				// managing a service request collection then we add
 				// this model to it.
 				app.trigger('service_request:create:success', model);
-				if(App.defined(app.serviceRequests)){
-					app.serviceRequests.add(model);
-				}
-				if(App.defined(app.appliances)){
-					app.appliances.add(model.appliances.models);
-				}
 				var route = 'service_request/show/' + model.id;
 				//Backbone.history.navigate(route, {trigger: true});
 				app.Renderer.show({
@@ -2521,7 +2549,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 					portletFrameClass: 'green',
 					flash            : self.serviceRequestSuccessFlash()
 				});
-				grandpa.dispose();
+				self.invoke('closePortletView');
 			},
 		});
 	},

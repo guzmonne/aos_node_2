@@ -20,7 +20,11 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// cutom event to let the views know that some changes occured.
 	updateModel: function(otherModel){
 		if (otherModel.cid !== this.cid && otherModel.id === this.id){
-			this.set(otherModel.attributes, {silent: true});
+			if (_.isFunction(this.customUpdate)){
+				this.customUpdate(otherModel);
+			} else {
+				this.set(otherModel.attributes, {silent: true});
+			}
 			this.trigger('updated');
 		}
 	},
@@ -33,7 +37,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		} else {
 			parsedDate = new Date(date);
 		}
-		return parsedDate.getDate() +
+		return  parsedDate.getDate() +
 			"/" + parsedDate.getMonth() + 
 			"/" + parsedDate.getFullYear();
 	},

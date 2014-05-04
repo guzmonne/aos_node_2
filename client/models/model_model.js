@@ -14,6 +14,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 		}
 	},
 
+	// This function gets called when the model is being synced with the server
 	parse: function(response){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();

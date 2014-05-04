@@ -123,8 +123,12 @@ ClientModel.prototype.update = function(id, params, callback){
 // -----------
 ClientModel.prototype.show = function(id, fields, callback){
 	var query = Client.findOne({'_id': id});
-	if (fields){
-		query.select(fields);
+	if (arguments.length > 2){
+		if (_.isString(fields)){
+			query.select(fields);
+		}
+	} else {
+		callback = fields;
 	}
 	query.exec(function(err, client){
 		if (err){return callback(err);}

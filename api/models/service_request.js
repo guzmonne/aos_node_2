@@ -111,7 +111,7 @@ ServiceRequestModel.prototype.create = function(params, callback){
 					async.each(s_r.appliances, function(appliance, cb){
 						appliance.populate({
 							path  : 'model_id',
-							select: 'brand model category subcategory -_id'
+							select: 'brand model category subcategory _id'
 						}, function(err, appliance){
 							cb(null, appliance);
 						});
@@ -162,7 +162,7 @@ ServiceRequestModel.prototype.show = function(id, callback){
 			async.each(s_r.appliances, function(appliance, cb){
 				appliance.populate({
 					path  : 'model_id',
-					select: 'brand model category subcategory -_id'
+					select: 'brand model category subcategory _id'
 				}, function(err, appliance){
 					cb(null, appliance);
 				});
