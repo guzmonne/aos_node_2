@@ -17,10 +17,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'submit form'                    : 'submitForm',
 	},
 
-	afterRender: function(){
-		console.log('rendered');
-	},
-
 	serialize: function(){
 		return this.model.serialize();
 	},

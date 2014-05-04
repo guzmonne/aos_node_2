@@ -172,6 +172,7 @@ App.Mixins.ShowViewAnnouncer = {
 	},
 };
 App.Models.BaseModel = Giraffe.Model.extend({
+	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
 	initialize: function(){
@@ -180,10 +181,16 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		this.listenTo(app , this.name + ':model:updated', this.updateModel);
 	},
 
+	// When the model gets synced with the server it calls the modelUpdated function.
+	// This function will then trigger a custom event to let other models know that
+	// it has been updated.
 	modelUpdated: function(){
 		app.trigger(this.name + ':model:updated', this);
 	},
 
+	// When the model hears that a model of its kind was updated it checks if it has
+	// to incorporate this new data on itself. Once its done it will run another
+	// cutom event to let the views know that some changes occured.
 	updateModel: function(otherModel){
 		if (otherModel.cid !== this.cid && otherModel.id === this.id){
 			this.set(otherModel.attributes, {silent: true});
@@ -191,6 +198,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		}
 	},
 	
+	// Just a basic function to parse a 'Date()' type.
 	dateDDMMYYYY: function(date){
 		var parsedDate;
 		if (date instanceof Date){
@@ -292,9 +300,38 @@ App.Models.Model = App.Models.BaseModel.extend({
 	url: function(){
 		var u = '/api/models';
 		if (this.id){
-			u = u + '/' + id;
+			u = u + '/' + this.id;
 		}
 		return u;
+	},
+
+	beforeInitialize: function(attributes, options){
+		if(!App.defined(this.appliances)){
+			this.appliances = new App.Collections.Appliances();
+		}
+	},
+
+	parse: function(response){
+		if(!App.defined(this.appliances)){
+			this.appliances = new App.Collections.Appliances();
+		}
+		if (App.defined(response.appliances)){
+			this.setAppliances(response.appliances);
+		}
+		return response;
+	},
+
+	setAppliances: function(array){
+		var self = this;
+		if (_.isArray(array)){
+			this.set('appliancesCount', array.length);
+			if(!_.isString(array[0])){
+				_.each(array, function(appliance){
+					self.appliances.add(app.pushToStorage('Appliances', appliance));
+				});
+			}
+		}
+		return this;
 	},
 
 	defaults: function(){
@@ -979,8 +1016,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		if (_.isFunction(this.activeView)){this.activeView();}
-		if (_.isFunction(this.setName)){this.setName();}
-		if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
+		this.invoke('setHeader');
 	},
 
 	serialize: function(){
@@ -1146,7 +1182,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
 			var modelOptions  = (params.options) ? (params.options) : {}; 
-			viewOptions.model = new App.Models[params.model](modelOptions);
+			viewOptions.model = (_.isString(params.model)) ? new App.Models[params.model](modelOptions) : params.model;
 			delete params.model;
 			delete params.options;
 		}	
@@ -1183,6 +1219,12 @@ App.Views.Renderer = App.Views.BaseView.extend({
 App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
+
+	beforeRender: function(){
+		if (_.isString(this.model.get('model_id'))){
+			this.model.set('model_id', this.invoke('requestModel'));
+		}
+	},
 
 	serialize: function(){
 		var object = {};
@@ -1435,10 +1477,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'click #reset-form'              : 'render',
 		'click #update-form'             : 'updateForm',
 		'submit form'                    : 'submitForm',
-	},
-
-	afterRender: function(){
-		console.log('rendered');
 	},
 
 	serialize: function(){
@@ -1866,9 +1904,11 @@ App.Views.NavView = Giraffe.View.extend({
 
 	toggleSidebar: function(e){
 		e.preventDefault();
-		var wrapper = $('#page-wrapper');
-		var sidebar = $('#sidebar-el');
+		var wrapper    = $('#page-wrapper');
+		var whiteSpace = $('#white-space');
+		var sidebar    = $('#sidebar-el');
 		wrapper.toggleClass('make-space-right');
+		whiteSpace.toggleClass('make-space-right');
 		app.trigger('nav:toggleMenu');
 	},
 });
@@ -2062,30 +2102,143 @@ App.Views.UserSettingsView = Giraffe.View.extend({
 App.Views.ModelRowView = App.Views.RowView.extend({
 	template : HBS.model_row_template,
 	modelName: 'model',
+
+	beforeRender: function(){
+		console.log(this.model);
+	}
+});
+App.Views.ModelDetailsView = App.Views.ShowView.extend({
+	template: HBS.model_details_template,
+	className: 'row',
+
+	afterInitialize: function(){
+		_.once(this.renderApplianceIndex);
+	},
+
+	afterRender: function(){
+		this.renderApplianceIndex();
+		this.invoke('setHeader');
+	},
+
+	renderApplianceIndex: function(){
+		if (!App.defined(this.model)){return;}
+		var el = this.$('#model-appliances');
+		this.appliancesIndex = new App.Views.ApplianceIndexView({
+			collection   : this.model.appliances,
+			fetchOnRender: false
+		});
+		this.appliancesIndex.attachTo(el, {method: 'html'});
+	},
+
+	serialize: function(){
+		var result = (App.defined(this.model)) ? this.model.toJSON() : {};
+		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
+		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
+		result.timestamp = this.timestamp;
+		return result;
+	},
+
+	// This function passes the current model attributes when invoked. 
+	// Used by the appliance row view to fill in the model info
+	requestModel: function(){
+		return this.model.attributes;
+	},
 });
 App.Views.ModelFormView = App.Views.BaseView.extend({
 	template: HBS.model_form_template,
 
+	edit  : false,
+	editOn: false,
+
 	events: {
-		'submit form': 'createModel',
+		'submit form'             : 'submitForm',
+		'click button#reset-model': 'reRender',
+		'click button#edit-model' : 'editModel',
+	},
+
+	initialize: function(){
+		_.once(this.editForm);
+	},
+
+	reRender: function(e){
+		if (e){e.preventDefault();}
+		this.editOn = false;
+		this.render();
+	},
+
+	afterRender: function(){
+		if (this.edit){
+			this.editForm();
+		}
+	},
+
+	editForm: function(){
+		this.$('#save-model').remove();
+		this.blockForm();
+	},
+
+	submitForm: function(e){
+		if (e){e.preventDefault();}
+		if (this.edit){
+			this.updateModel();
+		} else {
+			this.createModel();
+		}
+	},
+
+	editModel: function(e){
+		if (e){e.preventDefault();}
+		this.editOn = (this.editOn) ? false : true;
+		if (this.editOn){
+			this.unblockForm();
+		} else {
+			this.blockForm();
+		}
+		this.$('.btn').toggleClass('hide');
+	},
+
+	updateModel: function(e){
+		var self = this;
+		if (e){e.preventDefault();}
+		this.saveModel();
+		this.model.save({}, {
+			success: function(model){
+				self.invoke('showMessage', {
+					title  : 'Modelo Actualizado',
+					message: 'El modelo se ha actualizado con exito',
+					class  : 'success',
+				});
+			},
+			error: function(model){
+				self.invoke('showMessage', {
+					title  : 'Error',
+					message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
+					class  : 'danger',
+				});
+			}
+		});
+		this.editModel();
 	},
 
 	createModel: function(e){
 		var self = this;
-		e.preventDefault();
+		if (e){e.preventDefault();}
 		this.saveModel();
 		this.model.save({}, {
 			success: function(model){
-				self.displayPortletMessage({
-					viewCid: self.parent.cid,
+				self.invoke('showMessage', {
 					title  : 'Modelo Creado',
 					message: 'El nuevo modelo se ha creado con exito.',
 					class  : 'success',
 				});
-				if (App.defined(app.models)){
-					app.models.add(model);
-				}
 			},
+			error: function(model){
+				self.invoke('showMessage', {
+					title  : 'Error',
+					message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
+					class  : 'danger',
+				});
+			}
 		});
 		this.model.dispose();
 		this.model = new App.Models.Model();
@@ -2145,6 +2298,50 @@ App.Views.ModelSelectModalView = App.Views.BaseView.extend({
 		this.modelIndex.attachTo('#model-index');
 	},
 });
+App.Views.ModelShowView = App.Views.TabView.extend({
+	name: function(){
+		if (this.model){
+			return 'Equipos con modelo ' + this.model.get('model');
+		}
+	},
+	
+	modelId  : null,
+	modelName: 'model',
+
+	beforeInitialize: function(){
+		_.once(this.renderEditForm);
+	},
+
+	tabs: [
+		{
+			id    : 'details',
+			title : 'Detalle',
+			view  : 'ModelDetailsView',
+			active: true,
+		},
+		{
+			id            : 'edit',
+			title         : 'Editar Datos',
+			class         : 'air-t',
+			renderFunction: function(){
+				this.renderEditForm();
+			},
+		}
+	],
+
+	renderEditForm: function(){
+		this.editForm = new App.Views.ModelFormView({
+			model: this.model,
+			edit : true,
+		});
+		this.editForm.attachTo(this.$('#model-edit-'+ this.timestamp), {method: 'html'});
+	},
+
+	bindEvents: function(){
+		// Interacts with Row View to activate it
+		this.listenTo(app, this.modelName + ':row:rendered', this.announceEntrance);
+	},
+});
 App.Views.ServiceRequestRowView = App.Views.RowView.extend({
 	template : HBS.service_request_row_template,
 	modelName: "service_request",
@@ -2171,16 +2368,12 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	className: 'row',
 
 	afterInitialize: function(){
-		if (this.model){
-			this.model.fetch();
-		}
 		_.once(this.renderApplianceIndex);
 	},
 
 	afterRender: function(){
 		this.renderApplianceIndex();
-		this.parent.setName();
-		//console.log(this.model.cid);
+		this.invoke('setHeader');
 	},
 
 	renderApplianceIndex: function(){
@@ -2442,7 +2635,12 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 	},
 });
 App.Views.ServiceRequestShowView = App.Views.TabView.extend({
-	name     : null,
+	name     : function(){
+		if (this.model){
+			return 'Orden de Servicio #' + this.model.get('id');
+		}
+	},
+
 	modelId  : null,
 	modelName: 'service_request',
 
@@ -2484,11 +2682,6 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 				}
 			);
 		}
-	},
-
-	setName: function(){
-		this.name = 'Orden de Servicio #' + this.model.get('id');
-		this.parent.setHeader();
 	},
 });
 App.Views.UserRowView = App.Views.RowView.extend({

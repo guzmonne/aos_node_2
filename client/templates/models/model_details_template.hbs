@@ -1,0 +1,49 @@
+<div class="col-lg-12">
+  <span class="pull-right" style="margin-top: 20px">
+    <a href="#render/model/index" class="pull-right text-muted">
+      <i class="fa fa-list fa-3x"></i>
+    </a>
+  </span>
+  <h1>
+    Modelo: {{model}}
+    <span class="pull-right label {{statusClass status}}">{{status}}</span>
+  </h1>
+  <div class="row">
+  	<div class="col-xs-2">
+  		<ul class="list-unstyled">
+  			<li><strong>Marca</strong></li>
+  			<li><strong>Categoría</strong></li>
+  			<li><strong>Subcategoría</strong></li>
+  		</ul>
+  	</div>
+  	<div class="col-xs-4">
+  		<ul class="list-unstyled">
+	  		<li>{{brand}}</li>
+	  		<li>{{category}}</li>
+	  		<li>{{subcategory}}</li>
+  		</ul>
+  	</div>
+  </div>
+  <hr style="margin: 0">
+  <div class="row">
+    <div class="col-sm-6">
+        <h3>Equipos</h3>
+    </div>
+  </div>
+  <div id="model-appliances"></div>
+</div>
+<div class="col-lg-12">
+<hr>
+  <div class="row">
+    <div class="col-sm-6">
+      <small>
+        Creado el {{createdAt}} por {{createdBy}}
+      </small>
+    </div>
+    <div class="col-sm-6 text-right">
+      <small>
+        Modificado el {{updatedAt}} por {{updatedBy}}
+      </small>
+    </div>
+  </div>
+</div>

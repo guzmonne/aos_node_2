@@ -1,5 +1,10 @@
 App.Views.ServiceRequestShowView = App.Views.TabView.extend({
-	name     : null,
+	name     : function(){
+		if (this.model){
+			return 'Orden de Servicio #' + this.model.get('id');
+		}
+	},
+
 	modelId  : null,
 	modelName: 'service_request',
 
@@ -41,10 +46,5 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 				}
 			);
 		}
-	},
-
-	setName: function(){
-		this.name = 'Orden de Servicio #' + this.model.get('id');
-		this.parent.setHeader();
 	},
 });

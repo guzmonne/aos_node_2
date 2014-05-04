@@ -2,6 +2,12 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
 
+	beforeRender: function(){
+		if (_.isString(this.model.get('model_id'))){
+			this.model.set('model_id', this.invoke('requestModel'));
+		}
+	},
+
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){

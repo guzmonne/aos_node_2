@@ -1,5 +1,5 @@
-App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
-	template: HBS.service_request_details_template,
+App.Views.ModelDetailsView = App.Views.ShowView.extend({
+	template: HBS.model_details_template,
 	className: 'row',
 
 	afterInitialize: function(){
@@ -13,7 +13,7 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 
 	renderApplianceIndex: function(){
 		if (!App.defined(this.model)){return;}
-		var el = this.$('#service-request-appliances');
+		var el = this.$('#model-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
 			collection   : this.model.appliances,
 			fetchOnRender: false
@@ -27,5 +27,11 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
 		result.timestamp = this.timestamp;
 		return result;
+	},
+
+	// This function passes the current model attributes when invoked. 
+	// Used by the appliance row view to fill in the model info
+	requestModel: function(){
+		return this.model.attributes;
 	},
 });

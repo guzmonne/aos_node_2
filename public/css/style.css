@@ -2,7 +2,7 @@
 
 /* ------------------------------- */
 
- body {
+body {
     background-color: #f8f8f8;
 }
 
@@ -10,7 +10,7 @@
 
 /* ------------------------------- */
 
- #wrapper {
+#wrapper {
     width: 100%;
 }
 
@@ -43,6 +43,10 @@
 
 .navbar-static-side ul li {
     border-bottom: 1px solid #e7e7e7;
+}
+
+#white-space.make-space-right {
+  margin: 0 0 0 250px;
 }
 
 /* Navigation */

@@ -1067,6 +1067,54 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
   return "<a data-toggle=\"dropdown\" href=\"#\" class=\"dropdown-toggle\">\n  <i class=\"fa fa-user da-fw\">\n  </i>\n  <i class=\"fa fa-caret-down\">\n  </i>\n</a>\n<ul class=\"dropdown-menu dropdown-user\">\n  <li>\n    <a href=\"#\">\n      <i class=\"fa fa-user fa-fw\">\n      </i>\n      User Profile\n    </a>\n  </li>\n  <li>\n    <a href=\"#\">\n      <i class=\"fa fa-gear fa-fw\">\n      </i>\n      Settings\n    </a>\n  </li>\n  <li class=\"divider\">\n  </li>\n  <li>\n    <a href=\"#\">\n      <i class=\"fa fa-sign-out fa-fw\">\n      </i>\n      Logout\n    </a>\n  </li>\n</ul>";
   });
+this["HBS"] = this["HBS"] || {};this["HBS"]["model_details_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
+
+
+  buffer += "<div class=\"col-lg-12\">\n  <span class=\"pull-right\" style=\"margin-top: 20px\">\n    <a href=\"#render/model/index\" class=\"pull-right text-muted\">\n      <i class=\"fa fa-list fa-3x\"></i>\n    </a>\n  </span>\n  <h1>\n    Modelo: ";
+  if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n    <span class=\"pull-right label ";
+  options = {hash:{},data:data};
+  buffer += escapeExpression(((stack1 = helpers.statusClass || (depth0 && depth0.statusClass)),stack1 ? stack1.call(depth0, (depth0 && depth0.status), options) : helperMissing.call(depth0, "statusClass", (depth0 && depth0.status), options)))
+    + "\">";
+  if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</span>\n  </h1>\n  <div class=\"row\">\n  	<div class=\"col-xs-2\">\n  		<ul class=\"list-unstyled\">\n  			<li><strong>Marca</strong></li>\n  			<li><strong>Categoría</strong></li>\n  			<li><strong>Subcategoría</strong></li>\n  		</ul>\n  	</div>\n  	<div class=\"col-xs-4\">\n  		<ul class=\"list-unstyled\">\n	  		<li>";
+  if (stack2 = helpers.brand) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.brand); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</li>\n	  		<li>";
+  if (stack2 = helpers.category) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.category); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</li>\n	  		<li>";
+  if (stack2 = helpers.subcategory) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.subcategory); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</li>\n  		</ul>\n  	</div>\n  </div>\n  <hr style=\"margin: 0\">\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n        <h3>Equipos</h3>\n    </div>\n  </div>\n  <div id=\"model-appliances\"></div>\n</div>\n<div class=\"col-lg-12\">\n<hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el ";
+  if (stack2 = helpers.createdAt) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.createdAt); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + " por ";
+  if (stack2 = helpers.createdBy) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.createdBy); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "\n      </small>\n    </div>\n    <div class=\"col-sm-6 text-right\">\n      <small>\n        Modificado el ";
+  if (stack2 = helpers.updatedAt) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.updatedAt); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + " por ";
+  if (stack2 = helpers.updatedBy) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.updatedBy); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "\n      </small>\n    </div>\n  </div>\n</div>";
+  return buffer;
+  });
 this["HBS"] = this["HBS"] || {};this["HBS"]["model_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1089,7 +1137,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n					</div>\n				</div>\n			</div>\n		</div>\n\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<hr style=\"margin-top: 0;\">\n			</div>\n		</div>\n		\n\n		<div class=\"row\" style=\"border-radius: 0; margin-bottom: 0\">\n	    <div class=\"col-xs-12\">\n	      <button type=\"submit\" id=\"save-model\" class=\"btn btn-primary\">\n	      	<i class=\"fa fa-save\"></i>\n	      	 Guardar\n	      </button>\n	    </div>\n		</div>\n	</form>\n</div>";
+    + "\">\n					</div>\n				</div>\n			</div>\n		</div>\n\n		\n		<div class=\"row\">\n			<div class=\"col-lg-12\">\n				<hr style=\"margin-top: 0;\">\n			</div>\n		</div>\n		\n\n		<div class=\"row\" style=\"border-radius: 0; margin-bottom: 0\">\n	    <div class=\"col-xs-12\">\n	      <button type=\"submit\" id=\"save-model\" class=\"btn btn-primary\">\n	      	<i class=\"fa fa-save\"></i>\n	      	 Guardar\n	      </button>\n	      <button type=\"submit\" id=\"save-changes-model\" class=\"btn btn-warning hide\">\n	      	<i class=\"fa fa-save\"></i>\n	      	 Guardar Cambios\n	      </button>\n	      <button id=\"edit-model\" class=\"btn btn-primary\">\n	      	<i class=\"fa fa-pencil\"></i>\n	      	 Editar\n	      </button>\n	      <button id=\"reset-model\" class=\"btn btn-inverse hide pull-right\">\n	      	<i class=\"fa fa-reply\"></i>\n	      	 Reestablecer\n	      </button>\n	    </div>\n		</div>\n	</form>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["model_index_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

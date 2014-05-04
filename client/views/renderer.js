@@ -76,7 +76,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
 			var modelOptions  = (params.options) ? (params.options) : {}; 
-			viewOptions.model = new App.Models[params.model](modelOptions);
+			viewOptions.model = (_.isString(params.model)) ? new App.Models[params.model](modelOptions) : params.model;
 			delete params.model;
 			delete params.options;
 		}	

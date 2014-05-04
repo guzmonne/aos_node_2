@@ -31,9 +31,11 @@ App.Views.NavView = Giraffe.View.extend({
 
 	toggleSidebar: function(e){
 		e.preventDefault();
-		var wrapper = $('#page-wrapper');
-		var sidebar = $('#sidebar-el');
+		var wrapper    = $('#page-wrapper');
+		var whiteSpace = $('#white-space');
+		var sidebar    = $('#sidebar-el');
 		wrapper.toggleClass('make-space-right');
+		whiteSpace.toggleClass('make-space-right');
 		app.trigger('nav:toggleMenu');
 	},
 });

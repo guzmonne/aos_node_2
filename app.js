@@ -111,28 +111,30 @@ app.get('/', function(req, res){
 });
 // Client
 // ------
-app.get('/api/clients', client.index);
-app.get('/api/clients/:id', client.show);
-app.post('/api/clients', client.create);
-app.put('/api/clients/:id', client.update);
+app.get( '/api/clients'    , client.index);
+app.get( '/api/clients/:id', client.show);
+app.post('/api/clients'    , client.create);
+app.put( '/api/clients/:id', client.update);
 // Service Requests
 // ----------------
 app.get('/api/service_requests/client/:id', service_request.index);
-app.get('/api/service_requests', service_request.index);
-app.get('/api/service_requests/:id', service_request.show);
-app.post('/api/service_requests', service_request.create);
+app.get('/api/service_requests'           , service_request.index);
+app.get('/api/service_requests/:id'       , service_request.show);
+app.post('/api/service_requests'          , service_request.create);
 // Appliances
 // ----------
-app.get('/api/appliances', appliance.index);
+app.get('/api/appliances'    , appliance.index);
 app.get('/api/appliances/:id', appliance.show);
 app.put('/api/appliances/:id', appliance.update);
 // Models
 // ------
-app.get('/api/models', models.index);
-app.post('/api/models', models.create);
+app.get( '/api/models'    , models.index);
+app.post('/api/models'    , models.create);
+app.get( '/api/models/:id', models.show);
+app.put( '/api/models/:id', models.update);
 // Users
 // -----
-app.get('/api/users', users.index);
+app.get('/api/users' , users.index);
 app.post('/api/users', users.create);
 
 // =============

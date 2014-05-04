@@ -72,8 +72,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		if (_.isFunction(this.activeView)){this.activeView();}
-		if (_.isFunction(this.setName)){this.setName();}
-		if (_.isFunction(this.parent.setHeader)){this.parent.setHeader();}
+		this.invoke('setHeader');
 	},
 
 	serialize: function(){
