@@ -31,8 +31,9 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 
 	renderEditForm: function(){
 		this.editForm = new App.Views.ModelFormView({
-			model: this.model,
-			edit : true,
+			model    : this.model,
+			edit     : true,
+			className: 'row',
 		});
 		this.editForm.attachTo(this.$('#model-edit-'+ this.timestamp), {method: 'html'});
 	},

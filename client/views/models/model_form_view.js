@@ -12,6 +12,7 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		_.once(this.editForm);
+		_.once(this.newForm);
 	},
 
 	reRender: function(e){
@@ -23,7 +24,13 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 	afterRender: function(){
 		if (this.edit){
 			this.editForm();
+		} else {
+			this.newForm();
 		}
+	},
+
+	newForm: function(){
+		this.$('#edit-model').remove();
 	},
 
 	editForm: function(){
