@@ -24,22 +24,20 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	addPhoneToCollection: function(){
 		var number = this.$('[name=phone]').val();
 		if(number === ""){return;}
-		this.model.get('phones').add({number: number});
+		this.model.phones.add({number: number});
 	},
 
 	delPhoneNumber:function(e){
 		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		var phones = this.model.get('phones');
-		var model  = phones.models[index];
-		phones.remove(model);
+		var model  = this.model.phones.models[index];
+		this.model.phones.remove(model);
 		this.reRender('[name=phone]');
 	},
 
 	editPhoneNumber: function(e){
 		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		var phones = this.model.get('phones');
-		var model  = phones.models[index];
-		phones.remove(model);
+		var model  = this.model.phones.models[index];
+		this.model.phones.remove(model);
 		this.reRender("[name=phone]");
 		this.$('[name=phone]').val(model.get('number'));
 	},
@@ -54,22 +52,20 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 			city      : city,
 			department: department,
 		};
-		this.model.get('addresses').add(attrs);
+		this.model.addresses.add(attrs);
 	},
 
 	delAddress: function(e){
 		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
-		var addresses = this.model.get('addresses');
-		var model     = addresses.models[index];
-		addresses.remove(model);
+		var model     = this.model.addresses.models[index];
+		this.model.addresses.remove(model);
 		this.reRender('[name=street]');
 	},
 
 	editAddress: function(e){
 		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
-		var addresses = this.model.get('addresses');
-		var model     = addresses.models[index];
-		addresses.remove(model);
+		var model     = this.model.addresses.models[index];
+		this.model.addresses.remove(model);
 		this.reRender('[name=street]');
 		this.$('[name=street]').val(model.get('street'));
 		this.$('[name=city]').val(model.get('city'));
@@ -95,8 +91,9 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		var self = this;
 		if(this.$('button[type=submit]').length === 0){return;}
+		this.model.createChilds();
 		this.setModel();
-		this.model.save({}, {
+		this.model.save(this.model.serialize(), {
 			success: function(model, response, options){
 				self.handleSuccess(self ,model, response, options);
 			},
@@ -108,12 +105,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	handleSuccess: function(context, model, response, options){
 		var newModel = new App.Models.Client(response);
-		if(
-			App.defined(app.clients) &&
-			app.clients instanceof Giraffe.Collection
-		){
-			app.clients.add(newModel);
-		}
 		context.invoke('showMessage', {
 			title  : 'Cliente Creado',
 			message: 'El nuevo cliente se ha creado con exito.',
@@ -125,12 +116,11 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		e.preventDefault();
 		var self = this;
 		this.setModel();
-		this.model.save({}, {
+		this.model.save(this.model.serialize(), {
 			success: function(model, response, options){
-				self.model.parseAttributes(self.model.attributes);
 				self.invoke('showMessage', {
 					title  : 'Datos Actualizados',
-					message: 'El cliente se han actualizado correctamente',
+					message: 'El cliente se ha actualizado correctamente',
 					class  : 'success',
 				});
 				self.render();

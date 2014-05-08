@@ -167,7 +167,6 @@ ApplianceModel.prototype.updateById = function(id, params, callback){
 // Show appliance
 // --------------
 ApplianceModel.prototype.show = function(id, callback){
-	console.log(id);
 	Appliance.findById(id, function(err, appliance){
 		if (err){return callback(err);}
 		if (appliance === null){return callback();}

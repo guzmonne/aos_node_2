@@ -1,4 +1,4 @@
-App.Collections.Models = Giraffe.Collection.extend({
-	url  : '/api/models',
-	model: App.Models.Model,
+App.Collections.Models = App.Collections.BaseCollection.extend({
+	model    : App.Models.Model,
+	modelName: 'model',
 });

@@ -6,8 +6,6 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 	tableEl        : '#models-table',
 	tableCollection: 'Models',
 	modelView      : App.Views.ModelRowView,
-
-	appStorage  : 'models',
 	fetchOptions		: {
 		data: {
 			fields: 'brand model category subcategory _id'

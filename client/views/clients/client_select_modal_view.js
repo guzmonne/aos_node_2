@@ -10,7 +10,11 @@ App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		this.clientIndex = new App.Views.ClientIndexView();
+		var collection   = new App.Collections.Clients();
+		this.clientIndex = new App.Views.ClientIndexView({
+			fetchOnRender: true,
+			collection   : collection,
+		});
 		this.clientIndex.selection = true;
 		this.clientIndex.attachTo('#client-index');
 	},

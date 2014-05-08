@@ -1,11 +1,24 @@
 App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
+	name       : '',
 
-	initialize: function(){
-		if (_.isFunction(this.beforeInitialize)){this.beforeInitialize();}
+	url: function(){
+		var url = "";
+		if (this.name){
+			url = '/api/' + this.name;
+			if (this.id){
+				url = url + '/' + this.id;
+			}
+		}
+		return url; 
+	},
+
+	initialize: function(attributes, options){
+		if (_.isFunction(this.awake)){this.awake(attributes, options);}
 		this.listenTo(this, 'sync'                      , this.modelUpdated);
 		this.listenTo(app , this.name + ':model:updated', this.updateModel);
+		this.listenTo(app, 'active', function(){console.log(this.cid);});
 	},
 
 	// When the model gets synced with the server it calls the modelUpdated function.
@@ -41,4 +54,32 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			"/" + parsedDate.getMonth() + 
 			"/" + parsedDate.getFullYear();
 	},
+
+	// Modified Backbone.Model.sync() funtion to add an event call if a new model is created
+	sync: function(method, model, options) {
+		var self    = this;
+		options     = (options) ? _.clone(options) : {};
+		var success = options.success;
+		if (method === 'create'){
+			options.success = _.wrap(options.success, function(fun){
+				if(_.isFunction(self.beforeSuccessfulCreate)){
+					self.beforeSuccessfulCreate(arguments[1]);
+				}
+				// This will make the model trigger this event on success passing the data
+				// sent by the server.
+				// arguments[1] = model || arguments[2] = response || arguments[3] = options
+				app.trigger(self.name + ':model:created', arguments[1]);
+				if (fun){fun(arguments[1], arguments[2], arguments[3]);}
+				if(_.isFunction(self.afterSuccessfulCreate)){
+					self.afterSuccessfulCreate(arguments[1]);
+				}
+			});
+		}
+    return Backbone.sync.apply(this, [method, model, options]);
+  },
+
+  setParent: function(parent){
+		this.parent = parent;
+		this.listenTo(parent, 'disposed', this.dispose);
+  },
 });

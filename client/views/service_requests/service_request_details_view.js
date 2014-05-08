@@ -7,17 +7,21 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	},
 
 	afterRender: function(){
-		this.renderApplianceIndex();
+		if (App.defined(this.model) && this.model.hasChanged()){
+			this.renderApplianceIndex();
+		}
 		this.invoke('setHeader');
 	},
 
 	renderApplianceIndex: function(){
-		if (!App.defined(this.model)){return;}
 		var el = this.$('#service-request-appliances');
-		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			collection   : this.model.appliances,
-			fetchOnRender: false
-		});
+		if(!this.appliancesIndex){
+			this.appliancesIndex = new App.Views.ApplianceIndexView({
+				collection     : this.model.appliances,
+				fetchOnRender  : false,
+				disposeOnDetach: false,
+			});
+		}
 		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
 

@@ -102,18 +102,14 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	showMessage: function(data){
-		var options = {};
 		var method  = 'prepend';
-		if(App.defined(data.lifetime)){
-			options.lifetime = data.lifetime;
-			delete data.lifetime;
-		}
 		if(data.method){
 			method = data.method;
 			delete data.method;
 		}
-		options.model = new Backbone.Model(data);
-		var callout   = new App.Views.BSCalloutView(options);
+		var callout   = new App.Views.BSCalloutView({
+			data: data,
+		});
 		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
 	},
 

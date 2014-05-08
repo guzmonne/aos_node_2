@@ -87,23 +87,16 @@ ServiceRequestModel.prototype.create = function(params, callback){
 		// Save all the appliances in parallel asynchronously
 		// async.each([array], function(array_element, callback()))
 		async.each(params['appliances'], function(applianceParams, cb){
-			// Set the service_request_id parameter for the appliance
 			applianceParams['service_request_id'] = service_request['_id'];
-			// Create the appliance passing the appliance parameters
 			Appliance.create(applianceParams, function(err, appliance){
-				// Push the created appliance to the service request created before
-				// This is necessary to populate it at the end before returning
 				service_request.appliances.push(appliance);
-				// Async.Each uses this callback to check when the tasks end
 				cb(null, appliance);
 			});
 		// This function gets run wen all the async functions finish
 		}, function(err, results){
 			if (err){return callback(err);}
-			// We save the service request with all the freshly created appliances
 			service_request.save(function(err, service_request){
 				if (err){return callback(err);}
-				// We populate them to return them to the client
 				service_request.populate({
 					path: 'appliances'
 				}, function(err, s_r){
@@ -117,7 +110,6 @@ ServiceRequestModel.prototype.create = function(params, callback){
 						});
 					}, function(err, results){
 						if (err){return callback(err);}
-						// Return the populated service request
 						callback(null, s_r);
 					});
 				});

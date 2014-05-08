@@ -85,11 +85,15 @@ ClientModel.prototype.create = function(params, callback){
 		'doc-type'  : params['doc-type'],
 		'doc-number': params['doc-number'],
 	});
-	for (var i = 0; i < params['phones'].length; i++){
-		client.phones.push(params['phones'][i]);
+	if (params['phones']){
+		for (var i = 0; i < params['phones'].length; i++){
+			client.phones.push(params['phones'][i]);
+		}
 	}
-	for (var i = 0; i < params['addresses'].length; i++){
-		client.addresses.push(params['addresses'][i]);
+	if (params['addresses']){
+		for (var i = 0; i < params['addresses'].length; i++){
+			client.addresses.push(params['addresses'][i]);
+		}
 	}
 	client.save(function(err, client){
 		if (err){return callback(err);}
@@ -99,19 +103,23 @@ ClientModel.prototype.create = function(params, callback){
 // Update Client
 // -------------
 ClientModel.prototype.update = function(id, params, callback){
-	Client.findOne({"_id": id}, function(err, client){
+	Client.findOne({"_id": id}).select('-service_requests').exec(function(err, client){
 		if (err){return callback(err);}
 		client['name']       = params['name'];
 		client['email']      = params['email'];
 		client['doc-type']   = params['doc-type'];
 		client['doc-number'] = params['doc-number'];
-		client.phones = [];
-		client.addresses = [];
-		for (var i = 0; i < params['phones'].length; i++){
-			client.phones.push(params['phones'][i]);
+		client.phones        = [];
+		client.addresses     = [];
+		if (params['phones']){
+			for (var i = 0; i < params['phones'].length; i++){
+				client.phones.push(params['phones'][i]);
+			}
 		}
-		for (var i = 0; i < params['addresses'].length; i++){
-			client.addresses.push(params['addresses'][i]);
+		if (params['addresses']){
+			for (var i = 0; i < params['addresses'].length; i++){
+				client.addresses.push(params['addresses'][i]);
+			}
 		}
 		client.save(function(err, client){
 			if (err){return callback(err);}

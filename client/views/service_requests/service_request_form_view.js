@@ -64,13 +64,15 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 
 	singleApplianceForm: function(e){
 		e.preventDefault();
-		var appliances = this.model.appliances;
+		if (!this.model.appliances){
+			this.model.createChilds();
+		}
 		var model = new App.Models.Appliance({
 			client_name: this.model.get('client_name'),
 			client_id  : this.model.get('client_id'),
 		});
 		this.$('button[type=submit]').attr('disabled', false);
-		appliances.add(model);
+		this.model.appliances.add(model);
 		this.appendApplianceForm({model: model});
 	},
 
@@ -103,14 +105,6 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		});
 		this.model.save(this.model.serialize(), {
 			success: function(model, response, options){
-				// This event serves to purposes:
-				// 1. It let the single appliance forms to close
-				// 2. If the client show view is opened and it is 
-				// managing a service request collection then we add
-				// this model to it.
-				app.trigger('service_request:create:success', model);
-				var route = 'service_request/show/' + model.id;
-				//Backbone.history.navigate(route, {trigger: true});
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
 					model            : model,
@@ -123,8 +117,8 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('client_id', this.$('[name=client_id]').val());
-		this.model.set('client_name', this.$('[name=client_name]').val());
+		this.model.set('client_id'    , this.$('[name=client_id]').val());
+		this.model.set('client_name'  , this.$('[name=client_name]').val());
 		this.model.set('invoiceNumber', this.$('[name=invoiceNumber]').val());
 	},
 });

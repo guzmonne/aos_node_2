@@ -1,4 +1,7 @@
-App.Collections.ServiceRequests = Giraffe.Collection.extend({
+App.Collections.ServiceRequests = App.Collections.BaseCollection.extend({
+	model    : App.Models.ServiceRequest,
+	modelName: 'service_request',
+
 	// !!!
 	// Type: String
 	// -----
@@ -9,12 +12,16 @@ App.Collections.ServiceRequests = Giraffe.Collection.extend({
 	// ------------ 
 	// !!!
 	url  : function(){
-		var u = '/api/service_requests';
+		var u = '/api/' + this.modelName;
 		if (this.client_id){
 			u = u + '/client/' + this.client_id;
 		}
 		return u;
 	},
 
-	model: App.Models.ServiceRequest,
+	customModelAdd: function(attrs){
+		var model = new this.model(attrs);
+		console.log(model);
+		return this.add(model);
+	},
 });

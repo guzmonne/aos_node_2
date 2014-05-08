@@ -1,13 +1,13 @@
 App.Views.ShowView = App.Views.BaseView.extend({
 	sync  : true,
 
-	initialize: function(){
+	initialize: function(options){
+		if (_.isFunction(this.awake)){this.awake(options);}
 		if (!this.model){return;}
 		if (this.sync)  {this.listenTo(this.model, 'sync'   , this.update);}
 		if (this.change){this.listenTo(this.model, 'updated', this.render);}
 		this.listenTo(app, 'row:rendered', this.checkEventCaller);
 		this.modelShowActive();
-		if(_.isFunction(this.afterInitialize)){this.afterInitialize();}
 	},
 
 	update: function(){
@@ -40,6 +40,7 @@ App.Views.ShowView = App.Views.BaseView.extend({
 	modelShowInactive: function(){
 		if(!this.model){return;}
 		app.trigger('model:show:inactive', this.model.id);
+		Giraffe.View.prototype.beforeDispose.apply(this, arguments);
 	},
 
 	// !!!

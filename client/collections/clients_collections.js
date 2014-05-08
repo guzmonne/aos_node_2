@@ -1,12 +1,14 @@
-App.Collections.Clients = Giraffe.Collection.extend({
-	url  : '/api/clients',
-	model: App.Models.Client,
+App.Collections.Clients = App.Collections.BaseCollection.extend({
+	model    : App.Models.Client,
+	modelName: 'client',
 });
 
-App.Collections.Phones = Giraffe.Collection.extend({
-	model: App.Models.Phone,
+App.Collections.Phones = App.Collections.BaseCollection.extend({
+	model    : App.Models.Phone,
+	modelName: 'phone',
 });
 
-App.Collections.Addresses = Giraffe.Collection.extend({
-	model: App.Models.Address,
+App.Collections.Addresses = App.Collections.BaseCollection.extend({
+	model    : App.Models.Address,
+	modelName: 'address',
 });

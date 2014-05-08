@@ -1,47 +1,51 @@
 App.Models.Model = App.Models.BaseModel.extend({
-	
-	url: function(){
-		var u = '/api/models';
-		if (this.id){
-			u = u + '/' + this.id;
-		}
-		return u;
-	},
-
-	beforeInitialize: function(attributes, options){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-	},
-
-	// This function gets called when the model is being synced with the server
-	parse: function(response){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-		if (App.defined(response.appliances)){
-			this.setAppliances(response.appliances);
-		}
-		return response;
-	},
-
-	setAppliances: function(array){
-		var self = this;
-		if (_.isArray(array)){
-			this.set('appliancesCount', array.length);
-			if(!_.isString(array[0])){
-				_.each(array, function(appliance){
-					self.appliances.add(app.pushToStorage('Appliances', appliance));
-				});
-			}
-		}
-		return this;
-	},
+	name: 'model',
 
 	defaults: function(){
 		return {
 			'createdBy'  : 'Guzmán Monné',
 			'updatedBy'  : 'Guzmán Monné'
+		};
+	},
+
+	parse: function(response){
+		var self = this;
+		if (!App.defined(response)){return;}
+		var appliances  = (response.appliances) ? response.appliances : [];
+		var id          = (response._id)        ? response._id        : "";
+		var objectArray;
+		if (appliances){
+			this.set('appliancesCount', appliances.length);
+			for (i = 0; i < appliances.length; i++){
+				if (!_.isObject(appliances[i])){
+					objectArray = false;
+					break;
+				}
+				objectArray = true;
+			}
+			if (objectArray){
+				this.createChilds({id: id});
+				_.each(appliances, function(attr){
+					appliance       = new App.Models.Appliance(attr);
+					appliance.model = self;
+					self.appliances.add(appliance);
+				});
+			}
+			delete response.appliances;
+		}
+		return response;
+	},
+
+	createChilds: function(options){
+		if (this.appliances){return;}
+		var id = (this.id)    ? this.id    : "";
+		if (options && options.id){
+			id = options.id;
+		}
+		this.appliances = new App.Collections.Appliances();
+		this.appliances.setParent(this);
+		this.appliances.modelFilter = {
+			model_id: id,
 		};
 	},
 });

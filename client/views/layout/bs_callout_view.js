@@ -1,9 +1,8 @@
 App.Views.BSCalloutView = App.Views.BaseView.extend({
 	template: HBS.bs_callout_template,
+	data: {},
 
 	className: "bs-callout",
-
-	lifetime: 4000,
 
 	events: {
 		'click .close': 'closeCallout',
@@ -17,14 +16,15 @@ App.Views.BSCalloutView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		var self      = this;
-		var className = this.model.get('class');
+		var lifetime  = (this.data.lifetime) ? this.data.lifetime : 4000; 
+		var className = (this.data.class)    ? this.data.class    : 'default';
 		if(App.defined(className)){
 			this.$el.addClass('bs-callout-' + className);
 		}
-		if(this.lifetime > 0){
+		if(lifetime > 0){
 			this.timer = setTimeout(function(){
 				self.dispose();
-			}, this.lifetime);
+			}, lifetime);
 		}
 		App.animate(this.$el, 'fadeInDown');
 	},
@@ -34,5 +34,9 @@ App.Views.BSCalloutView = App.Views.BaseView.extend({
 			clearTimeout(this.timer);
 		}
 		this.dispose();
+	},
+
+	serialize: function(){
+		return this.data;
 	},
 });

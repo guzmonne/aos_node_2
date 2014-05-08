@@ -27,7 +27,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	afterSync: function(){
-		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
+		this.invoke('stopSpin');
 	},
 
 	// !!!
@@ -234,17 +234,8 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('.bootstrap-tagsinput').removeClass('active');
 	},
 
-	// !!!
-	// Type: Void
-	// -----
-	// Description:
-	// ------------
-	// Function called to announce that a show view is active. It triggers an event
-	// that is ussualy caught by the row views to mark the row as active
-	// ------------ 
-	// !!!
-	//announce: function(){
-	//	if(!App.defined(this.model)){return;}
-	//	app.trigger(this.modelName + ':show:active', this.model.id);
-	//},
+	dispose: function(){
+		if (this.model){this.model.dispose();}
+		Giraffe.dispose.apply(this, arguments);
+	}
 });

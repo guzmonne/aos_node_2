@@ -1,32 +1,14 @@
 App.Views.TableView = App.Views.BaseView.extend({
-	//firstRender   : true,
-	rowViewOptions: {},
-	fetchOptions	: {},
-	fetchOnRender : true,
+	rowViewOptions : {},
+	fetchOptions   : {},
+	fetchOnRender  : false,
 
-	initialize: function(){
-		var self = this;
-		// Let the parent view run some commands before the tableView initializes
-		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
-			this.beforeInitialize();
+	initialize: function(options){
+		if (_.isFunction(this.awake)){this.awake(options);}
+		if (this.collection){
+			this.listenToOnce (this.collection    , 'sync', this.appendCollection);
+			this.listenTo     (this.collection    , 'add' , this.append);
 		}
-		// If a collection was passed then we check if there is a custom 'setCollection()'
-		// method or we have to instantiate a new one based on the 'tableCollection' defined.
-		// Else we continue the initializing.
-		if (!App.defined(this.collection)){
-			if(_.isFunction(this.setCollection)){
-				this.collection = this.setCollection();
-			} else {
-				if (!App.defined(this.tableCollection)){
-					return new Error('A tableCollection must be defined on the view');
-				}
-				this.collection = app.getAppStorage(this.tableCollection);
-			}
-		}
-		this.listenTo(this.collection, 'add', this.append);
-		this.listenTo(this.collection, 'sync', this.afterSync);
-		_.bind(this.append, this);
-		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
 	},
 
@@ -41,10 +23,16 @@ App.Views.TableView = App.Views.BaseView.extend({
 			return new Error('Attribute tableEl must be set.');
 		}
 		this.activateTable();
-		this.appendCollection(this.collection);
+		if (this.collection){
+			this.appendCollection(this.collection);
+		}
 	},
 
 	appendCollection: function(collection){
+		if (this.collection){
+			collection = (collection) ? collection : this.collection;	
+		}
+		if (collection.length === 0){return;}
 		var self = this;
 		_.each(collection.models, function(model){
 			self.append(model);
@@ -63,13 +51,23 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	onSync: function(){
+		var self = this;
+		var options = {
+			success: function(){
+				self.afterSync();
+			}
+		};
+		_.extend(options, this.fetchOptions);
 		this.collection.fetch(this.fetchOptions);
 	},
 
 	activateTable: function(){
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
 		if (this.fetchOnRender){
+			var options = this.fetchOptions;
+			options.silent = (options.silent) ? (options.silent) : true;
 			this.collection.fetch(this.fetchOptions);
+			this.fetchOnRender = false;
 		}
 	},
 });

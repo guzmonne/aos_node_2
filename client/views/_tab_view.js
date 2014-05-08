@@ -7,25 +7,22 @@ App.Views.TabView = App.Views.BaseView.extend({
 
 	events: {},
 	
-	initialize: function(){
-		// Let the parent view call a 'beforeInitialize()' method if needed.
-		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
-			this.beforeInitialize();
-		}
+	initialize: function(options){
+		if (_.isFunction(this.awake)){this.awake(options);}
 		if(!this.modelName){return new Error('View must have a modelName defined');}
 		if(!App.defined(this.model)){
 			var titelizeModelName = this.titelize(this.modelName);
 			if (App.defined(App.Models[titelizeModelName])){
 				this.model = new App.Models[titelizeModelName]();
 			} else {
-				this.model = new Giraffe.Model();
+				this.model = new App.Models.BaseModel();
 			}
 		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
 		if (_.isFunction(this.bindEvents)){this.bindEvents();}
 		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
-		this.listenTo(this.model, 'sync', this.setHeader);
+		this.listenTo(this.model, 'sync', function(){this.invoke('setHeader');});
 	},
 
 	createTabs: function(){
@@ -63,10 +60,10 @@ App.Views.TabView = App.Views.BaseView.extend({
 		this.tabDetails = object;
 	},
 
-	renderTabView: function(id, viewName){
-		if (!App.defined(this[id])){
-			this[id] = new App.Views[viewName]({model: this.model});
-			this[id].attachTo(this.$('#' + this.modelName + '-' + id + '-' + this.timestamp), {method: 'html'});
+	renderTabView: function(tabId, viewName){
+		if (!App.defined(this[tabId])){
+			this[tabId] = new App.Views[viewName]({model: this.model});
+			this[tabId].attachTo(this.$('#' + this.modelName + '-' + tabId + '-' + this.timestamp), {method: 'html'});
 		}
 	},
 
@@ -78,10 +75,4 @@ App.Views.TabView = App.Views.BaseView.extend({
 	serialize: function(){
 		return this.tabDetails;
 	},
-
-	setHeader: function(){
-		if (App.defined(this.parent) && _.isFunction(this.parent.setHeader)){
-			this.parent.setHeader();
-		}
-	}
 });

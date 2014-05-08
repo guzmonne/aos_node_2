@@ -99,7 +99,7 @@ ModelModel.prototype.updateById = function(id, params, callback){
 ModelModel.prototype.findById = function(id, fields, callback, options){
 	var query = Model.findById(id);
 	// The id must be a string
-	if (!id || !_.isString(id)){return;}
+	if (arguments.length === 1){return;}
 	// Since we can call this function passing different parameters we need to check
 	// how it was called
 	switch (arguments.length){
@@ -134,13 +134,6 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 			}
 			break;
 	}
-	console.log(id, fields, callback, options);
-	//if (arguments.length > 2 && _.isString(fields)){
-	//	query.select(fields);
-	//} else if (arguments.length === 2 && _.isFunction(fields)){
-	//	callback = fields;
-	//}
-	// If the 'fields' argument was passed then we passed the filter to the query
 	if (_.isString(fields)){
 		query.select(fields);
 	}

@@ -1,4 +1,4 @@
-App.Collections.Users = Giraffe.Collection.extend({
-	url  : '/api/users',
-	model: App.Models.User,
+App.Collections.Users = App.Collections.BaseCollection.extend({
+	modelName: 'user',
+	model    : App.Models.User,
 });

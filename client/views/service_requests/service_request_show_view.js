@@ -30,9 +30,10 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 	},
 
 	renderAppliancesCarousel: function(){
+		console.log('renderAppliancesCarousel', this.model);
 		if (!this.appliancesCarousel){
-			if (!App.defined(this.model) || 
-				!App.defined(this.model.appliances)
+			if ( !App.defined(this.model) || 
+				   !App.defined(this.model.appliances)
 			){
 				return;
 			}

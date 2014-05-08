@@ -102,5 +102,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 
 	beforeDispose: function(){
 		this.$el.off('click', 'button#select-model');
+		Giraffe.View.prototype.beforeDispose.apply(this, arguments);
 	},
 });

@@ -8,18 +8,21 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 		return 'Equipo: #' + this.model.get('id');
 	},
 
-	beforeInitialize: function(){
+	awake: function(){
 		this.listenToOnce(this.model, 'sync', this.render);
+		_.once(this.setForm);
 	},
 
 	afterRender: function(){
-		if (!this.formView && this.model.hasChanged()){
-			this.formView = new App.Views.ApplianceEditFormView({
-				model: this.model,
-			});
-			this.formView.attachTo(this.$('#form-' + this.cid), {method: 'html'});
-			this.invoke('setHeader');
-		}
+		this.setForm();
+	},
+
+	setForm: function(){
+		this.formView = new App.Views.ApplianceEditFormView({
+			model: this.model,
+		});
+		this.formView.attachTo(this.$('#form-' + this.cid), {method: 'html'});
+		this.invoke('setHeader');
 	},
 
 	serialize: function(){

@@ -17,7 +17,6 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		var collection = this.model.collection;
 		if (App.defined(collection)){
 			this.listenTo(collection, 'appliance:deleted', this.saveAndDispose);
-			this.listenTo(collection, 'service_request:create:success', this.dispose);
 		}
 		_.extend(this, App.Mixins.SelectModel);
 		_.extend(this, App.Mixins.SelectModel);
@@ -36,14 +35,15 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('serial', this.$('[name=serial]').val());
-		this.model.set('observations', this.$('[name=observations]').val());
+		this.model.set('serial'          , this.$('[name=serial]').val());
+		this.model.set('observations'    , this.$('[name=observations]').val());
 		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
-		this.model.set('defect', this.$('[name=defect]').val());
-		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
+		this.model.set('defect'          , this.$('[name=defect]').val());
+		this.model.set('accessories'     , this.$('[name=accessories]').tagsinput('items'));
 	},
 
 	beforeDispose: function(){
-		this.$el.on('click', 'button#select-model');
+		this.$el.off('click', 'button#select-model');
+		Giraffe.View.prototype.beforeDispose.apply(this, arguments);
 	},
 });

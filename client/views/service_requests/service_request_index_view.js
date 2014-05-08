@@ -7,8 +7,6 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	tableCollection: 'ServiceRequests',
 	modelView      : App.Views.ServiceRequestRowView,
 
-	appStorage: 'serviceRequests',
-
 	appEvents: {
 		"service_request:create:success": 'checkCreatedModel', 
 	},

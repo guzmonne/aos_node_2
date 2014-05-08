@@ -1,5 +1,6 @@
 App.Views.Renderer = App.Views.BaseView.extend({
-	
+	name: 'Renderer',
+
 	appEvents: {
 		'render:doc'           : 'docView',
 		'render:show'          : 'showView',
@@ -26,6 +27,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		var params   = {
 			viewName: viewName,
 		};
+		if (typeName === "Index"){
+			params.collection = docName + 's';
+		}
 		this.showOrGoTo(params);
 	},
 
@@ -85,13 +89,22 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			delete params.model;
 			delete params.options;
 		}	
+		if (params.collection){
+			if (_.isString(params.collection)){
+				viewOptions.collection = new App.Collections[params.collection]();
+				fetch = true;
+			} else {
+				viewOptions.collection = params.collection;
+			}
+		}
 		// We create the correct view
 		params.view = new App.Views[params.viewName](viewOptions);
 		// Grab the fetchOptions from the new view and fetch the model if it exists
 		if (fetch){
 			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
 			fetchOptions.silent = true;
-			params.view.model.fetch(fetchOptions);
+			if (params.view.model)     { params.view.model.fetch(fetchOptions); }
+			if (params.view.collection){ params.view.collection.fetch(fetchOptions); }
 		}
 		// Instantiate the portletView with the necessary params and append it to the
 		// main content.

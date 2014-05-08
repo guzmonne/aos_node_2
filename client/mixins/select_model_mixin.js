@@ -34,7 +34,11 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
-		this.model.tempModel = this.model.model.clone();
+		var appliance = this.model;
+		if (!appliance.model){
+			appliance.setModel();
+		}
+		appliance.tempModel = appliance.model.clone();
 		this.exchangeModel(model);
 		this.render();
 	},

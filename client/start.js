@@ -4,32 +4,6 @@ App.GiraffeApp = Giraffe.App.extend({
 			'id': 'content-el',
 		};
 	},
-
-	getAppStorage: function(collectionName){
-		if(!App.defined(app[collectionName])){
-			this[collectionName] = new App.Collections[collectionName]();
-		}
-		return this[collectionName];
-	},
-
-	pushToStorage: function(collectionName, object){
-		var collection, model, id;
-		collection = this.getAppStorage(collectionName);
-		if (object instanceof collection.model){
-			model = object;
-		} else {
-			if (object._id){
-				model = collection.at(object._id);
-			}
-			if (model){
-				model.set(object);
-			} else {
-				model = new collection.model(object);
-			}
-		}
-		collection.add(model);
-		return model;
-	},
 });
 
 var app = new App.GiraffeApp();

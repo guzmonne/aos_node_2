@@ -8,7 +8,7 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 	modelId  : null,
 	modelName: 'model',
 
-	beforeInitialize: function(){
+	awake: function(){
 		_.once(this.renderEditForm);
 	},
 

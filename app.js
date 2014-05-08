@@ -96,8 +96,8 @@ app.use(function(req, res, next){
 var client          = require('./api/controllers/client'); 
 var service_request = require('./api/controllers/service_request'); 
 var appliance       = require('./api/controllers/appliance'); 
-var models          = require('./api/controllers/model');
-var users           = require('./api/controllers/user');
+var model           = require('./api/controllers/model');
+var user            = require('./api/controllers/user');
 
 // ======
 // ROUTES
@@ -111,31 +111,31 @@ app.get('/', function(req, res){
 });
 // Client
 // ------
-app.get( '/api/clients'    , client.index);
-app.get( '/api/clients/:id', client.show);
-app.post('/api/clients'    , client.create);
-app.put( '/api/clients/:id', client.update);
+app.get( '/api/client'    , client.index);
+app.get( '/api/client/:id', client.show);
+app.post('/api/client'    , client.create);
+app.put( '/api/client/:id', client.update);
 // Service Requests
 // ----------------
-app.get('/api/service_requests/client/:id', service_request.index);
-app.get('/api/service_requests'           , service_request.index);
-app.get('/api/service_requests/:id'       , service_request.show);
-app.post('/api/service_requests'          , service_request.create);
+app.get( '/api/service_request/client/:id', service_request.index);
+app.get( '/api/service_request'           , service_request.index);
+app.get( '/api/service_request/:id'       , service_request.show);
+app.post('/api/service_request'           , service_request.create);
 // Appliances
 // ----------
-app.get('/api/appliances'    , appliance.index);
-app.get('/api/appliances/:id', appliance.show);
-app.put('/api/appliances/:id', appliance.update);
+app.get('/api/appliance'    , appliance.index);
+app.get('/api/appliance/:id', appliance.show);
+app.put('/api/appliance/:id', appliance.update);
 // Models
 // ------
-app.get( '/api/models'    , models.index);
-app.post('/api/models'    , models.create);
-app.get( '/api/models/:id', models.show);
-app.put( '/api/models/:id', models.update);
+app.get( '/api/model'    , model.index);
+app.post('/api/model'    , model.create);
+app.get( '/api/model/:id', model.show);
+app.put( '/api/model/:id', model.update);
 // Users
 // -----
-app.get('/api/users' , users.index);
-app.post('/api/users', users.create);
+app.get( '/api/user' , user.index);
+app.post('/api/user' , user.create);
 
 // =============
 // DEFAULT ROUTE

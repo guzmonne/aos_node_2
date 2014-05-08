@@ -6,6 +6,4 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 	tableEl        : '#users-table',
 	tableCollection: 'Users',
 	modelView      : App.Views.UserRowView,
-
-	appStorage  : 'users',
 });

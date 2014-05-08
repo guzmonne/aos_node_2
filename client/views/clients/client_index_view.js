@@ -3,12 +3,9 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	className: "row",
 	name     : "Clientes",
 	
-	tableEl        : '#clients-table',
-	tableCollection: 'Clients',
-	modelView      : App.Views.ClientRowView,
-
-	appStorage      : 'clients',
-	fetchOptions		: {
+	tableEl     : '#clients-table',
+	modelView   : App.Views.ClientRowView,
+	fetchOptions: {
 		data: {
 			fields: '-service_requests'
 		}
