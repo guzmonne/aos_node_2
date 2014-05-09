@@ -6,6 +6,7 @@ App.Views.ShowView = App.Views.BaseView.extend({
 		if (this.sync)  {this.listenTo(this.model, 'sync'   , this.update);}
 		if (this.change){this.listenTo(this.model, 'updated', this.render);}
 		this.listenTo(app, 'row:rendered', this.checkEventCaller);
+		this.listenTo(this, 'disposing', this.modelShowInactive);
 		this.modelShowActive();
 		if(_.isFunction(this.afterInitialize)){this.afterInitialize();}
 	},
@@ -59,9 +60,5 @@ App.Views.ShowView = App.Views.BaseView.extend({
 		if (id === this.model.id){
 			this.modelShowActive();
 		}
-	},
-
-	beforeDispose: function(){
-		this.modelShowInactive();
 	},
 });

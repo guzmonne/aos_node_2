@@ -6,10 +6,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		var self = this;
-		// Let the parent view run some commands before the tableView initializes
-		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
-			this.beforeInitialize();
-		}
+		this.awake.apply(this, arguments);
 		// If a collection was passed then we check if there is a custom 'setCollection()'
 		// method or we have to instantiate a new one based on the 'tableCollection' defined.
 		// Else we continue the initializing.
@@ -23,7 +20,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 				this.collection = app.getAppStorage(this.tableCollection);
 			}
 		}
-		this.listenTo(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'sync', this.afterSync);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
@@ -67,7 +63,9 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	activateTable: function(){
+		if (this.oTable){return;}
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
+		this.listenTo(this.collection, 'add', this.append);
 		if (this.fetchOnRender){
 			this.collection.fetch(this.fetchOptions);
 		}

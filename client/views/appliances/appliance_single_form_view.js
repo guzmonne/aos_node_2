@@ -23,6 +23,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		_.extend(this, App.Mixins.SelectModel);
 		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
+		this.listenTo(this, 'disposing', this.selectModelOff);
 	},
 
 	afterRender: function(){
@@ -43,7 +44,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
 	},
 
-	beforeDispose: function(){
-		this.$el.on('click', 'button#select-model');
+	selectModelOff: function(){
+		this.$el.off('click', 'button#select-model');
 	},
 });

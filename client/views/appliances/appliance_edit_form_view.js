@@ -16,6 +16,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(this.model, 'sync'   , this.render);
+		this.listenTo(this, 'disposing', this.selectModelOff);
 		_.extend(this, App.Mixins.SelectModel);
 		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
@@ -100,7 +101,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.model.set('technician_id'   , this.$('[name=technician_id]').val()           , {silent: true});
 	},
 
-	beforeDispose: function(){
+	selectModelOff: function(){
 		this.$el.off('click', 'button#select-model');
 	},
 });

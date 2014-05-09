@@ -176,8 +176,10 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
+	awake: function(){},
+
 	initialize: function(){
-		if (_.isFunction(this.beforeInitialize)){this.beforeInitialize();}
+		this.awake.apply(this, arguments);
 		this.listenTo(this, 'sync'                      , this.modelUpdated);
 		this.listenTo(app , this.name + ':model:updated', this.updateModel);
 	},
@@ -430,6 +432,36 @@ App.Models.User = App.Models.BaseModel.extend({
 		};
 	},
 });
+App.Collections.BaseCollection = Giraffe.Collection.extend({
+	modelName  : '',
+	modelFilter: {},
+
+	url: function(){
+		return '/api/' + this.modelName;
+	},
+
+	awake: function(){},
+
+	initialize: function(options){
+		this.awake.apply(this, arguments);
+		this.listenTo(app, 'active', function(){console.log(this.modelName, this.length);});
+		//this.listenTo(app, this.modelName + ':model:created', this.checkModel);
+	},
+
+	checkModel: function(attrs){
+		// if there already exists a model with the passed id then return
+		if (this.where({id: attrs._id}).length > 1){return;}
+		var matches = _.matches(this.modelFilter);
+		if (this.modelFilter === null || matches(attrs)){
+			this.add(new this.model(attrs));
+		} 
+	},
+
+	//setParent: function(parent){
+	//	this.parent = parent;
+	//	this.listenTo(parent, 'disposed', this.dispose);
+  //},
+});
 App.Collections.Appliances = Giraffe.Collection.extend({
 	url: '/api/appliances',
 	model: App.Models.Appliance,
@@ -475,6 +507,8 @@ App.Collections.Users = Giraffe.Collection.extend({
 	model: App.Models.User,
 });
 App.Views.BaseView = Giraffe.View.extend({
+	awake: function(){},
+	
 	// !!!
 	// Type: Boolean
 	// -------------
@@ -916,6 +950,7 @@ App.Views.ShowView = App.Views.BaseView.extend({
 		if (this.sync)  {this.listenTo(this.model, 'sync'   , this.update);}
 		if (this.change){this.listenTo(this.model, 'updated', this.render);}
 		this.listenTo(app, 'row:rendered', this.checkEventCaller);
+		this.listenTo(this, 'disposing', this.modelShowInactive);
 		this.modelShowActive();
 		if(_.isFunction(this.afterInitialize)){this.afterInitialize();}
 	},
@@ -970,10 +1005,6 @@ App.Views.ShowView = App.Views.BaseView.extend({
 			this.modelShowActive();
 		}
 	},
-
-	beforeDispose: function(){
-		this.modelShowInactive();
-	},
 });
 App.Views.TabView = App.Views.BaseView.extend({
 	template: HBS.tabs_template,
@@ -985,10 +1016,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 	events: {},
 	
 	initialize: function(){
-		// Let the parent view call a 'beforeInitialize()' method if needed.
-		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
-			this.beforeInitialize();
-		}
+		this.awake.apply(this, arguments);
 		if(!this.modelName){return new Error('View must have a modelName defined');}
 		if(!App.defined(this.model)){
 			var titelizeModelName = this.titelize(this.modelName);
@@ -1070,10 +1098,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		var self = this;
-		// Let the parent view run some commands before the tableView initializes
-		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
-			this.beforeInitialize();
-		}
+		this.awake.apply(this, arguments);
 		// If a collection was passed then we check if there is a custom 'setCollection()'
 		// method or we have to instantiate a new one based on the 'tableCollection' defined.
 		// Else we continue the initializing.
@@ -1087,7 +1112,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 				this.collection = app.getAppStorage(this.tableCollection);
 			}
 		}
-		this.listenTo(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'sync', this.afterSync);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
@@ -1131,7 +1155,9 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	activateTable: function(){
+		if (this.oTable){return;}
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
+		this.listenTo(this.collection, 'add', this.append);
 		if (this.fetchOnRender){
 			this.collection.fetch(this.fetchOptions);
 		}
@@ -1140,6 +1166,9 @@ App.Views.TableView = App.Views.BaseView.extend({
 App.Views.Renderer = App.Views.BaseView.extend({
 	
 	appEvents: {
+		'client:show'          : 'clientShow',
+		'client:index'         : 'clientIndex',
+		'client:new'           : 'clientNew',
 		'render:doc'           : 'docView',
 		'render:show'          : 'showView',
 	},
@@ -1242,16 +1271,88 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	viewIsRendered: function(comparator, context){
 		var self = (context) ? context : this;
 		var result = null;
-		_.each(app.children, function(view){
-			if(comparator.apply(self, [view])){
-				result = view;
+		for(var i = 0; i < app.children.length; i++){
+			if ( comparator.apply(self, [ app.children[i] ]) ){
+				result = app.children[i];
+				break;
 			}
-		});
+		}
+		//_.each(app.children, function(view){
+		//	if(comparator.apply(self, [view])){
+		//		result = view;
+		//	}
+		//});
 		return result;
 	},
 
 	appendToContent: function(view){
 		app.attach(view, {el: '#content-el', method: 'prepend'});
+	},
+
+	clientShow: function(id){
+		var self = this;
+		var view = this.viewIsRendered(this.showComparator, {options: {_id: id}});
+		if (view){
+			App.scrollTo(view.el);
+			return;
+		}
+		var model = new App.Models.Client({_id: id});
+		view      = new App.Views.ClientShowView({
+			model: model,
+		});
+		var portletView = new App.Views.PortletView({
+			viewName         : 'ClientShowView',
+			view             : view,
+			portletFrameClass: 'green',
+		});
+		model.fetch({
+			success: function(){
+				self.appendToContent(portletView);
+			}
+		});
+	},
+
+	clientIndex: function(){
+		var self = this;
+		var view = this.viewIsRendered(this.defaultComparator, {
+			viewName: 'ClientIndexView',
+		});
+		if (view){
+			App.scrollTo(view.el);
+			return;
+		}
+		var collection = new App.Collections.Clients();
+		view = new App.Views.ClientIndexView({
+			collection: collection,
+		});
+		var portletView = new App.Views.PortletView({
+			viewName: 'ClientIndexView',
+			view: view,
+		});
+		collection.fetch({
+			success: function(){
+				self.appendToContent(portletView);
+			},
+		});
+	},
+
+	clientNew: function(){
+		var view = this.viewIsRendered(this.defaultComparator, {
+			viewName: 'ClientNewView',
+		});
+		if (view){
+			App.scrollTo(view.el);
+			return;
+		}
+		var model = new App.Models.Client();
+		view = new App.Views.ClientNewView({
+			model: model,
+		});
+		var portletView = new App.Views.PortletView({
+			viewName: 'ClientNewView',
+			view: view,
+		}); 
+		this.appendToContent(portletView);
 	},
 });
 App.Views.ApplianceRowView = App.Views.RowView.extend({
@@ -1306,6 +1407,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	initialize: function(){
 		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(this.model, 'sync'   , this.render);
+		this.listenTo(this, 'disposing', this.selectModelOff);
 		_.extend(this, App.Mixins.SelectModel);
 		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
@@ -1390,7 +1492,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.model.set('technician_id'   , this.$('[name=technician_id]').val()           , {silent: true});
 	},
 
-	beforeDispose: function(){
+	selectModelOff: function(){
 		this.$el.off('click', 'button#select-model');
 	},
 });
@@ -1460,6 +1562,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		_.extend(this, App.Mixins.SelectModel);
 		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
 		this.$el.on('click', 'button#select-model', this.selectModel);
+		this.listenTo(this, 'disposing', this.selectModelOff);
 	},
 
 	afterRender: function(){
@@ -1480,8 +1583,8 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
 	},
 
-	beforeDispose: function(){
-		this.$el.on('click', 'button#select-model');
+	selectModelOff: function(){
+		this.$el.off('click', 'button#select-model');
 	},
 });
 App.Views.ClientRowView = App.Views.RowView.extend({
@@ -2790,10 +2893,13 @@ App.Views.UserNewView = App.Views.NewView.extend({
 });
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {
-		'render/:doc/show/:id'                     : 'render:show',
-		'render/:doc/:type'                        : 'render:doc',
-		':doc/show/:id'                            : 'render:show',
-		':doc/:type'                               : 'render:doc',
+		'client/show/:id'                          : 'client:show',
+		'client/index'                             : 'client:index',
+		'client/new'                               : 'client:new',
+		//'render/:doc/show/:id'                     : 'render:show',
+		//'render/:doc/:type'                        : 'render:doc',
+		//':doc/show/:id'                            : 'render:show',
+		//':doc/:type'                               : 'render:doc',
 	},
 });
 App.GiraffeApp = Giraffe.App.extend({

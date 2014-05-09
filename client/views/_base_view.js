@@ -1,4 +1,6 @@
 App.Views.BaseView = Giraffe.View.extend({
+	awake: function(){},
+	
 	// !!!
 	// Type: Boolean
 	// -------------

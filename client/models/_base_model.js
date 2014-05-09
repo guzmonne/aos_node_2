@@ -2,8 +2,10 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
+	awake: function(){},
+
 	initialize: function(){
-		if (_.isFunction(this.beforeInitialize)){this.beforeInitialize();}
+		this.awake.apply(this, arguments);
 		this.listenTo(this, 'sync'                      , this.modelUpdated);
 		this.listenTo(app , this.name + ':model:updated', this.updateModel);
 	},

@@ -8,10 +8,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 	events: {},
 	
 	initialize: function(){
-		// Let the parent view call a 'beforeInitialize()' method if needed.
-		if(App.defined(this.beforeInitialize) && _.isFunction(this.beforeInitialize)){
-			this.beforeInitialize();
-		}
+		this.awake.apply(this, arguments);
 		if(!this.modelName){return new Error('View must have a modelName defined');}
 		if(!App.defined(this.model)){
 			var titelizeModelName = this.titelize(this.modelName);
