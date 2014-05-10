@@ -7,19 +7,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	initialize: function(){
 		var self = this;
 		this.awake.apply(this, arguments);
-		// If a collection was passed then we check if there is a custom 'setCollection()'
-		// method or we have to instantiate a new one based on the 'tableCollection' defined.
-		// Else we continue the initializing.
-		if (!App.defined(this.collection)){
-			if(_.isFunction(this.setCollection)){
-				this.collection = this.setCollection();
-			} else {
-				if (!App.defined(this.tableCollection)){
-					return new Error('A tableCollection must be defined on the view');
-				}
-				this.collection = app.getAppStorage(this.tableCollection);
-			}
-		}
 		this.listenTo(this.collection, 'sync', this.afterSync);
 		_.bind(this.append, this);
 		_.once(this.activateTable);

@@ -1099,19 +1099,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	initialize: function(){
 		var self = this;
 		this.awake.apply(this, arguments);
-		// If a collection was passed then we check if there is a custom 'setCollection()'
-		// method or we have to instantiate a new one based on the 'tableCollection' defined.
-		// Else we continue the initializing.
-		if (!App.defined(this.collection)){
-			if(_.isFunction(this.setCollection)){
-				this.collection = this.setCollection();
-			} else {
-				if (!App.defined(this.tableCollection)){
-					return new Error('A tableCollection must be defined on the view');
-				}
-				this.collection = app.getAppStorage(this.tableCollection);
-			}
-		}
 		this.listenTo(this.collection, 'sync', this.afterSync);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
@@ -1166,9 +1153,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 App.Views.Renderer = App.Views.BaseView.extend({
 	
 	appEvents: {
-		'client:show'          : 'clientShow',
-		'client:index'         : 'clientIndex',
-		'client:new'           : 'clientNew',
 		'render:doc'           : 'docView',
 		'render:show'          : 'showView',
 	},
@@ -1277,82 +1261,11 @@ App.Views.Renderer = App.Views.BaseView.extend({
 				break;
 			}
 		}
-		//_.each(app.children, function(view){
-		//	if(comparator.apply(self, [view])){
-		//		result = view;
-		//	}
-		//});
 		return result;
 	},
 
 	appendToContent: function(view){
 		app.attach(view, {el: '#content-el', method: 'prepend'});
-	},
-
-	clientShow: function(id){
-		var self = this;
-		var view = this.viewIsRendered(this.showComparator, {options: {_id: id}});
-		if (view){
-			App.scrollTo(view.el);
-			return;
-		}
-		var model = new App.Models.Client({_id: id});
-		view      = new App.Views.ClientShowView({
-			model: model,
-		});
-		var portletView = new App.Views.PortletView({
-			viewName         : 'ClientShowView',
-			view             : view,
-			portletFrameClass: 'green',
-		});
-		model.fetch({
-			success: function(){
-				self.appendToContent(portletView);
-			}
-		});
-	},
-
-	clientIndex: function(){
-		var self = this;
-		var view = this.viewIsRendered(this.defaultComparator, {
-			viewName: 'ClientIndexView',
-		});
-		if (view){
-			App.scrollTo(view.el);
-			return;
-		}
-		var collection = new App.Collections.Clients();
-		view = new App.Views.ClientIndexView({
-			collection: collection,
-		});
-		var portletView = new App.Views.PortletView({
-			viewName: 'ClientIndexView',
-			view: view,
-		});
-		collection.fetch({
-			success: function(){
-				self.appendToContent(portletView);
-			},
-		});
-	},
-
-	clientNew: function(){
-		var view = this.viewIsRendered(this.defaultComparator, {
-			viewName: 'ClientNewView',
-		});
-		if (view){
-			App.scrollTo(view.el);
-			return;
-		}
-		var model = new App.Models.Client();
-		view = new App.Views.ClientNewView({
-			model: model,
-		});
-		var portletView = new App.Views.PortletView({
-			viewName: 'ClientNewView',
-			view: view,
-		}); 
-		this.appendToContent(portletView);
 	},
 });
 App.Views.ApplianceRowView = App.Views.RowView.extend({
@@ -2893,13 +2806,10 @@ App.Views.UserNewView = App.Views.NewView.extend({
 });
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {
-		'client/show/:id'                          : 'client:show',
-		'client/index'                             : 'client:index',
-		'client/new'                               : 'client:new',
-		//'render/:doc/show/:id'                     : 'render:show',
-		//'render/:doc/:type'                        : 'render:doc',
-		//':doc/show/:id'                            : 'render:show',
-		//':doc/:type'                               : 'render:doc',
+		'render/:doc/show/:id'                     : 'render:show',
+		'render/:doc/:type'                        : 'render:doc',
+		':doc/show/:id'                            : 'render:show',
+		':doc/:type'                               : 'render:doc',
 	},
 });
 App.GiraffeApp = Giraffe.App.extend({
@@ -2907,32 +2817,6 @@ App.GiraffeApp = Giraffe.App.extend({
 		return {
 			'id': 'content-el',
 		};
-	},
-
-	getAppStorage: function(collectionName){
-		if(!App.defined(app[collectionName])){
-			this[collectionName] = new App.Collections[collectionName]();
-		}
-		return this[collectionName];
-	},
-
-	pushToStorage: function(collectionName, object){
-		var collection, model, id;
-		collection = this.getAppStorage(collectionName);
-		if (object instanceof collection.model){
-			model = object;
-		} else {
-			if (object._id){
-				model = collection.at(object._id);
-			}
-			if (model){
-				model.set(object);
-			} else {
-				model = new collection.model(object);
-			}
-		}
-		collection.add(model);
-		return model;
 	},
 });
 

@@ -1,9 +1,6 @@
 App.Views.Renderer = App.Views.BaseView.extend({
 	
 	appEvents: {
-		'client:show'          : 'clientShow',
-		'client:index'         : 'clientIndex',
-		'client:new'           : 'clientNew',
 		'render:doc'           : 'docView',
 		'render:show'          : 'showView',
 	},
@@ -112,81 +109,10 @@ App.Views.Renderer = App.Views.BaseView.extend({
 				break;
 			}
 		}
-		//_.each(app.children, function(view){
-		//	if(comparator.apply(self, [view])){
-		//		result = view;
-		//	}
-		//});
 		return result;
 	},
 
 	appendToContent: function(view){
 		app.attach(view, {el: '#content-el', method: 'prepend'});
-	},
-
-	clientShow: function(id){
-		var self = this;
-		var view = this.viewIsRendered(this.showComparator, {options: {_id: id}});
-		if (view){
-			App.scrollTo(view.el);
-			return;
-		}
-		var model = new App.Models.Client({_id: id});
-		view      = new App.Views.ClientShowView({
-			model: model,
-		});
-		var portletView = new App.Views.PortletView({
-			viewName         : 'ClientShowView',
-			view             : view,
-			portletFrameClass: 'green',
-		});
-		model.fetch({
-			success: function(){
-				self.appendToContent(portletView);
-			}
-		});
-	},
-
-	clientIndex: function(){
-		var self = this;
-		var view = this.viewIsRendered(this.defaultComparator, {
-			viewName: 'ClientIndexView',
-		});
-		if (view){
-			App.scrollTo(view.el);
-			return;
-		}
-		var collection = new App.Collections.Clients();
-		view = new App.Views.ClientIndexView({
-			collection: collection,
-		});
-		var portletView = new App.Views.PortletView({
-			viewName: 'ClientIndexView',
-			view: view,
-		});
-		collection.fetch({
-			success: function(){
-				self.appendToContent(portletView);
-			},
-		});
-	},
-
-	clientNew: function(){
-		var view = this.viewIsRendered(this.defaultComparator, {
-			viewName: 'ClientNewView',
-		});
-		if (view){
-			App.scrollTo(view.el);
-			return;
-		}
-		var model = new App.Models.Client();
-		view = new App.Views.ClientNewView({
-			model: model,
-		});
-		var portletView = new App.Views.PortletView({
-			viewName: 'ClientNewView',
-			view: view,
-		}); 
-		this.appendToContent(portletView);
 	},
 });
