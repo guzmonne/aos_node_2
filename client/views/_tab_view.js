@@ -6,6 +6,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 	activeView: null,
 
 	events: {},
+
 	
 	initialize: function(){
 		this.awake.apply(this, arguments);
@@ -20,11 +21,12 @@ App.Views.TabView = App.Views.BaseView.extend({
 		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
-		if (_.isFunction(this.bindEvents)){this.bindEvents();}
-		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
+		this.bindEvents.apply(this);
 		this.listenTo(this.model, 'sync', this.setHeader);
 	},
 
+	bindEvents: function(){},
+	
 	createTabs: function(){
 		var self   = this;
 		var object = {

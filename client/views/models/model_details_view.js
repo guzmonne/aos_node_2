@@ -2,7 +2,7 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 	template: HBS.model_details_template,
 	className: 'row',
 
-	afterInitialize: function(){
+	awake: function(){
 		_.once(this.renderApplianceIndex);
 	},
 

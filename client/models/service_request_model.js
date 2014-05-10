@@ -1,7 +1,7 @@
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	beforeInitialize: function(attributes, options){
+	awake: function(attributes, options){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}

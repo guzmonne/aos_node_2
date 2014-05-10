@@ -4,14 +4,12 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'phones'    : new App.Collections.Phones(),
-			'addresses' : new App.Collections.Addresses(),
 			'createdBy' : 'Guzmán Monné',
 			'updatedBy' : 'Guzmán Monné'
 		};
 	},
 
-	beforeInitialize: function(attributes, options){
+	awake: function(attributes, options){
 		if (attributes !== undefined && attributes !== null){
 			this.parseAttributes(attributes);
 		}
@@ -54,6 +52,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 });
 
 App.Models.Phone = App.Models.BaseModel.extend({
+	name: 'phone',
 	defaults: function(){
 		return {
 			number: '',
@@ -62,6 +61,7 @@ App.Models.Phone = App.Models.BaseModel.extend({
 });
 
 App.Models.Address = App.Models.BaseModel.extend({
+	name: 'address',
 	defaults: function(){
 		return {
 			street    : '',

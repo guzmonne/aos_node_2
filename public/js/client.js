@@ -230,7 +230,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 		};
 	},
 
-	beforeInitialize: function(options){
+	awake: function(options){
 		this.setModel(options);
 	},
 
@@ -275,14 +275,12 @@ App.Models.Client = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'phones'    : new App.Collections.Phones(),
-			'addresses' : new App.Collections.Addresses(),
 			'createdBy' : 'Guzmán Monné',
 			'updatedBy' : 'Guzmán Monné'
 		};
 	},
 
-	beforeInitialize: function(attributes, options){
+	awake: function(attributes, options){
 		if (attributes !== undefined && attributes !== null){
 			this.parseAttributes(attributes);
 		}
@@ -325,6 +323,7 @@ App.Models.Client = App.Models.BaseModel.extend({
 });
 
 App.Models.Phone = App.Models.BaseModel.extend({
+	name: 'phone',
 	defaults: function(){
 		return {
 			number: '',
@@ -333,6 +332,7 @@ App.Models.Phone = App.Models.BaseModel.extend({
 });
 
 App.Models.Address = App.Models.BaseModel.extend({
+	name: 'address',
 	defaults: function(){
 		return {
 			street    : '',
@@ -351,7 +351,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 		return u;
 	},
 
-	beforeInitialize: function(attributes, options){
+	awake: function(attributes, options){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}
@@ -391,7 +391,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	beforeInitialize: function(attributes, options){
+	awake: function(attributes, options){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}
@@ -946,13 +946,13 @@ App.Views.ShowView = App.Views.BaseView.extend({
 	sync  : true,
 
 	initialize: function(){
+		this.awake.apply(this, arguments);
 		if (!this.model){return;}
 		if (this.sync)  {this.listenTo(this.model, 'sync'   , this.update);}
 		if (this.change){this.listenTo(this.model, 'updated', this.render);}
 		this.listenTo(app, 'row:rendered', this.checkEventCaller);
 		this.listenTo(this, 'disposing', this.modelShowInactive);
 		this.modelShowActive();
-		if(_.isFunction(this.afterInitialize)){this.afterInitialize();}
 	},
 
 	update: function(){
@@ -1014,6 +1014,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 	activeView: null,
 
 	events: {},
+
 	
 	initialize: function(){
 		this.awake.apply(this, arguments);
@@ -1028,11 +1029,12 @@ App.Views.TabView = App.Views.BaseView.extend({
 		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
-		if (_.isFunction(this.bindEvents)){this.bindEvents();}
-		if (_.isFunction(this.afterInitialize)){this.afterInitialize();}
+		this.bindEvents.apply(this);
 		this.listenTo(this.model, 'sync', this.setHeader);
 	},
 
+	bindEvents: function(){},
+	
 	createTabs: function(){
 		var self   = this;
 		var object = {
@@ -1100,6 +1102,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var self = this;
 		this.awake.apply(this, arguments);
 		this.listenTo(this.collection, 'sync', this.afterSync);
+		this.listenTo(this.collection, 'add' , this.append);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
@@ -1144,10 +1147,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	activateTable: function(){
 		if (this.oTable){return;}
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.listenTo(this.collection, 'add', this.append);
-		if (this.fetchOnRender){
-			this.collection.fetch(this.fetchOptions);
-		}
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -1178,6 +1177,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		var params   = {
 			viewName: viewName,
 		};
+		if (typeName === "Index"){
+			params.collection = docName + 's';
+		}
 		this.showOrGoTo(params);
 	},
 
@@ -1237,13 +1239,26 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			delete params.model;
 			delete params.options;
 		}	
+		if (params.collection){
+			if (_.isString(params.collection)){
+				viewOptions.collection = new App.Collections[params.collection]();
+				fetch = true;
+			} else {
+				viewOptions.collection = params.collection;
+			}
+			delete params.collection;
+			delete params.options;
+		}
+		console.log(viewOptions);
 		// We create the correct view
-		params.view = new App.Views[params.viewName](viewOptions);
+		var view = params.view = new App.Views[params.viewName](viewOptions);
 		// Grab the fetchOptions from the new view and fetch the model if it exists
 		if (fetch){
 			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
-			fetchOptions.silent = true;
-			params.view.model.fetch(fetchOptions);
+			fetchOptions.silent = false;
+			if (view.model)      {view.model.fetch(fetchOptions);}
+			if (view.collection) {view.collection.fetch(fetchOptions);}
+			
 		}
 		// Instantiate the portletView with the necessary params and append it to the
 		// main content.
@@ -1430,7 +1445,7 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 		return 'Equipo: #' + this.model.get('id');
 	},
 
-	beforeInitialize: function(){
+	awake: function(){
 		this.listenToOnce(this.model, 'sync', this.render);
 	},
 
@@ -2172,7 +2187,7 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 	template: HBS.model_details_template,
 	className: 'row',
 
-	afterInitialize: function(){
+	awake: function(){
 		_.once(this.renderApplianceIndex);
 	},
 
@@ -2371,7 +2386,7 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 	modelId  : null,
 	modelName: 'model',
 
-	beforeInitialize: function(){
+	awake: function(){
 		_.once(this.renderEditForm);
 	},
 
@@ -2427,7 +2442,7 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	template: HBS.service_request_details_template,
 	className: 'row',
 
-	afterInitialize: function(){
+	awake: function(){
 		_.once(this.renderApplianceIndex);
 	},
 

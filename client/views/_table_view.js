@@ -8,6 +8,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var self = this;
 		this.awake.apply(this, arguments);
 		this.listenTo(this.collection, 'sync', this.afterSync);
+		this.listenTo(this.collection, 'add' , this.append);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
@@ -52,9 +53,5 @@ App.Views.TableView = App.Views.BaseView.extend({
 	activateTable: function(){
 		if (this.oTable){return;}
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.listenTo(this.collection, 'add', this.append);
-		if (this.fetchOnRender){
-			this.collection.fetch(this.fetchOptions);
-		}
 	},
 });

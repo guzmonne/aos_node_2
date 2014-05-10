@@ -2,7 +2,7 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	template: HBS.service_request_details_template,
 	className: 'row',
 
-	afterInitialize: function(){
+	awake: function(){
 		_.once(this.renderApplianceIndex);
 	},
 

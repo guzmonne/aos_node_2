@@ -8,7 +8,7 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 		return 'Equipo: #' + this.model.get('id');
 	},
 
-	beforeInitialize: function(){
+	awake: function(){
 		this.listenToOnce(this.model, 'sync', this.render);
 	},
 

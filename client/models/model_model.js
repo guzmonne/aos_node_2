@@ -8,7 +8,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 		return u;
 	},
 
-	beforeInitialize: function(attributes, options){
+	awake: function(attributes, options){
 		if(!App.defined(this.appliances)){
 			this.appliances = new App.Collections.Appliances();
 		}

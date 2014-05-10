@@ -26,6 +26,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		var params   = {
 			viewName: viewName,
 		};
+		if (typeName === "Index"){
+			params.collection = docName + 's';
+		}
 		this.showOrGoTo(params);
 	},
 
@@ -68,12 +71,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	show: function(params){
 		var portletView, fetchOptions, fetch;
 		var viewOptions = {};
-		// If no params object is passed or the viewName is not defined then return
 		if(!_.isObject(params) || !App.defined(params.viewName)){
 			return new Error('The viewName option must be set');
 		}
-		// If a model is necessary then instantiate it, then check the view for any
-		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
 			var modelOptions  = (params.options) ? (params.options) : {}; 
 			if (_.isString(params.model)){
@@ -85,16 +85,24 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			delete params.model;
 			delete params.options;
 		}	
-		// We create the correct view
-		params.view = new App.Views[params.viewName](viewOptions);
-		// Grab the fetchOptions from the new view and fetch the model if it exists
+		if (params.collection){
+			if (_.isString(params.collection)){
+				viewOptions.collection = new App.Collections[params.collection]();
+				fetch = true;
+			} else {
+				viewOptions.collection = params.collection;
+			}
+			delete params.collection;
+			delete params.options;
+		}
+		var view = params.view = new App.Views[params.viewName](viewOptions);
 		if (fetch){
 			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
-			fetchOptions.silent = true;
-			params.view.model.fetch(fetchOptions);
+			fetchOptions.silent = false;
+			if (view.model)      {view.model.fetch(fetchOptions);}
+			if (view.collection) {view.collection.fetch(fetchOptions);}
+			
 		}
-		// Instantiate the portletView with the necessary params and append it to the
-		// main content.
 		portletView = new App.Views.PortletView(params);
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);

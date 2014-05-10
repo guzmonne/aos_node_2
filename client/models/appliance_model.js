@@ -10,7 +10,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 		};
 	},
 
-	beforeInitialize: function(options){
+	awake: function(options){
 		this.setModel(options);
 	},
 
