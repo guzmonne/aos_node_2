@@ -66,7 +66,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.$('#addresses').html(this.addressFieldTemplate({
 			addresses : this.model.addresses.toJSON()
 		}));
-		this.$('[name=phone]').focus();
+		this.$('[name=street]').focus();
 	},
 
 	addAddress: function(){

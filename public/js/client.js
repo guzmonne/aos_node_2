@@ -1137,7 +1137,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 	}
 });
 App.Views.TableView = App.Views.BaseView.extend({
-	//firstRender   : true,
 	rowViewOptions: {},
 	fetchOptions	: {},
 	fetchOnRender : true,
@@ -1146,7 +1145,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var self = this;
 		this.awake.apply(this, arguments);
 		this.listenTo(this.collection, 'sync', this.afterSync);
-		this.listenTo(this.collection, 'add' , this.append);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
@@ -1174,14 +1172,11 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},	
 
 	append: function(model){
-		if (App.defined(this.modelView)){
-			this.rowViewOptions.model = model;
-			var view = new this.modelView(this.rowViewOptions);
-			this.addChild(view);
-			this.oTable.fnAddTr(view.render().el);
-		} else {
-			return new Error('Option modelView not defined');
-		}
+		if (!App.defined(this.modelView)){throw new Error('Option modelView not defined');}
+		this.rowViewOptions.model = model;
+		var view = new this.modelView(this.rowViewOptions);
+		this.addChild(view);
+		this.oTable.fnAddTr(view.render().el);
 	},
 
 	onSync: function(){
@@ -1191,6 +1186,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	activateTable: function(){
 		if (this.oTable){return;}
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
+		this.listenTo(this.collection, 'add' , this.append);//
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -1641,7 +1637,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.$('#addresses').html(this.addressFieldTemplate({
 			addresses : this.model.addresses.toJSON()
 		}));
-		this.$('[name=phone]').focus();
+		this.$('[name=street]').focus();
 	},
 
 	addAddress: function(){
@@ -1794,11 +1790,16 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){
+			var self = this;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
 				collection: new App.Collections.ServiceRequests()
 			});
 			this.serviceRequests.collection.client_id = this.model.id;
-			this.serviceRequests.attachTo(this.$('#client-service_requests-'+ this.timestamp), {method: 'html'});
+			this.serviceRequests.collection.fetch({
+				success: function(){
+					self.serviceRequests.attachTo(this.$('#client-service_requests-'+ self.timestamp), {method: 'html'});
+				}
+			});
 		}
 	},
 });

@@ -36,11 +36,16 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){
+			var self = this;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
 				collection: new App.Collections.ServiceRequests()
 			});
 			this.serviceRequests.collection.client_id = this.model.id;
-			this.serviceRequests.attachTo(this.$('#client-service_requests-'+ this.timestamp), {method: 'html'});
+			this.serviceRequests.collection.fetch({
+				success: function(){
+					self.serviceRequests.attachTo(this.$('#client-service_requests-'+ self.timestamp), {method: 'html'});
+				}
+			});
 		}
 	},
 });

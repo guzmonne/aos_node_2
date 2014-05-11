@@ -1,5 +1,4 @@
 App.Views.TableView = App.Views.BaseView.extend({
-	//firstRender   : true,
 	rowViewOptions: {},
 	fetchOptions	: {},
 	fetchOnRender : true,
@@ -8,7 +7,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var self = this;
 		this.awake.apply(this, arguments);
 		this.listenTo(this.collection, 'sync', this.afterSync);
-		this.listenTo(this.collection, 'add' , this.append);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
@@ -36,14 +34,11 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},	
 
 	append: function(model){
-		if (App.defined(this.modelView)){
-			this.rowViewOptions.model = model;
-			var view = new this.modelView(this.rowViewOptions);
-			this.addChild(view);
-			this.oTable.fnAddTr(view.render().el);
-		} else {
-			return new Error('Option modelView not defined');
-		}
+		if (!App.defined(this.modelView)){throw new Error('Option modelView not defined');}
+		this.rowViewOptions.model = model;
+		var view = new this.modelView(this.rowViewOptions);
+		this.addChild(view);
+		this.oTable.fnAddTr(view.render().el);
 	},
 
 	onSync: function(){
@@ -53,5 +48,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	activateTable: function(){
 		if (this.oTable){return;}
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
+		this.listenTo(this.collection, 'add' , this.append);//
 	},
 });

@@ -13,7 +13,7 @@
 		Calle
 	</label>
 
-	<div class="col-xs-2 form-control-under">
+	<div class="col-xs-2 form-control-under" style="padding: 0">
 		<button type="button" class="btn btn-success pull-right" id="add-address" tabindex = "-1" data-for="street">
 			<i class="fa fa-plus"></i>
 		</button>
@@ -35,7 +35,7 @@
 {{#each addresses}}
 	<div class="row" data-source-index="{{@index}}" style="margin: 0">
 		<hr>
-		<div class="col-xs-2 form-control-under">
+		<div class="col-xs-2 form-control-under" style="padding: 0">
 			<button type="button" class="btn btn-warning pull-right edit-address" tabindex = "-1" data-source-index="{{@index}}" style="margin-left: 4px;">
 				<i class="fa fa-pencil"></i>
 			</button>
