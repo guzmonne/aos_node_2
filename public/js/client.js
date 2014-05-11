@@ -1060,7 +1060,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 
 	events: {},
 
-	
 	initialize: function(){
 		this.awake.apply(this, arguments);
 		if(!this.modelName){return new Error('View must have a modelName defined');}
@@ -1566,7 +1565,7 @@ App.Views.ClientDetailsView = App.Views.ShowView.extend({
 	},
 
 	serialize: function(){
-		var result       = (App.defined(this.model)) ? this.model.serialize() : {};
+		var result       = (App.defined(this.model)) ? this.model.toJSON() : {};
 		var createdAt    = this.model.get('createdAt');
 		var updatedAt    = this.model.get('updatedAt');
 		result.createdAt = this.model.dateDDMMYYYY(createdAt);
@@ -1709,7 +1708,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.setModel();
 		this.model.save(null, {
 			success: function(model, response, options){
-				self.model.parseAttributes(self.model.attributes);
 				self.invoke('showMessage', {
 					title  : 'Datos Actualizados',
 					message: 'El cliente se ha actualizado correctamente',
@@ -1793,37 +1791,6 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 			view : 'ClientFormView',
 		}
 	],
-
-	onSync: function(){
-		var self = this;
-		this.model.fetch({
-			success: function(){
-				self.afterSync();
-				self.update();
-			},
-		});
-	},
-
-	update: function(){
-		this.parent.flash = {
-			title  : 'Cliente Actualizado',
-			message: 'El cliente se ha actualizado con exito.',
-			class  : 'success',
-		};
-		this.parent.render();
-	},
-
-	synchronize: function(){
-		this.parent.flash = {
-			title   : 'Cliente Desincronizado',
-			message : 'Se han realizado cambios en este cliente que no se ven reflejados actualmente. Desea actualizar esta información?',
-			htmlMsg : '<p><button type="button" class="btn btn-warning" data-event="sync:client:'+this.model.id+'">Actualizar</button></p>',
-			class   : 'warning',
-			lifetime: 0,
-			method  : 'html',
-		};
-		this.parent.displayFlash();
-	},
 
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){

@@ -34,37 +34,6 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 		}
 	],
 
-	onSync: function(){
-		var self = this;
-		this.model.fetch({
-			success: function(){
-				self.afterSync();
-				self.update();
-			},
-		});
-	},
-
-	update: function(){
-		this.parent.flash = {
-			title  : 'Cliente Actualizado',
-			message: 'El cliente se ha actualizado con exito.',
-			class  : 'success',
-		};
-		this.parent.render();
-	},
-
-	synchronize: function(){
-		this.parent.flash = {
-			title   : 'Cliente Desincronizado',
-			message : 'Se han realizado cambios en este cliente que no se ven reflejados actualmente. Desea actualizar esta información?',
-			htmlMsg : '<p><button type="button" class="btn btn-warning" data-event="sync:client:'+this.model.id+'">Actualizar</button></p>',
-			class   : 'warning',
-			lifetime: 0,
-			method  : 'html',
-		};
-		this.parent.displayFlash();
-	},
-
 	renderServiceRequests: function(){
 		if (!App.defined(this.serviceRequests)){
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({

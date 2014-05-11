@@ -8,7 +8,7 @@ App.Views.ClientDetailsView = App.Views.ShowView.extend({
 	},
 
 	serialize: function(){
-		var result       = (App.defined(this.model)) ? this.model.serialize() : {};
+		var result       = (App.defined(this.model)) ? this.model.toJSON() : {};
 		var createdAt    = this.model.get('createdAt');
 		var updatedAt    = this.model.get('updatedAt');
 		result.createdAt = this.model.dateDDMMYYYY(createdAt);

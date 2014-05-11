@@ -7,7 +7,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 
 	events: {},
 
-	
 	initialize: function(){
 		this.awake.apply(this, arguments);
 		if(!this.modelName){return new Error('View must have a modelName defined');}

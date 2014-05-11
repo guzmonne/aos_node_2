@@ -133,7 +133,6 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.setModel();
 		this.model.save(null, {
 			success: function(model, response, options){
-				self.model.parseAttributes(self.model.attributes);
 				self.invoke('showMessage', {
 					title  : 'Datos Actualizados',
 					message: 'El cliente se ha actualizado correctamente',
