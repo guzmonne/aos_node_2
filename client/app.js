@@ -72,4 +72,14 @@ window.App = {
 			console.log("EventSource is not supported");
 		}
 	},
+
+	isObjectsArray: function(value){
+		return _.reduce(value, function(memo, ele){ 
+			if(memo === false || !_.isObject(ele)){
+				return false;
+			} else {
+				return true; 
+			}
+		}, true);
+	},
 };

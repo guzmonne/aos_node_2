@@ -1,7 +1,27 @@
-<div class="col-sm-8 col-sm-offset-2">
-	<input type="text" class="form-control form-control-under" value="{{number}}" id="{{timestamp}}" data-type="phone-number">
-</div>​<div class="col-sm-2">
-	<button type="button" class="btn btn-danger form-control-under del-phone-number" tabindex = "-1" data-phone-id="{{timestamp}}">
-		<i class="fa fa-minus"></i>
+<label for="phone" class="col-xs-2 control-label">
+	{{#is phones.length ">" 1}}
+		Telefonos
+	{{else}}
+		Telefono
+	{{/is}}
+</label>
+<div class="col-xs-8">
+	<input type="text" class="form-control" name="phone" placeholder="e.j: 099123456" data-type="phone-number">
+</div>
+<div class="col-xs-2">
+	<button type="button" class="btn btn-success" id="add-phone-number" data-for="phone" tabindex = "-1">
+		<i class="fa fa-plus"></i>
 	</button>
 </div>
+{{#each phones}}
+<div class="col-xs-8 col-xs-offset-2" data-source-index="{{@index}}">
+	<input type="text" class="form-control form-control-under" value="{{number}}" readonly>
+</div>​<div class="col-xs-2">
+	<button type="button" class="btn btn-danger form-control-under del-phone-number" tabindex = "-1" data-phone-index="{{@index}}">
+		<i class="fa fa-minus"></i>
+	</button>
+	<button type="button" class="btn btn-warning form-control-under edit-phone-number" tabindex = "-1" data-phone-index="{{@index}}">
+		<i class="fa fa-pencil"></i>
+	</button>
+</div>
+{{/each}}

@@ -249,4 +249,8 @@ App.Views.BaseView = Giraffe.View.extend({
 	//	if(!App.defined(this.model)){return;}
 	//	app.trigger(this.modelName + ':show:active', this.model.id);
 	//},
+
+	updateViewField: function(field){
+		this.$('[name='+ field +']').val(this.model.get(field));
+	},
 });

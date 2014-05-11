@@ -72,6 +72,16 @@ window.App = {
 			console.log("EventSource is not supported");
 		}
 	},
+
+	isObjectsArray: function(value){
+		return _.reduce(value, function(memo, ele){ 
+			if(memo === false || !_.isObject(ele)){
+				return false;
+			} else {
+				return true; 
+			}
+		}, true);
+	},
 };
 // !!!
 // Type: Mixin
@@ -176,12 +186,71 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
+	constructor: function(){
+		this.children = [];
+		if (this.childs){this.createChilds.apply(this, arguments);}
+		Giraffe.Model.apply(this, arguments);
+	},
+
 	awake: function(){},
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		this.listenTo(this, 'sync'                      , this.modelUpdated);
-		this.listenTo(app , this.name + ':model:updated', this.updateModel);
+		//this.listenTo(this, 'sync'                      , this.modelUpdated);
+		//this.listenTo(app , this.name + ':model:updated', this.updateModel);
+	},
+
+	createChilds: function(){
+		var self = this;
+		if(	!_.isArray(this.childs) || !App.isObjectsArray(this.childs)){
+			throw new Error("'childs' attribute must be an objects's array");
+		}
+		var childs = this.childs;
+		var attrs = (arguments.length > 0) ? arguments[0] : {};
+		_.each(childs, function(child){
+			var attribute, type;
+			if (!child.attribute || !child.type || !child.name){
+				throw new Error("Every 'child' should have an 'attribute', 'name' and 'type' key value");
+			}
+			if (child.type === 'model'){
+				type = "Models";
+			} else if (child.type === 'collection'){
+				type = "Collections";
+			} else {
+				throw new Error("'child' type must be 'model' or 'collection'");
+			}
+			self[child.attribute] = new App[type][child.name]();
+			self[child.attribute].parent = self; 
+			self.children.push(self[child.attribute]);
+			if (attrs[child.attribute]){
+				self[child.attribute].set(attrs[child.attribute]);
+			}
+			var triggerChange = function(){
+				self.set(child.attribute, self[child.attribute].toJSON());
+			};
+			if(child.type === "model"){
+				self.listenTo(self[child.attribute], 'change', triggerChange);
+			} else if (child.type === "collection"){
+				self.listenTo(self[child.attribute], 'add', triggerChange);
+				self.listenTo(self[child.attribute], 'remove', triggerChange);
+			}
+			self[child.attribute].listenTo(self, 'disposing', self[child.attribute].dispose);
+		});
+	},
+
+	parse: function(response){
+		var self = this;
+		if (this.childs){
+			var attributes = _.map(this.childs, function(child){
+				return child.attribute;
+			});
+			_.each(attributes, function(attribute){
+				if (response[attribute]){
+					self[attribute].set(response[attribute]);
+				}
+			});
+		}
+		return response;
 	},
 
 	// When the model gets synced with the server it calls the modelUpdated function.
@@ -280,46 +349,18 @@ App.Models.Client = App.Models.BaseModel.extend({
 		};
 	},
 
-	awake: function(attributes, options){
-		if (attributes !== undefined && attributes !== null){
-			this.parseAttributes(attributes);
+	childs: [
+		{
+			attribute: 'phones',
+			type: 'collection',
+			name: 'Phones'
+		},
+		{
+			attribute: 'addresses',
+			type: 'collection',
+			name: 'Addresses',
 		}
-	},
-
-	parseAttributes: function(attributes){
-		if(App.defined(attributes.phones)){
-			if(_.isArray(attributes.phones)){
-				this.set('phones', new App.Collections.Phones(attributes.phones), {silent: true});
-				delete attributes.phones;
-			}
-		}
-		if(App.defined(attributes.addresses)){
-			if(_.isArray(attributes.addresses)){
-				this.set('addresses', new App.Collections.Addresses(attributes.addresses), {silent: true});
-				delete attributes.addresses;
-			}
-		}
-		return attributes;
-	},
-
-	parse: function(response){
-		if (this.id === undefined){
-			return response;
-		} else {
-			return this.parseAttributes(response);
-		}
-	},
-
-	serialize: function(){
-		var attributes = this.toJSON();
-		if(attributes.phones instanceof(Giraffe.Collection)){
-			attributes.phones = attributes.phones.toJSON();
-		}
-		if(attributes.addresses instanceof(Giraffe.Collection)){
-			attributes.addresses = attributes.addresses.toJSON();
-		}
-		return attributes;
-	},
+	],
 });
 
 App.Models.Phone = App.Models.BaseModel.extend({
@@ -757,6 +798,10 @@ App.Views.BaseView = Giraffe.View.extend({
 	//	if(!App.defined(this.model)){return;}
 	//	app.trigger(this.modelName + ':show:active', this.model.id);
 	//},
+
+	updateViewField: function(field){
+		this.$('[name='+ field +']').val(this.model.get(field));
+	},
 });
 App.Views.CarouselView = App.Views.BaseView.extend({
 	template: HBS.carousel_template,
@@ -1222,12 +1267,9 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	show: function(params){
 		var portletView, fetchOptions, fetch;
 		var viewOptions = {};
-		// If no params object is passed or the viewName is not defined then return
 		if(!_.isObject(params) || !App.defined(params.viewName)){
 			return new Error('The viewName option must be set');
 		}
-		// If a model is necessary then instantiate it, then check the view for any
-		// special fetch options. Then append the model to the view and fetch the data.
 		if(params.model){
 			var modelOptions  = (params.options) ? (params.options) : {}; 
 			if (_.isString(params.model)){
@@ -1249,10 +1291,7 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			delete params.collection;
 			delete params.options;
 		}
-		console.log(viewOptions);
-		// We create the correct view
 		var view = params.view = new App.Views[params.viewName](viewOptions);
-		// Grab the fetchOptions from the new view and fetch the model if it exists
 		if (fetch){
 			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
 			fetchOptions.silent = false;
@@ -1260,8 +1299,6 @@ App.Views.Renderer = App.Views.BaseView.extend({
 			if (view.collection) {view.collection.fetch(fetchOptions);}
 			
 		}
-		// Instantiate the portletView with the necessary params and append it to the
-		// main content.
 		portletView = new App.Views.PortletView(params);
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
@@ -1545,152 +1582,143 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	className: 'col-md-12 col-lg-offset-1 col-lg-9',
 
 	events: {
-		'click #add-phone-number'        : 'reRender',
-		'click button.del-phone-number'  : 'delPhoneNumber',
-		'click button.edit-phone-number' : 'editPhoneNumber',
-		'click #add-address'             : 'reRender',
+		'click #add-phone-number'        : 'addPhone',
+		'click button.del-phone-number'  : 'delPhone',
+		'click button.edit-phone-number' : 'editPhone',
+		'click #add-address'             : 'addAddress',
 		'click button.del-address'       : 'delAddress',
 		'click button.edit-address'      : 'editAddress',
 		'click #reset-form'              : 'render',
-		'click #update-form'             : 'updateForm',
-		'submit form'                    : 'submitForm',
+		'click #update-form'             : 'updateModel',
+		'submit form'                    : 'createModel',
 	},
 
-	serialize: function(){
-		return this.model.serialize();
+	initialize: function(){
+		this.bindEvents();
 	},
 
-	addPhoneToCollection: function(){
+	bindEvents: function(){
+		this.listenTo(this.model, 'change:phones'    , this.renderPhones);
+		this.listenTo(this.model, 'change:addresses' , this.renderAddresses);
+		this.listenTo(this.model, 'change:name'      , function(){this.updateViewField.apply(this, ['name']);});
+		this.listenTo(this.model, 'change:doc-type'  , function(){this.updateViewField.apply(this, ['doc-type']);});
+		this.listenTo(this.model, 'change:doc-number', function(){this.updateViewField.apply(this, ['doc-number']);});
+		this.listenTo(this.model, 'change:email'     , function(){this.updateViewField.apply(this, ['email']);});
+	},
+
+	afterRender: function(){
+		this.renderPhones();
+		this.renderAddresses();
+	},
+
+	renderPhones: function(){
+		this.$('#phone-numbers').html(this.phoneFieldTemplate({
+			phones : this.model.phones.toJSON()
+		}));
+		this.$('[name=phone]').focus();
+	},
+
+	addPhone: function(){
 		var number = this.$('[name=phone]').val();
 		if(number === ""){return;}
-		this.model.get('phones').add({number: number});
+		this.model.phones.add({number: number});
 	},
 
-	delPhoneNumber:function(e){
-		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		var phones = this.model.get('phones');
-		var model  = phones.models[index];
-		phones.remove(model);
-		this.reRender('[name=phone]');
+	delPhone:function(e){
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
+		this.model.phones.remove(this.model.phones.at(index));
 	},
 
-	editPhoneNumber: function(e){
-		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		var phones = this.model.get('phones');
-		var model  = phones.models[index];
-		phones.remove(model);
-		this.reRender("[name=phone]");
-		this.$('[name=phone]').val(model.get('number'));
+	editPhone: function(e){
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
+		var phone = this.model.phones.at(index);
+		this.delPhone(index);
+		this.$('[name=phone]').val(phone.get('number'));
 	},
 
-	addAddressToCollection: function(){
-		var street     = this.$('[name=street]').val();
-		var city       = this.$('[name=city]').val();
-		var department = this.$('[name=department]').val();
-		if(street === ""){return;}
+	renderAddresses: function(){
+		this.$('#addresses').html(this.addressFieldTemplate({
+			addresses : this.model.addresses.toJSON()
+		}));
+		this.$('[name=phone]').focus();
+	},
+
+	addAddress: function(){
 		var attrs = {
-			street    : street,
-			city      : city,
-			department: department,
+			street    : this.$('[name=street]').val(),
+			city      : this.$('[name=city]').val(),
+			department: this.$('[name=department]').val(),
 		};
-		this.model.get('addresses').add(attrs);
+		if(attrs.street === ""){return;}
+		this.model.addresses.add(attrs);
 	},
 
 	delAddress: function(e){
-		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
-		var addresses = this.model.get('addresses');
-		var model     = addresses.models[index];
-		addresses.remove(model);
-		this.reRender('[name=street]');
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
+		this.model.addresses.remove(this.model.addresses.at(index));
 	},
 
 	editAddress: function(e){
-		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
-		var addresses = this.model.get('addresses');
-		var model     = addresses.models[index];
-		addresses.remove(model);
-		this.reRender('[name=street]');
-		this.$('[name=street]').val(model.get('street'));
-		this.$('[name=city]').val(model.get('city'));
-		this.$('[name=department]').val(model.get('department'));
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
+		var address = this.model.addresses.at(index);
+		this.delAddress(index);
+		this.$('[name=street]').val(address.get('street'));
+		this.$('[name=city]').val(address.get('city'));
+		this.$('[name=department]').val(address.get('department'));
 	},
 
 	setModel: function(){
-		this.model.set('name'      , this.$('[name=name]').val());
-		this.model.set('doc-type'  , this.$('[name=doc-type]').val());
-		this.model.set('doc-number', this.$('[name=doc-number]').val());
-		this.model.set('email'     , this.$('[name=email]').val());
-		var phone  = this.$('[name=phone]').val();
-		var street = this.$('[name=street]').val();
-		if (phone !== ''){
-			this.addPhoneToCollection();
-		}
-		if (street !== ''){
-			this.addAddressToCollection();
-		}
+		var attr = {
+			'name'      : this.$('[name=name]').val(), 
+			'doc-type'  : this.$('[name=doc-type]').val(),
+			'doc-number': this.$('[name=doc-number]').val(),
+			'email'     : this.$('[name=email]').val(),
+		};
+		this.model.set(attr);
+		if(this.$('[name=phone]').val()  !== ''){ this.addPhone(); }
+		if(this.$('[name=street]').val() !== ''){ this.addAddress(); }
 	},
 
-	submitForm: function(e){
-		e.preventDefault();
+	createModel: function(e){
+		if (e){e.preventDefault();}
 		var self = this;
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.save({}, {
+		this.model.save(null, {
 			success: function(model, response, options){
-				self.handleSuccess(self ,model, response, options);
+				self.invoke('showMessage', {
+					title  : 'Cliente Creado',
+					message: 'El nuevo cliente se ha creado con exito.',
+					class  : 'success',
+				});
 			},
 		});
 		this.model = new App.Models.Client();
+		this.bindEvents();
 		this.render();
 		this.$('[name=name]').focus();
 	},
 
-	handleSuccess: function(context, model, response, options){
-		var newModel = new App.Models.Client(response);
-		if(
-			App.defined(app.clients) &&
-			app.clients instanceof Giraffe.Collection
-		){
-			app.clients.add(newModel);
-		}
-		context.invoke('showMessage', {
-			title  : 'Cliente Creado',
-			message: 'El nuevo cliente se ha creado con exito.',
-			class  : 'success',
-		});
-	},
-
-	updateForm: function(e){
-		e.preventDefault();
+	updateModel: function(e){
+		if (e){e.preventDefault();}
 		var self = this;
 		this.setModel();
-		this.model.save({}, {
+		this.model.save(null, {
 			success: function(model, response, options){
 				self.model.parseAttributes(self.model.attributes);
 				self.invoke('showMessage', {
 					title  : 'Datos Actualizados',
-					message: 'El cliente se han actualizado correctamente',
+					message: 'El cliente se ha actualizado correctamente',
 					class  : 'success',
 				});
-				self.render();
 			},
 		});
 	},
 
-	reRender: function(elToFocus){
-		this.setModel();
-		this.render();
-		if (
-			_.isObject(elToFocus)                             && 
-			elToFocus.currentTarget !== undefined             &&
-			elToFocus.currentTarget.dataset !== undefined     &&
-			elToFocus.currentTarget.dataset.for !== undefined
-		){
-			this.$('[name='+ elToFocus.currentTarget.dataset.for +']').focus();
-		} else {
-			this.$(elToFocus).focus();
-		}
-	},
 });
 App.Views.ClientIndexView = App.Views.TableView.extend({
 	template : HBS.client_index_template,

@@ -1,26 +1,65 @@
-<div class="row" style="margin: 0" data-address-id="{{timestamp}}">
-	<hr>
-	<div class="col-sm-2 form-control-under">
-		<button type="button" class="btn btn-danger pull-right del-address" tabindex = "-1">
-			<i class="fa fa-minus"></i>
-		</button>
+<div class="row" style="margin: 0">
+	<label for="address" class="col-xs-2 control-label">
+		{{#is address.length ">" 1}}
+			Direcciones
+		{{else}}
+			Dirección
+		{{/is}}
+	</label>
+	<div class="col-xs-8">
+		<input type="text" class="form-control" name="street" placeholder="e.j: Av. 18 de Julio 123">
 	</div>
-	<div class="col-sm-8 form-control-under">
-		<input type="text" class="form-control" value="{{street}}">
-	</div>
-	<label for="street" class="col-sm-2 text-muted control-label-under" style="text-align: left; margin-bottom: 8px">
+	<label for="street" class="col-xs-2 control-label text-muted" style="text-align: left; margin-bottom: 9px">
 		Calle
 	</label>
-	<div class="col-sm-8 col-sm-offset-2">
-		<input type="text" class="form-control form-control-under" value="{{city}}">
+
+	<div class="col-xs-2 form-control-under">
+		<button type="button" class="btn btn-success pull-right" id="add-address" tabindex = "-1" data-for="street">
+			<i class="fa fa-plus"></i>
+		</button>
 	</div>
-	<label for="city" class="col-sm-2 text-muted control-label-under">
+	
+	<div class="col-xs-8">
+		<input type="text" class="form-control form-control-under" name="city" placeholder="e.j: Las Piedras">
+	</div>
+	<label for="city" class="col-xs-2 text-muted control-label-under">
 		Ciudad
 	</label>
-	<div class="col-sm-8 col-sm-offset-2">
-		<input type="text" class="form-control form-control-under" value="{{department}}">
+	<div class="col-xs-8 col-xs-offset-2">
+		<input type="text" class="form-control form-control-under" name="department" placeholder="e.j: Artigas">
 	</div>
-	<label for="department" class="col-sm-2 text-muted control-label-under">
+	<label for="department" class="col-xs-2 text-muted control-label-under">
 		Dep.
 	</label>
 </div>
+{{#each addresses}}
+	<div class="row" data-source-index="{{@index}}" style="margin: 0">
+		<hr>
+		<div class="col-xs-2 form-control-under">
+			<button type="button" class="btn btn-warning pull-right edit-address" tabindex = "-1" data-source-index="{{@index}}" style="margin-left: 4px;">
+				<i class="fa fa-pencil"></i>
+			</button>
+			<button type="button" class="btn btn-danger pull-right del-address" tabindex = "-1" data-source-index="{{@index}}">
+				<i class="fa fa-minus"></i>
+			</button>
+		</div>
+		<div class="col-xs-8 form-control-under">
+			<input type="text" class="form-control" value="{{street}}" data-name="street" readonly>
+		</div>
+		<label for="street" class="col-xs-2 text-muted control-label-under" style="text-align: left; margin-bottom: 8px">
+			Calle
+		</label>
+		<div class="col-xs-8 col-xs-offset-2">
+			<input type="text" class="form-control form-control-under" value="{{city}}" data-name="city" readonly>
+		</div>
+		<label for="city" class="col-xs-2 text-muted control-label-under">
+			Ciudad
+		</label>
+		<div class="col-xs-8 col-xs-offset-2">
+			<input type="text" class="form-control form-control-under" value="{{department}}" data-name="department" readonly>
+		</div>
+		<label for="department" class="col-xs-2 text-muted control-label-under">
+			Dep.
+		</label>
+	</div>
+{{/each}}

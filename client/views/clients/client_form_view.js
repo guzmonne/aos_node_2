@@ -6,150 +6,141 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	className: 'col-md-12 col-lg-offset-1 col-lg-9',
 
 	events: {
-		'click #add-phone-number'        : 'reRender',
-		'click button.del-phone-number'  : 'delPhoneNumber',
-		'click button.edit-phone-number' : 'editPhoneNumber',
-		'click #add-address'             : 'reRender',
+		'click #add-phone-number'        : 'addPhone',
+		'click button.del-phone-number'  : 'delPhone',
+		'click button.edit-phone-number' : 'editPhone',
+		'click #add-address'             : 'addAddress',
 		'click button.del-address'       : 'delAddress',
 		'click button.edit-address'      : 'editAddress',
 		'click #reset-form'              : 'render',
-		'click #update-form'             : 'updateForm',
-		'submit form'                    : 'submitForm',
+		'click #update-form'             : 'updateModel',
+		'submit form'                    : 'createModel',
 	},
 
-	serialize: function(){
-		return this.model.serialize();
+	initialize: function(){
+		this.bindEvents();
 	},
 
-	addPhoneToCollection: function(){
+	bindEvents: function(){
+		this.listenTo(this.model, 'change:phones'    , this.renderPhones);
+		this.listenTo(this.model, 'change:addresses' , this.renderAddresses);
+		this.listenTo(this.model, 'change:name'      , function(){this.updateViewField.apply(this, ['name']);});
+		this.listenTo(this.model, 'change:doc-type'  , function(){this.updateViewField.apply(this, ['doc-type']);});
+		this.listenTo(this.model, 'change:doc-number', function(){this.updateViewField.apply(this, ['doc-number']);});
+		this.listenTo(this.model, 'change:email'     , function(){this.updateViewField.apply(this, ['email']);});
+	},
+
+	afterRender: function(){
+		this.renderPhones();
+		this.renderAddresses();
+	},
+
+	renderPhones: function(){
+		this.$('#phone-numbers').html(this.phoneFieldTemplate({
+			phones : this.model.phones.toJSON()
+		}));
+		this.$('[name=phone]').focus();
+	},
+
+	addPhone: function(){
 		var number = this.$('[name=phone]').val();
 		if(number === ""){return;}
-		this.model.get('phones').add({number: number});
+		this.model.phones.add({number: number});
 	},
 
-	delPhoneNumber:function(e){
-		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		var phones = this.model.get('phones');
-		var model  = phones.models[index];
-		phones.remove(model);
-		this.reRender('[name=phone]');
+	delPhone:function(e){
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
+		this.model.phones.remove(this.model.phones.at(index));
 	},
 
-	editPhoneNumber: function(e){
-		var index  = parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex'));
-		var phones = this.model.get('phones');
-		var model  = phones.models[index];
-		phones.remove(model);
-		this.reRender("[name=phone]");
-		this.$('[name=phone]').val(model.get('number'));
+	editPhone: function(e){
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
+		var phone = this.model.phones.at(index);
+		this.delPhone(index);
+		this.$('[name=phone]').val(phone.get('number'));
 	},
 
-	addAddressToCollection: function(){
-		var street     = this.$('[name=street]').val();
-		var city       = this.$('[name=city]').val();
-		var department = this.$('[name=department]').val();
-		if(street === ""){return;}
+	renderAddresses: function(){
+		this.$('#addresses').html(this.addressFieldTemplate({
+			addresses : this.model.addresses.toJSON()
+		}));
+		this.$('[name=phone]').focus();
+	},
+
+	addAddress: function(){
 		var attrs = {
-			street    : street,
-			city      : city,
-			department: department,
+			street    : this.$('[name=street]').val(),
+			city      : this.$('[name=city]').val(),
+			department: this.$('[name=department]').val(),
 		};
-		this.model.get('addresses').add(attrs);
+		if(attrs.street === ""){return;}
+		this.model.addresses.add(attrs);
 	},
 
 	delAddress: function(e){
-		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
-		var addresses = this.model.get('addresses');
-		var model     = addresses.models[index];
-		addresses.remove(model);
-		this.reRender('[name=street]');
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
+		this.model.addresses.remove(this.model.addresses.at(index));
 	},
 
 	editAddress: function(e){
-		var index     = parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex'));
-		var addresses = this.model.get('addresses');
-		var model     = addresses.models[index];
-		addresses.remove(model);
-		this.reRender('[name=street]');
-		this.$('[name=street]').val(model.get('street'));
-		this.$('[name=city]').val(model.get('city'));
-		this.$('[name=department]').val(model.get('department'));
+		var index = (_.isObject(e)) ? 
+			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
+		var address = this.model.addresses.at(index);
+		this.delAddress(index);
+		this.$('[name=street]').val(address.get('street'));
+		this.$('[name=city]').val(address.get('city'));
+		this.$('[name=department]').val(address.get('department'));
 	},
 
 	setModel: function(){
-		this.model.set('name'      , this.$('[name=name]').val());
-		this.model.set('doc-type'  , this.$('[name=doc-type]').val());
-		this.model.set('doc-number', this.$('[name=doc-number]').val());
-		this.model.set('email'     , this.$('[name=email]').val());
-		var phone  = this.$('[name=phone]').val();
-		var street = this.$('[name=street]').val();
-		if (phone !== ''){
-			this.addPhoneToCollection();
-		}
-		if (street !== ''){
-			this.addAddressToCollection();
-		}
+		var attr = {
+			'name'      : this.$('[name=name]').val(), 
+			'doc-type'  : this.$('[name=doc-type]').val(),
+			'doc-number': this.$('[name=doc-number]').val(),
+			'email'     : this.$('[name=email]').val(),
+		};
+		this.model.set(attr);
+		if(this.$('[name=phone]').val()  !== ''){ this.addPhone(); }
+		if(this.$('[name=street]').val() !== ''){ this.addAddress(); }
 	},
 
-	submitForm: function(e){
-		e.preventDefault();
+	createModel: function(e){
+		if (e){e.preventDefault();}
 		var self = this;
 		if(this.$('button[type=submit]').length === 0){return;}
 		this.setModel();
-		this.model.save({}, {
+		this.model.save(null, {
 			success: function(model, response, options){
-				self.handleSuccess(self ,model, response, options);
+				self.invoke('showMessage', {
+					title  : 'Cliente Creado',
+					message: 'El nuevo cliente se ha creado con exito.',
+					class  : 'success',
+				});
 			},
 		});
 		this.model = new App.Models.Client();
+		this.bindEvents();
 		this.render();
 		this.$('[name=name]').focus();
 	},
 
-	handleSuccess: function(context, model, response, options){
-		var newModel = new App.Models.Client(response);
-		if(
-			App.defined(app.clients) &&
-			app.clients instanceof Giraffe.Collection
-		){
-			app.clients.add(newModel);
-		}
-		context.invoke('showMessage', {
-			title  : 'Cliente Creado',
-			message: 'El nuevo cliente se ha creado con exito.',
-			class  : 'success',
-		});
-	},
-
-	updateForm: function(e){
-		e.preventDefault();
+	updateModel: function(e){
+		if (e){e.preventDefault();}
 		var self = this;
 		this.setModel();
-		this.model.save({}, {
+		this.model.save(null, {
 			success: function(model, response, options){
 				self.model.parseAttributes(self.model.attributes);
 				self.invoke('showMessage', {
 					title  : 'Datos Actualizados',
-					message: 'El cliente se han actualizado correctamente',
+					message: 'El cliente se ha actualizado correctamente',
 					class  : 'success',
 				});
-				self.render();
 			},
 		});
 	},
 
-	reRender: function(elToFocus){
-		this.setModel();
-		this.render();
-		if (
-			_.isObject(elToFocus)                             && 
-			elToFocus.currentTarget !== undefined             &&
-			elToFocus.currentTarget.dataset !== undefined     &&
-			elToFocus.currentTarget.dataset.for !== undefined
-		){
-			this.$('[name='+ elToFocus.currentTarget.dataset.for +']').focus();
-		} else {
-			this.$(elToFocus).focus();
-		}
-	},
 });

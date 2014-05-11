@@ -19,12 +19,21 @@ var jsFiles = [
 								'./client/start.js',
 							];
 
+var specFiles = [
+									'./tests/spec/app/*.js',
+									'./tests/spec/mixins/*.js',
+									'./tests/spec/models/*.js',
+									'./tests/spec/collections/*.js',
+									'./tests/spec/views/*.js',
+									'./tests/spec/routers/*.js',
+								]
+
 // ======= //
 // DEFAULT //
 // ======= //
 gulp.task('default', function(){
 	// Run tasks at the beggining
-	gulp.run('jshint', 'concat', 'styles', 'handlebars');
+	gulp.run('jshint', 'concat', 'styles', 'handlebars', 'concat-tests', 'jshint-tests');
 	// Watch for JS changes
 	gulp.watch('./client/**/*.js', function(){
 		gulp.run('jshint', 'concat');
@@ -37,6 +46,10 @@ gulp.task('default', function(){
 	gulp.watch('./client/templates/**/*.hbs', function(){
 		gulp.run('handlebars');
 	});
+	// Watch for new Specs
+	gulp.watch(specFiles, function(){
+		gulp.run('jshint-tests', 'concat-tests');
+	});
 });
 
 // ====== //
@@ -48,6 +61,15 @@ gulp.task('jshint', function(){
 		.pipe(jshint.reporter(stylish));
 });
 
+// ============ //
+// JSHINT TESTS //
+// ============ //
+gulp.task('jshint-tests', function(){
+	gulp.src(specFiles)
+		.pipe(jshint())
+		.pipe(jshint.reporter(stylish));
+});
+
 // ====== //
 // CONCAT //
 // ====== //
@@ -55,6 +77,15 @@ gulp.task('concat', function(){
 	gulp.src(jsFiles)
 		.pipe(concat('client.js'))
 		.pipe(gulp.dest('./public/js/'));
+});
+
+// ============ //
+// CONCAT TESTS //
+// ============ //
+gulp.task('concat-tests', function(){
+	gulp.src(specFiles)
+		.pipe(concat('specs.js'))
+		.pipe(gulp.dest('./tests/spec/'));
 });
 
 // ============ //
