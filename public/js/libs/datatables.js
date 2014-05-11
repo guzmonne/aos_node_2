@@ -25,7 +25,7 @@
 
 	/* Default class modification */
 	$.extend( $.fn.dataTableExt.oStdClasses, {
-		"sWrapper": "dataTables_wrapper form-inline table-responsive"
+		"sWrapper": "dataTables_wrapper form-inline"
 	} );
 
 	/* API method to get paging information */

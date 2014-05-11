@@ -19,6 +19,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
+		var self = this;
 		if(!App.defined(this.tableEl)){
 			return new Error('Attribute tableEl must be set.');
 		}
@@ -47,7 +48,14 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	activateTable: function(){
 		if (this.oTable){return;}
+		var self = this;
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.listenTo(this.collection, 'add' , this.append);//
+		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
+		this.listenTo(this.collection, 'add', this.append);
+	},
+
+	dispose: function(){
+		this.$el.off('resize');
+		Giraffe.dispose.apply(this, arguments);
 	},
 });

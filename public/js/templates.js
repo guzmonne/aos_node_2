@@ -556,7 +556,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"table table-striped table-bordered table-hover table-office\" aria-describedby=\"clients-table-info\">\n				<thead>\n					<tr>\n						<th>Nombre</th>\n						<th>Documento</th>\n						<th>Telefono/s</th>\n						<th>Dirección/es</th>\n						<th>E-mail</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\">\n				</tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
+    + "\" class=\"table table-striped table-bordered table-hover table-office\" aria-describedby=\"clients-table-info\">\n				<thead>\n					<tr>\n						<th>Nombre</th>\n						<th>Documento</th>\n						<th>Telefono/s</th>\n						<th>Dirección/es</th>\n						<th>E-mail</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\"></tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

@@ -15,7 +15,7 @@ App.Views.NavView = Giraffe.View.extend({
 
 	events: {
 		'click #toggle-sidebar': 'toggleSidebar',
-		'click .navbar-brand': 'toggleSidebar'
+		'click .navbar-brand'  : 'toggleSidebar'
 	},
 
 	afterRender: function(){

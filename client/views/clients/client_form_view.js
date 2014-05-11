@@ -70,11 +70,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	addAddress: function(){
-		var attrs = {
-			street    : this.$('[name=street]').val(),
-			city      : this.$('[name=city]').val(),
-			department: this.$('[name=department]').val(),
-		};
+		var attrs = _.pick(this.$('form').formParams(), 'street', 'city', 'department');
 		if(attrs.street === ""){return;}
 		this.model.addresses.add(attrs);
 	},
@@ -96,13 +92,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	setModel: function(){
-		var attr = {
-			'name'      : this.$('[name=name]').val(), 
-			'doc-type'  : this.$('[name=doc-type]').val(),
-			'doc-number': this.$('[name=doc-number]').val(),
-			'email'     : this.$('[name=email]').val(),
-		};
-		this.model.set(attr);
+		this.model.set(_.pick(this.$('form').formParams(), 'name', 'email', 'doc-type', 'doc-number'));
 		if(this.$('[name=phone]').val()  !== ''){ this.addPhone(); }
 		if(this.$('[name=street]').val() !== ''){ this.addAddress(); }
 	},

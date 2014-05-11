@@ -1157,6 +1157,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
+		var self = this;
 		if(!App.defined(this.tableEl)){
 			return new Error('Attribute tableEl must be set.');
 		}
@@ -1185,8 +1186,15 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	activateTable: function(){
 		if (this.oTable){return;}
+		var self = this;
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.listenTo(this.collection, 'add' , this.append);//
+		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
+		this.listenTo(this.collection, 'add', this.append);
+	},
+
+	dispose: function(){
+		this.$el.off('resize');
+		Giraffe.dispose.apply(this, arguments);
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -1641,11 +1649,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	addAddress: function(){
-		var attrs = {
-			street    : this.$('[name=street]').val(),
-			city      : this.$('[name=city]').val(),
-			department: this.$('[name=department]').val(),
-		};
+		var attrs = _.pick(this.$('form').formParams(), 'street', 'city', 'department');
 		if(attrs.street === ""){return;}
 		this.model.addresses.add(attrs);
 	},
@@ -1667,13 +1671,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	},
 
 	setModel: function(){
-		var attr = {
-			'name'      : this.$('[name=name]').val(), 
-			'doc-type'  : this.$('[name=doc-type]').val(),
-			'doc-number': this.$('[name=doc-number]').val(),
-			'email'     : this.$('[name=email]').val(),
-		};
-		this.model.set(attr);
+		this.model.set(_.pick(this.$('form').formParams(), 'name', 'email', 'doc-type', 'doc-number'));
 		if(this.$('[name=phone]').val()  !== ''){ this.addPhone(); }
 		if(this.$('[name=street]').val() !== ''){ this.addAddress(); }
 	},
@@ -1960,7 +1958,7 @@ App.Views.NavView = Giraffe.View.extend({
 
 	events: {
 		'click #toggle-sidebar': 'toggleSidebar',
-		'click .navbar-brand': 'toggleSidebar'
+		'click .navbar-brand'  : 'toggleSidebar'
 	},
 
 	afterRender: function(){
