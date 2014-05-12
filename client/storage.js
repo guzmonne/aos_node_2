@@ -8,19 +8,41 @@ App.Storage = (function(){
 		};
 
 		var setSubCollection = function(collection, objects, options, context){
-			if (!collection){ throw new Error('No "collection" was passed'); }
+			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
+			var subCollection;
 			collection    = colls[collection];
 			subCollection = new collection.constructor();
-			collection.set(objects);
-			_.each(objects, function(obj){
-				subCollection.add(collection.where(obj));
-			});
+			options       = (options) ? options : {};
+			subCollection.set(collection.set(objects, {remove: false}));
+			if (options.filter){
+				var matches = _.matches(options.filter);
+				subCollection.listenTo(collection, 'add', function(model){
+					if(matches(model.attributes)){
+						subCollection.add(model);
+					}
+				});
+				subCollection.listenTo(collection, 'remove', function(model){
+					if(matches(model.attributes)){
+						subCollection.remove(model);
+					}
+				});
+				_.each(_.keys(options.filter), function(key){
+					subCollection.on('change:' + key, function(model){
+						if(!matches(model.attributes)){
+							subCollection.remove(model);
+						}
+					});
+				});
+				subCollection.listenTo(subCollection, 'disposing', function(){
+					subCollection.off('change');
+				});
+			}
 			return subCollection;
 		};
 
 		var getCollection = function(collection, options, context){
-			if (!collection){ throw new Error('No "collection" was passed'); }
+			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
 			var fetch;
 			collection = colls[collection];
@@ -32,8 +54,8 @@ App.Storage = (function(){
 		};
 
 		var getModel = function(collection, id, options, context){
-			if (!collection){ throw new Error('No "collection" was passed'); }
-			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
+			if (!collection)            { throw new Error('No "collection" was passed'); }
+			if (!colls[collection])     { throw new Error('Collection "'+collection+'" is not defined'); }
 			if (!id && !_.isString(id)) { throw new Error('An "id must be passed"'); }
 			var model, fetch;
 			collection = colls[collection];
@@ -51,7 +73,7 @@ App.Storage = (function(){
 		};
 
 		var getSubCollection = function(collection, condition, options, context){
-			if (!collection){ throw new Error('No "collection" was passed'); }
+			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
 			if (!condition && !_.isObject(condition)) { throw new Error('A "condition" must be passed'); }
 			var success, fetch, conModels;
@@ -73,21 +95,21 @@ App.Storage = (function(){
 		};
 
 		var add = function(collection, model){
-			if (!collection){ throw new Error('No "collection" was passed'); }
+			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
-			colls[collection].add(model);
+			return colls[collection].add(model, {merge: true});
 		};
 
 		var get = function(collection, id){
-			if (!collection){ throw new Error('No "collection" was passed'); }
+			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
-			colls[collection].get(id);
+			return colls[collection].get(id);
 		};
 
 		var remove = function(collection, id){
-			if (!collection){ throw new Error('No "collection" was passed'); }
+			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
-			colls[collection].remove(colls[collection].get(id));
+			return colls[collection].remove(colls[collection].get(id));
 		};
 
 		return {

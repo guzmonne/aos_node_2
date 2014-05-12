@@ -23,7 +23,7 @@ describe('App.Storage', function(){
 	beforeEach(function(){
 		this.storage = App.Storage.getInstance();
 		this.storage.add("clients", {_id: 1});
-		this.storage.add("service_requests", [{_id: 1, client_id: 1}, {_id: 2, client_id: 1}]);
+		this.storage.add("service_requests", [{_id: 1, f1: 1}, {_id: 2, f1: 1}]);
 	});
 
 	afterEach(function(){
@@ -66,6 +66,50 @@ describe('App.Storage', function(){
 			expect(subCol.length).toEqual(2);
 			this.storage.remove("clients", 2);
 			this.storage.remove("clients", 3);
+		});
+
+		describe("setSubCollection() with options.filter", function(){
+			beforeEach(function(){
+				this.testCol = this.storage.setSubCollection("service_requests", [
+					{_id: 3, f1: 1, f2: 2}, {_id: 4, f1: 1, f2: 2}
+				], {filter: {f1: 1, f2: 2}});
+			});
+
+			afterEach(function(){
+				this.testCol.dispose();
+				this.storage.remove("service_requests", 3);
+				this.storage.remove("service_requests", 4);
+				this.testCol = undefined;
+			});
+
+			it("should add an event listener for 'add' events on the main collection and add it if it matches", function(){
+				expect(this.testCol.length).toEqual(2);
+				this.storage.add('service_requests', {_id: 5, f1:1, f2:2});
+				expect(this.testCol.length).toEqual(3);
+				this.storage.remove('service_requests', 5);
+			});
+			
+			it("should add an event listener for 'remove' events on the main collection and remove it", function(){
+				expect(this.testCol.length).toEqual(2);
+				this.storage.remove('service_requests', 3);
+				expect(this.testCol.length).toEqual(1);
+			});
+
+			it("should add an event listener for every 'client:key' events on the main collection and remove it if it does not match", function(){
+				expect(this.testCol.length).toEqual(2);
+				this.storage.add('service_requests', {_id: 3, f1: 1, f2: 1});
+				expect(this.testCol.length).toEqual(1);
+				this.storage.add('service_requests', {_id: 4, f1: 2, f2: 2});
+				expect(this.testCol.length).toEqual(0);
+			});
+
+			it("should add an event listener for the 'dispose' event on the subCollection to stop listening to events", function(){
+				expect(this.testCol.length).toEqual(2);
+				this.testCol.dispose();
+				this.storage.add("service_requests", {_id: 5, f1: 1, f2:2});
+				expect(this.testCol.length).toEqual(0);
+				this.storage.remove('service_requests', 5);
+			});
 		});
 	});
 
@@ -169,18 +213,18 @@ describe('App.Storage', function(){
 
 		it("should not call fetch if 'options.fetch' equals false", function(){
 			spyOn(Giraffe.Collection.prototype, 'fetch');
-			this.storage.getSubCollection('service_requests', {client_id: 1}, {fetch: false});
+			this.storage.getSubCollection('service_requests', {f1: 1}, {fetch: false});
 			expect(Giraffe.Collection.prototype.fetch).not.toHaveBeenCalled();
 		});
 
 		it("should call the 'fetch()' method on the collection", function(){
 			spyOn(Giraffe.Collection.prototype, 'fetch');
-			this.storage.getSubCollection('service_requests', {client_id: 1});
+			this.storage.getSubCollection('service_requests', {f1: 1});
 			expect(Giraffe.Collection.prototype.fetch).toHaveBeenCalled();
 		});
 
 		it("should return a collection form from the models on the main collection", function(){
-			var col = this.storage.getSubCollection('service_requests', {client_id: 1}, {fetch: false}); 
+			var col = this.storage.getSubCollection('service_requests', {f1: 1}, {fetch: false}); 
 			expect(col instanceof Giraffe.Collection).toBe(true);
 			expect(col.length).toEqual(2);
 		});
