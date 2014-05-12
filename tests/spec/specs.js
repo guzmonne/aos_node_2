@@ -513,6 +513,41 @@ describe("App.Views.ClientFormView", function(){
 			});
 		});
 	});
+	
+	describe("Form", function(){
+		describe("toggleButtons()", function(){
+			beforeEach(function(){
+				this.v = new App.Views.ClientFormView({
+					model : new App.Models.Client({_id: 123}),
+				});
+				this.v.render();
+			});
+
+			afterEach(function(){
+				this.v.dispose();
+				this.v = undefined;
+			});
+
+			it("should toggle the edit and update buttons", function(){
+				expect(this.v.model.isNew()).toBe(false);
+				expect(this.v.$('#update-form').hasClass('hide')).toBe(true);
+				expect(this.v.$('#edit-form').hasClass('hide')).toBe(false);
+				this.v.toggleButtons();
+				expect(this.v.$('#update-form').hasClass('hide')).toBe(false);
+				expect(this.v.$('#edit-form').hasClass('hide')).toBe(true);
+				this.v.dispose();
+			});
+			
+			it("should call the 'unblockForm()' method", function(){
+				spyOn(this.v, 'unblockForm');
+				expect(this.v.$('#update-form').hasClass('hide')).toBe(true);
+				this.v.toggleButtons();
+				expect(this.v.$('#update-form').hasClass('hide')).toBe(false);
+				expect(this.v.unblockForm).toHaveBeenCalled();
+			});
+		});
+
+	});
 });
 describe("App.Views.ClientShowView", function(){
 	beforeEach(function(){

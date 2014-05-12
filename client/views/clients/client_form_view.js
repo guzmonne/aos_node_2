@@ -14,6 +14,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'click button.edit-address'      : 'editAddress',
 		'click #reset-form'              : 'render',
 		'click #update-form'             : 'updateModel',
+		'click #edit-form'               : 'toggleButtons',
 		'submit form'                    : 'createModel',
 	},
 
@@ -33,6 +34,16 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	afterRender: function(){
 		this.renderPhones();
 		this.renderAddresses();
+		if(!this.model.isNew()){this.blockForm();}
+	},
+
+	toggleButtons: function(){
+		if (this.$('#update-form').hasClass('hide')){
+			this.unblockForm();
+		} else {
+			this.blockForm();
+		}
+		this.$('.update-buttons').toggleClass('hide');
 	},
 
 	renderPhones: function(){
@@ -121,6 +132,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		if (e){e.preventDefault();}
 		var self = this;
 		this.setModel();
+		if (!this.model.hasChanged()){return;}
 		this.model.save(null, {
 			success: function(model, response, options){
 				self.invoke('showMessage', {
@@ -130,6 +142,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 				});
 			},
 		});
+		this.toggleButtons();
 	},
 
 });

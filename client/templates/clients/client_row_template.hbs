@@ -1,7 +1,11 @@
-<td>{{name}}</td>
 <td>
-	<dt>{{doc-type}}</dt>
-	<dd>{{doc-number}}</dd>
+	<ul class="list-unstyled">
+		<li><strong style="font-size: 16px">{{name}}</strong></li>
+		<li><strong>{{doc-type}}</strong> <i class="fa fa-barcode fa-fw"></i> {{doc-number}}</li>
+		{{#if email}}
+			<li><i class="fa fa-envelope fa-fw"></i> {{email}}</li>
+		{{/if}}
+	</ul>
 </td>
 <td>
 	<ul class="list-unstyled">
@@ -18,7 +22,6 @@
 		</address>
 	{{/addresses}}
 </td>
-<td>{{email}}</td>
 <td class="center-vh">
 	<a href="#render/client/show/{{_id}}" id="show" class="btn btn-green" data-toggle="tooltip" data-placement="top" title="Más Información">
 		<i class="fa fa-ellipsis-h fa-lg"></i>

@@ -31,11 +31,23 @@
 	<div class="form-group">
 		{{#unless _id}}
 			<div class="col-xs-offset-2 col-xs-8">
-				<button type="submit" class="btn btn-dark-blue">Crear</button>
+				<button type="submit" class="btn btn-dark-blue">
+					<i class="fa fa-save"></i>
+					Crear
+				</button>
 			</div>
 		{{else}}
 			<div class="col-xs-offset-2 col-xs-8">
-				<button id="update-form" class="btn btn-warning">Actualizar</button>
+				<button id="update-form" class="btn btn-warning update-buttons hide">
+					<i class="fa fa-save"></i>
+					Actualizar
+				</button>
+			</div>
+			<div class="col-xs-offset-2 col-xs-8">
+				<button id="edit-form" class="btn btn-primary update-buttons">
+					<i class="fa fa-pencil"></i>
+					Editar
+				</button>
 			</div>
 		{{/unless}}
 	</div>

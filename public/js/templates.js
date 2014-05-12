@@ -503,13 +503,13 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   
-  return "\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button type=\"submit\" class=\"btn btn-dark-blue\">Crear</button>\n			</div>\n		";
+  return "\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button type=\"submit\" class=\"btn btn-dark-blue\">\n					<i class=\"fa fa-save\"></i>\n					Crear\n				</button>\n			</div>\n		";
   }
 
 function program5(depth0,data) {
   
   
-  return "\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button id=\"update-form\" class=\"btn btn-warning\">Actualizar</button>\n			</div>\n		";
+  return "\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button id=\"update-form\" class=\"btn btn-warning update-buttons hide\">\n					<i class=\"fa fa-save\"></i>\n					Actualizar\n				</button>\n			</div>\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button id=\"edit-form\" class=\"btn btn-primary update-buttons\">\n					<i class=\"fa fa-pencil\"></i>\n					Editar\n				</button>\n			</div>\n		";
   }
 
   buffer += "<form class=\"form-horizontal\">\n	<div class=\"form-group\">\n		<label for=\"name\" class=\"col-xs-2 control-label\">Nombre</label>\n		<div class=\"col-xs-10\">\n			<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"e.j: Juan Perez\" value=\"";
@@ -556,7 +556,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"table table-striped table-bordered table-hover table-office\" aria-describedby=\"clients-table-info\">\n				<thead>\n					<tr>\n						<th>Nombre</th>\n						<th>Documento</th>\n						<th>Telefono/s</th>\n						<th>Dirección/es</th>\n						<th>E-mail</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\"></tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
+    + "\" class=\"table table-striped table-bordered table-hover table-office\" aria-describedby=\"clients-table-info\">\n				<thead>\n					<tr>\n						<th>Datos</th>\n						<th>Telefono/s</th>\n						<th>Dirección/es</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\"></tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -575,6 +575,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 function program1(depth0,data) {
   
   var buffer = "", stack1;
+  buffer += "\n			<li><i class=\"fa fa-envelope fa-fw\"></i> ";
+  if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</li>\n		";
+  return buffer;
+  }
+
+function program3(depth0,data) {
+  
+  var buffer = "", stack1;
   buffer += "\n			<li><i class=\"fa fa-phone fa-muted fa-fw\"></i>";
   if (stack1 = helpers.number) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.number); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
@@ -583,7 +594,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-function program3(depth0,data) {
+function program5(depth0,data) {
   
   var buffer = "", stack1;
   buffer += "\n		<address>\n	  	<strong>";
@@ -602,35 +613,34 @@ function program3(depth0,data) {
   return buffer;
   }
 
-  buffer += "<td>";
+  buffer += "<td>\n	<ul class=\"list-unstyled\">\n		<li><strong style=\"font-size: 16px\">";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td>\n	<dt>";
+    + "</strong></li>\n		<li><strong>";
   if (stack1 = helpers['doc-type']) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0['doc-type']); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</dt>\n	<dd>";
+    + "</strong> <i class=\"fa fa-barcode fa-fw\"></i> ";
   if (stack1 = helpers['doc-number']) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0['doc-number']); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</dd>\n</td>\n<td>\n	<ul class=\"list-unstyled\">\n		";
-  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
+    + "</li>\n		";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.email), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	</ul>\n</td>\n<td>\n	<ul class=\"list-unstyled\">\n		";
+  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
   if (stack1 = helpers.phones) { stack1 = stack1.call(depth0, options); }
   else { stack1 = (depth0 && depth0.phones); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
   if (!helpers.phones) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n	</ul>\n</td>\n<td>\n	";
-  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
+  options = {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data};
   if (stack1 = helpers.addresses) { stack1 = stack1.call(depth0, options); }
   else { stack1 = (depth0 && depth0.addresses); stack1 = typeof stack1 === functionType ? stack1.call(depth0, options) : stack1; }
   if (!helpers.addresses) { stack1 = blockHelperMissing.call(depth0, stack1, options); }
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</td>\n<td>";
-  if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</td>\n<td class=\"center-vh\">\n	<a href=\"#render/client/show/";
+  buffer += "\n</td>\n<td class=\"center-vh\">\n	<a href=\"#render/client/show/";
   if (stack1 = helpers._id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0._id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
