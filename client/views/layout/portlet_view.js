@@ -51,12 +51,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	stopSpin: function(){
 		if (this.$('#sync i').hasClass('fa-spinner')) {
 			this.$('#sync i').removeClass('fa-spinner fa-spin').addClass('fa-undo');
-			this.flash = {
+			this.showMessage({
 				title  : 'Datos Actualizados',
 				message: 'Los datos se han actualizado correctamente',
 				class  : 'success',
-			};
-			this.displayFlash();
+			});
 		}
 	},
 

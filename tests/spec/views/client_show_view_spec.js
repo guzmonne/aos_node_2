@@ -17,11 +17,13 @@ describe("App.Views.ClientShowView", function(){
 		spyOn($, 'ajax').and.callFake(function(options){
 			options.success(MOCK_GET_DATA);
 		});
+		$('#page-wrapper').append('<div id="client-service_requests-'+this.view.timestamp+'"></div>');
 	});
 
 	afterEach(function(){
 		this.view.dispose();
 		this.view = undefined;
+		$('#page-wrapper').empty();
 	});
 
 	describe("renderServiceRequests()", function(){

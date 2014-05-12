@@ -578,7 +578,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	afterSync: function(){
-		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
+		this.invoke('stopSpin');
 	},
 
 	// !!!
@@ -1139,12 +1139,17 @@ App.Views.TabView = App.Views.BaseView.extend({
 App.Views.TableView = App.Views.BaseView.extend({
 	rowViewOptions: {},
 	fetchOptions	: {},
-	fetchOnRender : true,
+
+	constructor: function(options){
+		this.rendered = false;
+		this.synced   = (options.synced) ? options.synced : false;
+		Giraffe.View.apply(this, arguments);
+	},
 
 	initialize: function(){
 		var self = this;
 		this.awake.apply(this, arguments);
-		this.listenTo(this.collection, 'sync', this.afterSync);
+		this.listenTo(this.collection, 'sync', this.tableFetched);
 		_.bind(this.append, this);
 		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
@@ -1159,17 +1164,33 @@ App.Views.TableView = App.Views.BaseView.extend({
 	afterRender: function(){
 		var self = this;
 		if(!App.defined(this.tableEl)){
-			return new Error('Attribute tableEl must be set.');
+			throw new Error('Attribute tableEl must be set.');
 		}
-		this.activateTable();
-		this.appendCollection(this.collection);
+		if(this.synced === true && this.rendered === false){ this.appendCollection(); }
+		this.rendered = true;
 	},
 
 	appendCollection: function(collection){
-		var self = this;
-		_.each(collection.models, function(model){
-			self.append(model);
+		var self   = this;
+		this.$('tbody').remove();
+		this.tbody = $('<tbody />');
+		_.each(this.collection.models, function(model){
+			self.rowViewOptions.model = model;
+			var view = new self.modelView(self.rowViewOptions);
+			self.addChild(view);
+			self.tbody.append(view.render().el);
 		});
+		this.$('table').append(this.tbody);
+		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
+		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
+		this.stopListening(this.collection, 'add', this.append);
+		this.listenTo(this.collection, 'add', this.append);
+	},
+
+	tableFetched: function(){
+		this.afterSync();
+		if(this.rendered === true && this.synced === false){ this.appendCollection(); }
+		this.synced = true;
 	},	
 
 	append: function(model){
@@ -1182,14 +1203,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 
 	onSync: function(){
 		this.collection.fetch(this.fetchOptions);
-	},
-
-	activateTable: function(){
-		if (this.oTable){return;}
-		var self = this;
-		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
-		this.listenTo(this.collection, 'add', this.append);
 	},
 
 	dispose: function(){
@@ -2048,12 +2061,11 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	stopSpin: function(){
 		if (this.$('#sync i').hasClass('fa-spinner')) {
 			this.$('#sync i').removeClass('fa-spinner fa-spin').addClass('fa-undo');
-			this.flash = {
+			this.showMessage({
 				title  : 'Datos Actualizados',
 				message: 'Los datos se han actualizado correctamente',
 				class  : 'success',
-			};
-			this.displayFlash();
+			});
 		}
 	},
 
@@ -2463,7 +2475,6 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 		var el = this.$('#service-request-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
 			collection   : this.model.appliances,
-			fetchOnRender: false
 		});
 		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},

@@ -29,7 +29,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	afterSync: function(){
-		app.trigger('portlet:view: '+ this.cid +':sync:spin:stop');
+		this.invoke('stopSpin');
 	},
 
 	// !!!

@@ -29,6 +29,10 @@
   <script src="../public/js/templates-helpers.js"></script>
   <script src="../public/js/templates.js"></script>
   <script src="../public/js/client.js"></script>
+  <script>
+    App.Views.BaseView.prototype.showMessage = function(){};
+    App.Views.BaseView.prototype.stopSpin = function(){};
+  </script>
 
   <!-- include spec files here... -->
   <script src="./spec/specs.js"></script>
@@ -36,5 +40,13 @@
 </head>
 
 <body>
+  <div id="app" style="display: none">
+    <div id="wrapper">      
+      <header id="nav-el"></header>  
+      <aside id="sidebar-el" class="sidebar-collapse"></aside>
+      <section id="page-wrapper" class="make-space-right row"></section>
+      <aside id="scroller-el"></aside>
+    </div>
+  </div>
 </body>
 </html>
