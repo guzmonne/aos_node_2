@@ -70,6 +70,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ================
 if ('development' == app.get('env')) {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(express.static(path.join(__dirname, 'tests')));
 }
 
 // ===============

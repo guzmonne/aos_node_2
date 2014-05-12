@@ -16,6 +16,7 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 		var el = this.$('#service-request-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
 			collection   : this.model.appliances,
+			synced       : true,
 		});
 		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},

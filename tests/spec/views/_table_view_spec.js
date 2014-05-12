@@ -113,9 +113,9 @@ describe("App.Views.TableView", function(){
 			this.view.modelView = App.Views.RowView.extend({
 				template: function(attrs){
 					var foo = (attrs.foo) ? attrs.foo : 'bar';
-					return '<td>'+ foo + '</td>'
+					return '<td>'+ foo + '</td>';
 				},
-			})
+			});
 			this.view.render();
 		});
 
