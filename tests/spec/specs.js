@@ -32,6 +32,49 @@ describe('App.Storage', function(){
 		this.storage.remove("service_requests", 2);
 	});
 
+	describe("setModel(collection, options, context)", function(){
+		it("should throw an error if a collection was not passed", function(){
+			var self = this;
+			expect(function(){
+				return self.storage.setModel();
+			})
+			.toThrowError('No "collection" was passed');
+		});	
+
+		it("should throw an error if a collection is not defined", function(){
+			var self = this;
+			expect(function(){
+				return self.storage.setModel('error');
+			})
+			.toThrowError('Collection "error" is not defined');
+		});
+
+		it("should return an existing model fron the collection if 'options._id' is passed", function(){
+			var cid = this.storage.get("clients", 1).cid;
+			expect(this.storage.setModel("clients", {_id: 1}).cid).toEqual(cid);
+		});
+
+		it("should return an existing model from the collection if 'options.attributes._id' is passed", function(){
+			var cid = this.storage.get("clients", 1).cid;
+			expect(this.storage.setModel("clients", { attributes: {_id: 1} }).cid).toEqual(cid);
+		});
+
+		it("should return a new model if no 'options._id' is passed or it does no exists in the collection", function(){
+			var m1 = this.storage.setModel("clients");
+			var m2 = this.storage.setModel("clients", {_id: 2});
+			expect(m1.isNew()).toBe(true);
+			expect(m2.hasChanged()).toBe(false);
+			this.storage.remove("clients", m1);
+			this.storage.remove("clients", m2);
+		});
+
+		it("should set the attributes passed on 'options.attributes'", function(){
+			var m1 = this.storage.setModel("clients", {attributes: {_id: 2, foo: "bar"}});
+			expect(m1.get("foo")).toEqual("bar");
+			this.storage.remove("service_requests", m1);
+		});
+	});
+
 	describe("setSubCollection(collection, objects, options, context)", function(){
 		it("should throw an error if a collection was not passed", function(){
 			var self = this;
@@ -110,6 +153,18 @@ describe('App.Storage', function(){
 				expect(this.testCol.length).toEqual(0);
 				this.storage.remove('service_requests', 5);
 			});
+
+			it("should accept a function on the filter array that returns the 'filter' object", function(){
+				var m = new App.Models.BaseModel({_id: 1});
+				m.clients = this.storage.setSubCollection("clients", [
+					{_id: 3, f1: 1, f2: 2}, {_id: 4, f1: 1, f2: 2}
+				], {filter: function(){
+					return {f1: m.id};
+				}});
+				expect(m.clients.length).toEqual(2);
+				this.storage.remove("clients", 3);
+				this.storage.remove("clients", 4);
+			});
 		});
 	});
 
@@ -176,6 +231,12 @@ describe('App.Storage', function(){
 				return self.storage.remove('error');
 			})
 			.toThrowError('Collection "error" is not defined');
+		});
+
+		it("should remove the model if its passed to the method", function(){
+			var m = this.storage.get("clients", 1);
+			this.storage.remove("clients", m);
+			expect(this.storage.collection("clients").length).toBe(0);
 		});
 
 		it("should call the 'collection's' 'remove()' method", function(){
@@ -270,6 +331,16 @@ describe('App.Storage', function(){
 		it("should return the model from the collection if found", function(){
 			expect(this.storage.getModel('clients',1, {fetch: false}) instanceof Giraffe.Model).toBe(true);
 		});
+
+		it("should set the model attributes if 'options.attributes' is passed", function(){
+			var m = this.storage.getModel('clients', 1, {
+				fetch: false,
+				attributes: {
+					foo: 'bar'
+				}
+			});
+			expect(m.get('foo')).toEqual('bar');
+		});
 	});
 
 	describe('getCollection(collection, options, context)', function(){
@@ -318,6 +389,7 @@ describe("App.Models.BaseModel", function() {
 
   beforeEach(function() {
     model = new App.Models.BaseModel();
+    this.storage = App.Storage.getInstance();
   });
 
   it("should call its awake method on initialize", function(){
@@ -347,6 +419,15 @@ describe("App.Models.BaseModel", function() {
           }
         ],
       });
+      this.FilterModel = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'clients',
+            type     : 'collection',
+            filter   : function(){return {f1: this.id};}    
+          },
+        ],
+      });
       this.ErrorTestModel1 = App.Models.BaseModel.extend({
         childs: "test",
       });
@@ -370,7 +451,34 @@ describe("App.Models.BaseModel", function() {
           },
         ],
       });
+      this.ErrorTestModel6 = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'attribute',
+            type     : 'error',   
+          },
+        ],
+      });
+      this.OkTestModel1 = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'client',
+            type     : 'model',
+            filter   : {_id: 1},  
+          },
+        ],
+      });
+      this.OkTestModel2 = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'clients',
+            type     : 'collection',
+            filter   : {_id: 1},  
+          },
+        ],
+      });
       this.test = new this.TestModel();
+      this.testFilter = new this.FilterModel({_id: 1});
     });
 
     afterEach(function(){
@@ -403,10 +511,29 @@ describe("App.Models.BaseModel", function() {
       expect(function(){new self.ErrorTestModel4();}).toThrowError();
     });
 
-    it("should throw an error if a 'child' doesn't have an 'attribute', 'type', or 'name' key", function(){
+    it("should throw an error if a 'child' doesn't have an 'attribute' or 'type'", function(){
       var self = this;
       expect(function(){new self.TestModel();}).not.toThrowError();
       expect(function(){new self.ErrorTestModel3();}).toThrowError();
+    });
+
+    it("should throw an error if a 'child' doesn't have a 'type' or a 'filter' attribute", function(){
+      var self = this;
+      expect(function(){new self.ErrorTestModel6();}).toThrowError();
+      expect(function(){new self.TestModel();}).not.toThrowError();
+      expect(function(){new self.OkTestModel1();}).not.toThrowError();
+    });
+
+    it("should call the storage's 'setModel()' method if 'type' equals 'model' and 'filter' is defined", function(){
+      spyOn(this.storage, 'setModel').and.callThrough();
+      m = new this.OkTestModel1();
+      expect(this.storage.setModel).toHaveBeenCalled();
+    });
+
+    it("should call the storage's 'setSubCollection()' method if 'type' equals 'collection' and 'filter' is defined", function(){
+      spyOn(this.storage, 'setSubCollection').and.callThrough();
+      m = new this.OkTestModel2();
+      expect(this.storage.setSubCollection).toHaveBeenCalled();
     });
 
     it("should add the childs objects to the children array", function(){

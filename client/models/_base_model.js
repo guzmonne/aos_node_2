@@ -12,8 +12,6 @@ App.Models.BaseModel = Giraffe.Model.extend({
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		//this.listenTo(this, 'sync'                      , this.modelUpdated);
-		//this.listenTo(app , this.name + ':model:updated', this.updateModel);
 	},
 
 	createChilds: function(){
@@ -24,9 +22,9 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		var childs = this.childs;
 		var attrs = (arguments.length > 0) ? arguments[0] : {};
 		_.each(childs, function(child){
-			var attribute, type;
-			if (!child.attribute || !child.type || !child.name){
-				throw new Error("Every 'child' should have an 'attribute', 'name' and 'type' key value");
+			var attribute, type, storage;
+			if (!child.attribute || !child.type){
+				throw new Error("Every 'child' should have an 'attribute' and 'type' key value");
 			}
 			if (child.type === 'model'){
 				type = "Models";
@@ -35,12 +33,32 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			} else {
 				throw new Error("'child' type must be 'model' or 'collection'");
 			}
-			self[child.attribute] = new App[type][child.name]();
+			if (child.name && child.filter){
+				throw new Error("A 'child' can't have both a 'name' an a 'filter' options");
+			} else if (child.name && !child.filter) {
+				self[child.attribute] = new App[type][child.name]();
+				if (attrs[child.attribute]){
+					self[child.attribute].set(attrs[child.attribute]);
+				}
+			} else if  (!child.name && child.filter) {
+					var collection, options, objects;
+					if (child.type === "model"){
+						collection = (child.collection) ? child.collection : child.attribute + 's';
+						options    = {};
+						if (attrs[child.attribute]) { options.attributes = attrs[child.attribute]; }
+						self[child.attribute] = app.storage.setModel(collection, options);
+					} else {
+						collection            = (child.collection) ? child.collection : child.attribute;
+						options               = {};
+						objects               = (attrs[child.attribute]) ? attrs[child.attribute] : {};
+						options.filter        = child.filter;
+						self[child.attribute] = app.storage.setSubCollection(collection, objects, options);
+					}
+			} else {
+				throw new Error('A "child" must have either a "name" or a "filter" value');
+			}
 			self[child.attribute].parent = self; 
 			self.children.push(self[child.attribute]);
-			if (attrs[child.attribute]){
-				self[child.attribute].set(attrs[child.attribute]);
-			}
 			var triggerChange = function(){
 				self.set(child.attribute, self[child.attribute].toJSON());
 			};
@@ -49,6 +67,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			} else if (child.type === "collection"){
 				self.listenTo(self[child.attribute], 'add', triggerChange);
 				self.listenTo(self[child.attribute], 'remove', triggerChange);
+				self.listenTo(self[child.attribute], 'change', triggerChange);
 			}
 			self[child.attribute].listenTo(self, 'disposing', self[child.attribute].dispose);
 		});
@@ -67,27 +86,6 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			});
 		}
 		return response;
-	},
-
-	// When the model gets synced with the server it calls the modelUpdated function.
-	// This function will then trigger a custom event to let other models know that
-	// it has been updated.
-	modelUpdated: function(){
-		app.trigger(this.name + ':model:updated', this);
-	},
-
-	// When the model hears that a model of its kind was updated it checks if it has
-	// to incorporate this new data on itself. Once its done it will run another
-	// cutom event to let the views know that some changes occured.
-	updateModel: function(otherModel){
-		if (otherModel.cid !== this.cid && otherModel.id === this.id){
-			if (_.isFunction(this.customUpdate)){
-				this.customUpdate(otherModel);
-			} else {
-				this.set(otherModel.attributes, {silent: true});
-			}
-			this.trigger('updated');
-		}
 	},
 	
 	// Just a basic function to parse a 'Date()' type.

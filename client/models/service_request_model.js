@@ -15,16 +15,15 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		};
 	},
 
-	parse: function(response){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-		if (App.defined(response.appliances)){
-			this.set('appliancesCount', response.appliances.length);
-			this.appliances.reset(response.appliances);
-		}
-		return response;
-	},
+	childs: [
+		{
+			attribute: 'appliances',
+			type: 'collection',
+			filter: function(){
+				return {service_request_id: this.id};
+			}
+		},
+	],
 
 	serialize: function(){
 		var attributes = this.toJSON();

@@ -90,41 +90,15 @@ App.Storage = (function(){
 		var colls = {
 			clients         : new App.Collections.Clients(),
 			service_requests: new App.Collections.ServiceRequests(),
+			appliances      : new App.Collections.Appliances(),
+			models          : new App.Collections.Models(),
+			users           : new App.Collections.Users(),
 		};
 
-		var setSubCollection = function(collection, objects, options, context){
-			if (!collection)        { throw new Error('No "collection" was passed'); }
-			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
-			var subCollection;
-			collection    = colls[collection];
-			subCollection = new collection.constructor();
-			options       = (options) ? options : {};
-			subCollection.set(collection.set(objects, {remove: false}));
-			if (options.filter){
-				var matches = _.matches(options.filter);
-				subCollection.listenTo(collection, 'add', function(model){
-					if(matches(model.attributes)){
-						subCollection.add(model);
-					}
-				});
-				subCollection.listenTo(collection, 'remove', function(model){
-					if(matches(model.attributes)){
-						subCollection.remove(model);
-					}
-				});
-				_.each(_.keys(options.filter), function(key){
-					subCollection.on('change:' + key, function(model){
-						if(!matches(model.attributes)){
-							subCollection.remove(model);
-						}
-					});
-				});
-				subCollection.listenTo(subCollection, 'disposing', function(){
-					subCollection.off('change');
-				});
-			}
-			return subCollection;
+		var collection = function(collection){
+			return this.getCollection(collection, {fetch: false});
 		};
+
 
 		var getCollection = function(collection, options, context){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
@@ -138,6 +112,23 @@ App.Storage = (function(){
 			return collection;
 		};
 
+		var setModel = function(collection, options, context){
+			if (!collection)            { throw new Error('No "collection" was passed'); }
+			if (!colls[collection])     { throw new Error('Collection "'+collection+'" is not defined'); }
+			var model, id;
+			collection = colls[collection];
+			options    = (options) ? options : {};
+			if (options.attributes && options.attributes._id){ id = options.attributes._id; }
+			if (!id && options._id) { id = options._id; }
+			if (id){ model = collection.get(id); }
+			if (model === undefined){
+				model = new collection.model({_id: id});
+				collection.add(model);
+			}
+			if (options.attributes){ model.set(options.attributes); }
+			return model;
+		};
+
 		var getModel = function(collection, id, options, context){
 			if (!collection)            { throw new Error('No "collection" was passed'); }
 			if (!colls[collection])     { throw new Error('Collection "'+collection+'" is not defined'); }
@@ -147,14 +138,49 @@ App.Storage = (function(){
 			options    = (options) ? options : {};
 			context    = (context) ? context : this;
 			fetch      = (options.fetch === false) ? false : true;
-			options.id = id;
 			model = collection.get(id);
 			if (model === undefined){
 				model = new collection.model({_id: id});
 				collection.add(model);
 			}
+			if (options.attributes){ model.set(options.attributes); }
 			if (fetch === true){ model.fetch(options); }
 			return model;
+		};
+
+		var setSubCollection = function(collection, objects, options, context){
+			if (!collection)        { throw new Error('No "collection" was passed'); }
+			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
+			var subCollection;
+			collection    = colls[collection];
+			subCollection = new collection.constructor();
+			options       = (options) ? options : {};
+			subCollection.set(collection.set(objects, {remove: false}));
+			if (options.filter){
+				subCollection.listenTo(collection, 'add', function(model){
+					var matches = _.matches(_.result(options, 'filter'));
+					if(matches(model.attributes)){
+						subCollection.add(model);
+					}
+				});
+				subCollection.listenTo(collection, 'remove', function(model){
+					var matches = _.matches(_.result(options, 'filter'));
+					if(matches(model.attributes)){
+						subCollection.remove(model);
+					}
+				});
+				_.each(_.keys(_.result(options, 'filter')), function(key){
+					var matches = _.matches(_.result(options, 'filter'));
+					subCollection.listenTo(collection, 'change:' + key, function(model){
+						if(!matches(model.attributes) && subCollection.get(model)){
+							subCollection.remove(model);
+						} else if (matches(model.attributes) && !subCollection.get(model)){
+							subCollection.add(model);
+						}
+					});
+				});
+			}
+			return subCollection;
 		};
 
 		var getSubCollection = function(collection, condition, options, context){
@@ -194,17 +220,22 @@ App.Storage = (function(){
 		var remove = function(collection, id){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
+			if (id instanceof Giraffe.Model){
+				return colls[collection].remove(id);
+			}
 			return colls[collection].remove(colls[collection].get(id));
 		};
 
 		return {
 			setSubCollection: setSubCollection,
+			setModel        : setModel,
 			getCollection   : getCollection,
 			getModel        : getModel,
 			getSubCollection: getSubCollection,
 			add             : add,
 			remove          : remove,
 			get             : get,
+			collection      : collection,
 		};
 	};
 
@@ -328,8 +359,6 @@ App.Models.BaseModel = Giraffe.Model.extend({
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		//this.listenTo(this, 'sync'                      , this.modelUpdated);
-		//this.listenTo(app , this.name + ':model:updated', this.updateModel);
 	},
 
 	createChilds: function(){
@@ -340,9 +369,9 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		var childs = this.childs;
 		var attrs = (arguments.length > 0) ? arguments[0] : {};
 		_.each(childs, function(child){
-			var attribute, type;
-			if (!child.attribute || !child.type || !child.name){
-				throw new Error("Every 'child' should have an 'attribute', 'name' and 'type' key value");
+			var attribute, type, storage;
+			if (!child.attribute || !child.type){
+				throw new Error("Every 'child' should have an 'attribute' and 'type' key value");
 			}
 			if (child.type === 'model'){
 				type = "Models";
@@ -351,12 +380,32 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			} else {
 				throw new Error("'child' type must be 'model' or 'collection'");
 			}
-			self[child.attribute] = new App[type][child.name]();
+			if (child.name && child.filter){
+				throw new Error("A 'child' can't have both a 'name' an a 'filter' options");
+			} else if (child.name && !child.filter) {
+				self[child.attribute] = new App[type][child.name]();
+				if (attrs[child.attribute]){
+					self[child.attribute].set(attrs[child.attribute]);
+				}
+			} else if  (!child.name && child.filter) {
+					var collection, options, objects;
+					if (child.type === "model"){
+						collection = (child.collection) ? child.collection : child.attribute + 's';
+						options    = {};
+						if (attrs[child.attribute]) { options.attributes = attrs[child.attribute]; }
+						self[child.attribute] = app.storage.setModel(collection, options);
+					} else {
+						collection            = (child.collection) ? child.collection : child.attribute;
+						options               = {};
+						objects               = (attrs[child.attribute]) ? attrs[child.attribute] : {};
+						options.filter        = child.filter;
+						self[child.attribute] = app.storage.setSubCollection(collection, objects, options);
+					}
+			} else {
+				throw new Error('A "child" must have either a "name" or a "filter" value');
+			}
 			self[child.attribute].parent = self; 
 			self.children.push(self[child.attribute]);
-			if (attrs[child.attribute]){
-				self[child.attribute].set(attrs[child.attribute]);
-			}
 			var triggerChange = function(){
 				self.set(child.attribute, self[child.attribute].toJSON());
 			};
@@ -365,6 +414,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			} else if (child.type === "collection"){
 				self.listenTo(self[child.attribute], 'add', triggerChange);
 				self.listenTo(self[child.attribute], 'remove', triggerChange);
+				self.listenTo(self[child.attribute], 'change', triggerChange);
 			}
 			self[child.attribute].listenTo(self, 'disposing', self[child.attribute].dispose);
 		});
@@ -383,27 +433,6 @@ App.Models.BaseModel = Giraffe.Model.extend({
 			});
 		}
 		return response;
-	},
-
-	// When the model gets synced with the server it calls the modelUpdated function.
-	// This function will then trigger a custom event to let other models know that
-	// it has been updated.
-	modelUpdated: function(){
-		app.trigger(this.name + ':model:updated', this);
-	},
-
-	// When the model hears that a model of its kind was updated it checks if it has
-	// to incorporate this new data on itself. Once its done it will run another
-	// cutom event to let the views know that some changes occured.
-	updateModel: function(otherModel){
-		if (otherModel.cid !== this.cid && otherModel.id === this.id){
-			if (_.isFunction(this.customUpdate)){
-				this.customUpdate(otherModel);
-			} else {
-				this.set(otherModel.attributes, {silent: true});
-			}
-			this.trigger('updated');
-		}
 	},
 	
 	// Just a basic function to parse a 'Date()' type.
@@ -578,16 +607,15 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		};
 	},
 
-	parse: function(response){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-		if (App.defined(response.appliances)){
-			this.set('appliancesCount', response.appliances.length);
-			this.appliances.reset(response.appliances);
-		}
-		return response;
-	},
+	childs: [
+		{
+			attribute: 'appliances',
+			type: 'collection',
+			filter: function(){
+				return {service_request_id: this.id};
+			}
+		},
+	],
 
 	serialize: function(){
 		var attributes = this.toJSON();
@@ -617,7 +645,7 @@ App.Collections.BaseCollection = Giraffe.Collection.extend({
 
 	initialize: function(options){
 		this.awake.apply(this, arguments);
-		this.listenTo(app, 'active', function(){console.log(this.modelName, this.length);});
+		//this.listenTo(app, 'active', function(){console.log(this.modelName, this.length);});
 		//this.listenTo(app, this.modelName + ':model:created', this.checkModel);
 	},
 
@@ -1569,7 +1597,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
-		this.model.modelUpdated();
+		//this.model.modelUpdated();
 		this.editMode = false;
 	},
 
@@ -3019,6 +3047,11 @@ app.addInitializer(function(){
 app.addInitializer(function(options){
 	app.GoToTopView = new App.Views.GoToTopView();
 	app.GoToTopView.attachTo('#scroller-el');
+});
+
+// Add an easy access for the storage on the app object
+app.addInitializer(function(){
+	app.storage = App.Storage.getInstance();
 });
 
 // Start Backbone History, Renderer and main router

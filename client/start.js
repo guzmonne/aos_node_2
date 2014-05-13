@@ -41,6 +41,11 @@ app.addInitializer(function(options){
 	app.GoToTopView.attachTo('#scroller-el');
 });
 
+// Add an easy access for the storage on the app object
+app.addInitializer(function(){
+	app.storage = App.Storage.getInstance();
+});
+
 // Start Backbone History, Renderer and main router
 app.addInitializer(function(){
 	app.Renderer   = new App.Views.Renderer();

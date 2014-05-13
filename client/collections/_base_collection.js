@@ -10,7 +10,7 @@ App.Collections.BaseCollection = Giraffe.Collection.extend({
 
 	initialize: function(options){
 		this.awake.apply(this, arguments);
-		this.listenTo(app, 'active', function(){console.log(this.modelName, this.length);});
+		//this.listenTo(app, 'active', function(){console.log(this.modelName, this.length);});
 		//this.listenTo(app, this.modelName + ':model:created', this.checkModel);
 	},
 

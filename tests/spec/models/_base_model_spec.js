@@ -3,6 +3,7 @@ describe("App.Models.BaseModel", function() {
 
   beforeEach(function() {
     model = new App.Models.BaseModel();
+    this.storage = App.Storage.getInstance();
   });
 
   it("should call its awake method on initialize", function(){
@@ -32,6 +33,15 @@ describe("App.Models.BaseModel", function() {
           }
         ],
       });
+      this.FilterModel = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'clients',
+            type     : 'collection',
+            filter   : function(){return {f1: this.id};}    
+          },
+        ],
+      });
       this.ErrorTestModel1 = App.Models.BaseModel.extend({
         childs: "test",
       });
@@ -55,7 +65,34 @@ describe("App.Models.BaseModel", function() {
           },
         ],
       });
+      this.ErrorTestModel6 = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'attribute',
+            type     : 'error',   
+          },
+        ],
+      });
+      this.OkTestModel1 = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'client',
+            type     : 'model',
+            filter   : {_id: 1},  
+          },
+        ],
+      });
+      this.OkTestModel2 = App.Models.BaseModel.extend({
+        childs: [
+          {
+            attribute: 'clients',
+            type     : 'collection',
+            filter   : {_id: 1},  
+          },
+        ],
+      });
       this.test = new this.TestModel();
+      this.testFilter = new this.FilterModel({_id: 1});
     });
 
     afterEach(function(){
@@ -88,10 +125,29 @@ describe("App.Models.BaseModel", function() {
       expect(function(){new self.ErrorTestModel4();}).toThrowError();
     });
 
-    it("should throw an error if a 'child' doesn't have an 'attribute', 'type', or 'name' key", function(){
+    it("should throw an error if a 'child' doesn't have an 'attribute' or 'type'", function(){
       var self = this;
       expect(function(){new self.TestModel();}).not.toThrowError();
       expect(function(){new self.ErrorTestModel3();}).toThrowError();
+    });
+
+    it("should throw an error if a 'child' doesn't have a 'type' or a 'filter' attribute", function(){
+      var self = this;
+      expect(function(){new self.ErrorTestModel6();}).toThrowError();
+      expect(function(){new self.TestModel();}).not.toThrowError();
+      expect(function(){new self.OkTestModel1();}).not.toThrowError();
+    });
+
+    it("should call the storage's 'setModel()' method if 'type' equals 'model' and 'filter' is defined", function(){
+      spyOn(this.storage, 'setModel').and.callThrough();
+      m = new this.OkTestModel1();
+      expect(this.storage.setModel).toHaveBeenCalled();
+    });
+
+    it("should call the storage's 'setSubCollection()' method if 'type' equals 'collection' and 'filter' is defined", function(){
+      spyOn(this.storage, 'setSubCollection').and.callThrough();
+      m = new this.OkTestModel2();
+      expect(this.storage.setSubCollection).toHaveBeenCalled();
     });
 
     it("should add the childs objects to the children array", function(){

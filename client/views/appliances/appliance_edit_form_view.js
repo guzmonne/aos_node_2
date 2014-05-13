@@ -65,7 +65,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
-		this.model.modelUpdated();
+		//this.model.modelUpdated();
 		this.editMode = false;
 	},
 

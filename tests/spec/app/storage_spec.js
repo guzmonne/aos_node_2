@@ -11,6 +11,49 @@ describe('App.Storage', function(){
 		this.storage.remove("service_requests", 2);
 	});
 
+	describe("setModel(collection, options, context)", function(){
+		it("should throw an error if a collection was not passed", function(){
+			var self = this;
+			expect(function(){
+				return self.storage.setModel();
+			})
+			.toThrowError('No "collection" was passed');
+		});	
+
+		it("should throw an error if a collection is not defined", function(){
+			var self = this;
+			expect(function(){
+				return self.storage.setModel('error');
+			})
+			.toThrowError('Collection "error" is not defined');
+		});
+
+		it("should return an existing model fron the collection if 'options._id' is passed", function(){
+			var cid = this.storage.get("clients", 1).cid;
+			expect(this.storage.setModel("clients", {_id: 1}).cid).toEqual(cid);
+		});
+
+		it("should return an existing model from the collection if 'options.attributes._id' is passed", function(){
+			var cid = this.storage.get("clients", 1).cid;
+			expect(this.storage.setModel("clients", { attributes: {_id: 1} }).cid).toEqual(cid);
+		});
+
+		it("should return a new model if no 'options._id' is passed or it does no exists in the collection", function(){
+			var m1 = this.storage.setModel("clients");
+			var m2 = this.storage.setModel("clients", {_id: 2});
+			expect(m1.isNew()).toBe(true);
+			expect(m2.hasChanged()).toBe(false);
+			this.storage.remove("clients", m1);
+			this.storage.remove("clients", m2);
+		});
+
+		it("should set the attributes passed on 'options.attributes'", function(){
+			var m1 = this.storage.setModel("clients", {attributes: {_id: 2, foo: "bar"}});
+			expect(m1.get("foo")).toEqual("bar");
+			this.storage.remove("service_requests", m1);
+		});
+	});
+
 	describe("setSubCollection(collection, objects, options, context)", function(){
 		it("should throw an error if a collection was not passed", function(){
 			var self = this;
@@ -89,6 +132,18 @@ describe('App.Storage', function(){
 				expect(this.testCol.length).toEqual(0);
 				this.storage.remove('service_requests', 5);
 			});
+
+			it("should accept a function on the filter array that returns the 'filter' object", function(){
+				var m = new App.Models.BaseModel({_id: 1});
+				m.clients = this.storage.setSubCollection("clients", [
+					{_id: 3, f1: 1, f2: 2}, {_id: 4, f1: 1, f2: 2}
+				], {filter: function(){
+					return {f1: m.id};
+				}});
+				expect(m.clients.length).toEqual(2);
+				this.storage.remove("clients", 3);
+				this.storage.remove("clients", 4);
+			});
 		});
 	});
 
@@ -155,6 +210,12 @@ describe('App.Storage', function(){
 				return self.storage.remove('error');
 			})
 			.toThrowError('Collection "error" is not defined');
+		});
+
+		it("should remove the model if its passed to the method", function(){
+			var m = this.storage.get("clients", 1);
+			this.storage.remove("clients", m);
+			expect(this.storage.collection("clients").length).toBe(0);
 		});
 
 		it("should call the 'collection's' 'remove()' method", function(){
@@ -248,6 +309,16 @@ describe('App.Storage', function(){
 
 		it("should return the model from the collection if found", function(){
 			expect(this.storage.getModel('clients',1, {fetch: false}) instanceof Giraffe.Model).toBe(true);
+		});
+
+		it("should set the model attributes if 'options.attributes' is passed", function(){
+			var m = this.storage.getModel('clients', 1, {
+				fetch: false,
+				attributes: {
+					foo: 'bar'
+				}
+			});
+			expect(m.get('foo')).toEqual('bar');
 		});
 	});
 
