@@ -19,10 +19,11 @@ App.Storage = (function(){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
 			var fetch;
-			collection = colls[collection];
-			options    = (options) ? options : {};
-			context    = (context) ? context : this;
-			fetch      = (options.fetch === false) ? false : true;
+			collection     = colls[collection];
+			options        = (options) ? options : {};
+			context        = (context) ? context : this;
+			fetch          = (options.fetch === false) ? false : true;
+			options.remove = false;
 			if (fetch === true){ collection.fetch(options); }
 			return collection;
 		};
@@ -124,6 +125,7 @@ App.Storage = (function(){
 			options.data  = condition;
 			// add models fetched from the server to the subCollection
 			if (options.success){ success = options.success; }
+			options.remove  = false;
 			options.success = function(){
 				conModels = collection.where(condition);
 				subCollection.set(conModels, {remove: false});
@@ -133,13 +135,24 @@ App.Storage = (function(){
 			// set subCollection events
 			matches = _.matches(condition);
 			subCollection.listenTo(collection, "add", function(model){
-				if (matches(model.attributes)){ subCollection.add(model); }
+				if (matches(model.attributes) && !subCollection.get(model.id)){
+					subCollection.add(model); 
+				}
 			});
+			//subCollection.listenTo(subCollection, "change", function(model){
+			//	if (!matches(model.attributes)){
+			//		subCollection.remove(model, {silent: true});
+			//	}
+			//});
 			subCollection.listenTo(collection, "change", function(model){
-				if (!matches(model.attributes)){subCollection.remove(model);}
+				if (matches(model.attributes) && !subCollection.get(model.id)){
+					subCollection.add(model); 
+				}
 			});
 			subCollection.listenTo(collection, "remove", function(model){
-				subCollection.remove(model);
+				if(subCollection.get(model.id)){
+					subCollection.remove(model, {silent: true});
+				}
 			});
 			return subCollection;
 		};

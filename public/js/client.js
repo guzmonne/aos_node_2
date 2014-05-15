@@ -104,10 +104,11 @@ App.Storage = (function(){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
 			var fetch;
-			collection = colls[collection];
-			options    = (options) ? options : {};
-			context    = (context) ? context : this;
-			fetch      = (options.fetch === false) ? false : true;
+			collection     = colls[collection];
+			options        = (options) ? options : {};
+			context        = (context) ? context : this;
+			fetch          = (options.fetch === false) ? false : true;
+			options.remove = false;
 			if (fetch === true){ collection.fetch(options); }
 			return collection;
 		};
@@ -209,6 +210,7 @@ App.Storage = (function(){
 			options.data  = condition;
 			// add models fetched from the server to the subCollection
 			if (options.success){ success = options.success; }
+			options.remove  = false;
 			options.success = function(){
 				conModels = collection.where(condition);
 				subCollection.set(conModels, {remove: false});
@@ -218,13 +220,24 @@ App.Storage = (function(){
 			// set subCollection events
 			matches = _.matches(condition);
 			subCollection.listenTo(collection, "add", function(model){
-				if (matches(model.attributes)){ subCollection.add(model); }
+				if (matches(model.attributes) && !subCollection.get(model.id)){
+					subCollection.add(model); 
+				}
 			});
+			//subCollection.listenTo(subCollection, "change", function(model){
+			//	if (!matches(model.attributes)){
+			//		subCollection.remove(model, {silent: true});
+			//	}
+			//});
 			subCollection.listenTo(collection, "change", function(model){
-				if (!matches(model.attributes)){subCollection.remove(model);}
+				if (matches(model.attributes) && !subCollection.get(model.id)){
+					subCollection.add(model); 
+				}
 			});
 			subCollection.listenTo(collection, "remove", function(model){
-				subCollection.remove(model);
+				if(subCollection.get(model.id)){
+					subCollection.remove(model, {silent: true});
+				}
 			});
 			return subCollection;
 		};
@@ -322,6 +335,7 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
+		if(!this.model.prevModelId){ this.model.prevModelId = this.model.get('model_id'); }
 		this.model.set('model_id', model.id);
 	},
 
@@ -616,15 +630,6 @@ App.Collections.BaseCollection = Giraffe.Collection.extend({
 
 	initialize: function(options){
 		this.awake.apply(this, arguments);
-	},
-
-	checkModel: function(attrs){
-		// if there already exists a model with the passed id then return
-		if (this.where({id: attrs._id}).length > 1){return;}
-		var matches = _.matches(this.modelFilter);
-		if (this.modelFilter === null || matches(attrs)){
-			this.add(new this.model(attrs));
-		} 
 	},
 });
 App.Collections.Appliances = Giraffe.Collection.extend({
@@ -1087,7 +1092,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change' , this.render);
 		this.listenTo(app, 'model:show:active',   this.activate);
 		this.listenTo(app, 'model:show:inactive', this.deactivate);
-		_.debounce(this.render, 100);
 	},
 
 	afterRender: function(){
@@ -1311,7 +1315,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.$('table').append(this.tbody);
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
 		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
-		this.stopListening(this.collection, 'add', this.append);
+		//this.stopListening(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'add', this.append);
 	},
 
@@ -1401,7 +1405,6 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	showComparator: function(portletView){
-		console.log(portletView, this);
 		return (
 			portletView instanceof(App.Views.PortletView)	&&
 			App.defined(portletView.view)									&&
@@ -1590,6 +1593,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 					message: 'El equipo se ha actualizado con exito',
 					class  : 'success',
 				});
+				self.model.prevModelId = self.model.get('model_id');
 			}
 		});
 		this.editMode = false;
@@ -1600,9 +1604,8 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
-		if (this.model._previousAttributes.model_id){
-			this.model.set('model_id', this.model._previousAttributes.model_id);
-		}
+		var model_id  = this.model.changedAttributes().model_id;
+		if (this.model.prevModelId){ this.model.set('model_id', this.model.prevModelId); }
 		this.render();
 	},
 
@@ -1616,7 +1619,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			'accessories',
 			'status',
 			'replacements',
-			'dispose',
+			'diagnose',
 			'solution',
 			'technician_id'
 		));

@@ -11,7 +11,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change' , this.render);
 		this.listenTo(app, 'model:show:active',   this.activate);
 		this.listenTo(app, 'model:show:inactive', this.deactivate);
-		_.debounce(this.render, 100);
 	},
 
 	afterRender: function(){

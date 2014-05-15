@@ -73,6 +73,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 					message: 'El equipo se ha actualizado con exito',
 					class  : 'success',
 				});
+				self.model.prevModelId = self.model.get('model_id');
 			}
 		});
 		this.editMode = false;
@@ -83,9 +84,8 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
-		if (this.model._previousAttributes.model_id){
-			this.model.set('model_id', this.model._previousAttributes.model_id);
-		}
+		var model_id  = this.model.changedAttributes().model_id;
+		if (this.model.prevModelId){ this.model.set('model_id', this.model.prevModelId); }
 		this.render();
 	},
 
@@ -99,7 +99,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			'accessories',
 			'status',
 			'replacements',
-			'dispose',
+			'diagnose',
 			'solution',
 			'technician_id'
 		));

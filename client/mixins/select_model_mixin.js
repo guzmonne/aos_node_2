@@ -34,6 +34,7 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
+		if(!this.model.prevModelId){ this.model.prevModelId = this.model.get('model_id'); }
 		this.model.set('model_id', model.id);
 	},
 
