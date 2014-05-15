@@ -2,7 +2,19 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 	template: HBS.user_form_template,
 
 	events: {
-		'submit form': 'createModel',
+		'click .checkbox label': 'toggleCheckBox',
+		'submit form'          : 'createModel',
+	},
+
+	initialize: function(){
+		this.bindEvents();
+	},
+
+	bindEvents: function(){
+		this.listenTo(this.model, 'change:name' , function(){this.updateViewField.apply(this, ['name']);});
+		this.listenTo(this.model, 'change:email', function(){this.updateViewField.apply(this, ['email']);});
+		this.listenTo(this.model, 'change:admin', function(){this.updateViewField.apply(this, ['admin']);});
+		this.listenTo(this.model, 'change:tech' , function(){this.updateViewField.apply(this, ['tech']);});
 	},
 
 	createModel: function(e){
@@ -11,27 +23,26 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 		this.saveModel();
 		this.model.save({}, {
 			success: function(){
-				self.displayPortletMessage({
-					viewCid: self.parent.cid,
+				self.invoke('showMessage', {
 					title  : 'Usuario Creado',
 					message: 'El nuevo Usuario se ha creado con exito.',
 					class  : 'success',
 				});
 			},
 		});
-		this.model.dispose();
 		this.model = app.storage.newModel("users");
+		this.bindEvents();
 		this.cleanForm();
 	},
 
 	saveModel: function(){
-		this.model.set('name', this.$('[name=name]').val());
-		this.model.set('email', this.$('[name=email]').val());
-		this.model.set('permissions', this.getPermissions());
+		var attrs = _.pick(this.$('form').formParams(), 'name', 'email');
+		attrs.permissions = this.getPermissions();
+		this.model.set(attrs);
 	},
 
 	cleanForm: function(){
-		this.$('[name=name]').val('');
+		this.$('[name=name]').val('').focus();
 		this.$('[name=email]').val('');
 		this.$('[name=admin]').removeAttr('checked');
 		this.$('[name=tech]').removeAttr('checked');
@@ -44,5 +55,11 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 				isTech : this.$('[name=tech]').is(':checked'),
 			}
 		};
+	},
+
+	toggleCheckBox: function(e){
+		var name     = e.target.htmlFor;
+		var checkbox = this.$('[name='+name+']');
+		checkbox.prop("checked", !checkbox.prop('checked'));
 	},
 });

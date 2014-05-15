@@ -66,10 +66,13 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	showComparator: function(portletView){
+		console.log(portletView, this);
 		return (
 			portletView instanceof(App.Views.PortletView)	&&
 			App.defined(portletView.view)									&&
 			App.defined(portletView.view.model)						&&
+			App.defined(portletView.viewName)							&& 
+			portletView.viewName === this.viewName				&&
 			portletView.view.model.id === this.options._id
 		);
 	},

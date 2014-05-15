@@ -1071,6 +1071,7 @@ App.Views.NewView = App.Views.BaseView.extend({
 			model: this.model,
 		});
 		this.formView.attachTo(this.$el, {method: 'html'});
+		this.model = undefined;
 	},
 });
 App.Views.RowView = App.Views.BaseView.extend({
@@ -1400,10 +1401,13 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	showComparator: function(portletView){
+		console.log(portletView, this);
 		return (
 			portletView instanceof(App.Views.PortletView)	&&
 			App.defined(portletView.view)									&&
 			App.defined(portletView.view.model)						&&
+			App.defined(portletView.viewName)							&& 
+			portletView.viewName === this.viewName				&&
 			portletView.view.model.id === this.options._id
 		);
 	},
@@ -2444,8 +2448,16 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
+		this.bindEvents();
 		_.once(this.editForm);
 		_.once(this.newForm);
+	},
+
+	bindEvents: function(){
+		this.listenTo(this.model, 'change:model'       , function(){this.updateViewField.apply(this, ['model']);});
+		this.listenTo(this.model, 'change:brand'       , function(){this.updateViewField.apply(this, ['brand']);});
+		this.listenTo(this.model, 'change:category'    , function(){this.updateViewField.apply(this, ['category']);});
+		this.listenTo(this.model, 'change:subcategory' , function(){this.updateViewField.apply(this, ['subcategory']);});
 	},
 
 	reRender: function(e){
@@ -2534,16 +2546,13 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
-		this.model.dispose();
 		this.model = app.storage.newModel("models");
+		this.bindEvents();
 		this.cleanForm();
 	},
 
 	saveModel: function(){
-		this.model.set('brand', this.$('[name=brand]').val());
-		this.model.set('model', this.$('[name=model]').val());
-		this.model.set('category', this.$('[name=category]').val());
-		this.model.set('subcategory', this.$('[name=subcategory]').val());
+		this.model.set(this.$('form').formParams());
 	},
 
 	cleanForm: function(){
@@ -2551,6 +2560,7 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 		this.$('[name=model]').val('');
 		this.$('[name=category]').val('');
 		this.$('[name=subcategory]').val('');
+		this.$('[name=brand]').focus();
 	}
 });
 App.Views.ModelIndexView = App.Views.TableView.extend({
@@ -2562,7 +2572,6 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 	tableCollection: 'Models',
 	modelView      : App.Views.ModelRowView,
 
-	appStorage  : 'models',
 	fetchOptions		: {
 		data: {
 			fields: 'brand model category subcategory _id'
@@ -2992,7 +3001,19 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 	template: HBS.user_form_template,
 
 	events: {
-		'submit form': 'createModel',
+		'click .checkbox label': 'toggleCheckBox',
+		'submit form'          : 'createModel',
+	},
+
+	initialize: function(){
+		this.bindEvents();
+	},
+
+	bindEvents: function(){
+		this.listenTo(this.model, 'change:name' , function(){this.updateViewField.apply(this, ['name']);});
+		this.listenTo(this.model, 'change:email', function(){this.updateViewField.apply(this, ['email']);});
+		this.listenTo(this.model, 'change:admin', function(){this.updateViewField.apply(this, ['admin']);});
+		this.listenTo(this.model, 'change:tech' , function(){this.updateViewField.apply(this, ['tech']);});
 	},
 
 	createModel: function(e){
@@ -3001,27 +3022,26 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 		this.saveModel();
 		this.model.save({}, {
 			success: function(){
-				self.displayPortletMessage({
-					viewCid: self.parent.cid,
+				self.invoke('showMessage', {
 					title  : 'Usuario Creado',
 					message: 'El nuevo Usuario se ha creado con exito.',
 					class  : 'success',
 				});
 			},
 		});
-		this.model.dispose();
 		this.model = app.storage.newModel("users");
+		this.bindEvents();
 		this.cleanForm();
 	},
 
 	saveModel: function(){
-		this.model.set('name', this.$('[name=name]').val());
-		this.model.set('email', this.$('[name=email]').val());
-		this.model.set('permissions', this.getPermissions());
+		var attrs = _.pick(this.$('form').formParams(), 'name', 'email');
+		attrs.permissions = this.getPermissions();
+		this.model.set(attrs);
 	},
 
 	cleanForm: function(){
-		this.$('[name=name]').val('');
+		this.$('[name=name]').val('').focus();
 		this.$('[name=email]').val('');
 		this.$('[name=admin]').removeAttr('checked');
 		this.$('[name=tech]').removeAttr('checked');
@@ -3034,6 +3054,12 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 				isTech : this.$('[name=tech]').is(':checked'),
 			}
 		};
+	},
+
+	toggleCheckBox: function(e){
+		var name     = e.target.htmlFor;
+		var checkbox = this.$('[name='+name+']');
+		checkbox.prop("checked", !checkbox.prop('checked'));
 	},
 });
 App.Views.UserIndexView = App.Views.TableView.extend({

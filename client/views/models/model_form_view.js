@@ -11,8 +11,16 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
+		this.bindEvents();
 		_.once(this.editForm);
 		_.once(this.newForm);
+	},
+
+	bindEvents: function(){
+		this.listenTo(this.model, 'change:model'       , function(){this.updateViewField.apply(this, ['model']);});
+		this.listenTo(this.model, 'change:brand'       , function(){this.updateViewField.apply(this, ['brand']);});
+		this.listenTo(this.model, 'change:category'    , function(){this.updateViewField.apply(this, ['category']);});
+		this.listenTo(this.model, 'change:subcategory' , function(){this.updateViewField.apply(this, ['subcategory']);});
 	},
 
 	reRender: function(e){
@@ -101,16 +109,13 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
-		this.model.dispose();
 		this.model = app.storage.newModel("models");
+		this.bindEvents();
 		this.cleanForm();
 	},
 
 	saveModel: function(){
-		this.model.set('brand', this.$('[name=brand]').val());
-		this.model.set('model', this.$('[name=model]').val());
-		this.model.set('category', this.$('[name=category]').val());
-		this.model.set('subcategory', this.$('[name=subcategory]').val());
+		this.model.set(this.$('form').formParams());
 	},
 
 	cleanForm: function(){
@@ -118,5 +123,6 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 		this.$('[name=model]').val('');
 		this.$('[name=category]').val('');
 		this.$('[name=subcategory]').val('');
+		this.$('[name=brand]').focus();
 	}
 });
