@@ -38,13 +38,17 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 		if (!App.defined(this.serviceRequests)){
 			var self = this;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
-				collection: new App.Collections.ServiceRequests()
-			});
-			this.serviceRequests.collection.client_id = this.model.id;
-			this.serviceRequests.collection.fetch({
-				success: function(){
-					self.serviceRequests.attachTo(this.$('#client-service_requests-'+ self.timestamp), {method: 'html'});
-				}
+				collection: app.storage.getSubCollection("service_requests", {
+					client_id: this.model.id,
+				}, {
+					success: function(){
+						self.serviceRequests.attachTo(
+							self.$('#client-service_requests-'+ self.timestamp), 
+							{method: 'html'}
+						);
+					}
+				}),
+				synced: true,
 			});
 		}
 	},

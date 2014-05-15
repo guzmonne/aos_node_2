@@ -34,15 +34,9 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
-		this.model.tempModel = this.model.model.clone();
-		this.exchangeModel(model);
-		this.render();
-	},
-
-	exchangeModel: function(model){
-		this.model.model = model;
 		this.model.set('model_id', model.id);
 	},
+
 	// !!!
 	// Type: Object
 	// -----
@@ -54,10 +48,25 @@ App.Mixins.SelectModel = {
 	// !!!
 	serialize: function(){
 		var object = this.model.toJSON();
-		var model  = this.model.model;
+		var model  = this.model.model_id;
 		if (model){
 			_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
 		}
 		return object;
+	},
+
+	setModelDetails: function(){
+		this.$('[name=brand]').val(this.model.model_id.get('brand'));
+		this.$('[name=model]').val(this.model.model_id.get('model'));
+		this.$('[name=category]').val(this.model.model_id.get('category'));
+		this.$('[name=subcategory]').val(this.model.model_id.get('subcategory'));
+	},
+
+	setAccessories: function(){
+		var self = this;
+		var accessories = this.model.get('accessories');
+		_.each(accessories, function(accessory){
+			self.$('[name=accessories]').tagsinput("add", accessory);
+		});
 	},
 };

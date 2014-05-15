@@ -32,10 +32,15 @@ exports.update = function(req, res){
 };
 
 exports.show = function(req, res){
-	if (!req.params.id){return res.send(400, {err: {
-		msg: 'No ID was passed'
-	}});}
-	Model.findById(req.params.id, function(error, model){
+	var fields = req.query.fields;
+	if (!req.params.id){
+		return res.send(400, {err: 
+			{
+				msg: 'No ID was passed'
+			}
+		});
+	}
+	Model.findById(req.params.id, fields, function(error, model){
 		if (error){return res.send(400, error);}
 		res.send(200, model);
 	}, {populate: true});

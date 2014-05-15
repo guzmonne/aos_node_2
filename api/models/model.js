@@ -78,6 +78,7 @@ ModelModel.prototype.create = function(params, callback){
 // Get all models
 // ------------------
 ModelModel.prototype.findAll = function(fields, callback){
+	if (_.isFunction(fields)){callback = fields;}
 	var query = Model.find({});
 	if (arguments.length > 1 && _.isString(fields)){
 		query.select(fields);
@@ -111,7 +112,7 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 		case 2:
 			if (_.isFunction(fields)){
 				callback = fields;
-				fields   = null;
+				fields   = undefined;
 			} else {
 				return;
 			}
@@ -122,8 +123,10 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 			if (_.isFunction(fields) && _.isObject(callback)){
 				options  = callback;
 				callback = fields;
-				fields   = null;
-			} else if ( !(_.isString(fields) && _.isFunction(callback)) ){
+				fields   = undefined;			
+			} else if ( !(_.isString(fields) && _.isFunction(callback)) &&
+									(_.isUndefined(fields) && _.isFunction(callback))	
+			){
 				return;
 			}
 			break;
@@ -134,13 +137,7 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 			}
 			break;
 	}
-	console.log(id, fields, callback, options);
-	//if (arguments.length > 2 && _.isString(fields)){
-	//	query.select(fields);
-	//} else if (arguments.length === 2 && _.isFunction(fields)){
-	//	callback = fields;
-	//}
-	// If the 'fields' argument was passed then we passed the filter to the query
+	
 	if (_.isString(fields)){
 		query.select(fields);
 	}

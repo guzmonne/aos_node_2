@@ -5,8 +5,7 @@ App.Views.ServiceRequestRowView = App.Views.RowView.extend({
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
-			object = this.model.toJSON();
-			var appliances = this.model.appliances;
+			object = this.model.serialize();
 			var createdAt = this.model.get('createdAt');
 			if (App.defined(createdAt)){
 				object.createdAt = this.model.dateDDMMYYYY(createdAt);

@@ -122,7 +122,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 				});
 			},
 		});
-		this.model = new App.Models.Client();
+		this.model = app.storage.newModel("clients");
 		this.bindEvents();
 		this.render();
 		this.$('[name=name]').focus();

@@ -70,22 +70,34 @@ App.Storage = (function(){
 			collection    = colls[collection];
 			subCollection = new collection.constructor();
 			options       = (options) ? options : {};
+			context       = (context) ? context : this; 
 			subCollection.set(collection.set(objects, {remove: false}));
 			if (options.filter){
+				var filter, matches;
+				var getFilter = function(){
+					if(_.isFunction(options.filter)){
+						return options.filter.apply(context);
+					} else {
+						return options.filter;
+					}
+				};
 				subCollection.listenTo(collection, 'add', function(model){
-					var matches = _.matches(_.result(options, 'filter'));
+					filter  = getFilter();
+					matches = _.matches(filter);
 					if(matches(model.attributes)){
 						subCollection.add(model);
 					}
 				});
 				subCollection.listenTo(collection, 'remove', function(model){
-					var matches = _.matches(_.result(options, 'filter'));
+					filter  = getFilter();
+					matches = _.matches(filter);
 					if(matches(model.attributes)){
 						subCollection.remove(model);
 					}
 				});
-				_.each(_.keys(_.result(options, 'filter')), function(key){
-					var matches = _.matches(_.result(options, 'filter'));
+				filter = getFilter();
+				_.each(_.keys(filter), function(key){
+					matches = _.matches(filter);
 					subCollection.listenTo(collection, 'change:' + key, function(model){
 						if(!matches(model.attributes) && subCollection.get(model)){
 							subCollection.remove(model);
@@ -102,7 +114,7 @@ App.Storage = (function(){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
 			if (!condition && !_.isObject(condition)) { throw new Error('A "condition" must be passed'); }
-			var success, fetch, conModels;
+			var success, fetch, conModels, matches;
 			collection    = colls[collection];
 			conModels     = collection.where(condition);
 			subCollection = new collection.constructor(conModels);
@@ -110,13 +122,25 @@ App.Storage = (function(){
 			context       = (context) ? context : this;
 			fetch         = (options.fetch === false) ? false : true;
 			options.data  = condition;
+			// add models fetched from the server to the subCollection
 			if (options.success){ success = options.success; }
 			options.success = function(){
 				conModels = collection.where(condition);
-				subCollection.set(conModels);
+				subCollection.set(conModels, {remove: false});
 				if (success){ success.apply(context, arguments); }
 			}; 
 			if (fetch === true){ collection.fetch(options); }
+			// set subCollection events
+			matches = _.matches(condition);
+			subCollection.listenTo(collection, "add", function(model){
+				if (matches(model.attributes)){ subCollection.add(model); }
+			});
+			subCollection.listenTo(collection, "change", function(model){
+				if (!matches(model.attributes)){subCollection.remove(model);}
+			});
+			subCollection.listenTo(collection, "remove", function(model){
+				subCollection.remove(model);
+			});
 			return subCollection;
 		};
 
@@ -141,6 +165,21 @@ App.Storage = (function(){
 			return colls[collection].remove(colls[collection].get(id));
 		};
 
+		var newModel = function(collection){
+			if (!collection)        { throw new Error('No "collection" was passed'); }
+			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
+			var model;
+			collection = colls[collection];
+			model      = new collection.model();
+			collection.listenTo(model, 'change:_id', function(){
+				collection.add(model);
+			});
+			collection.listenTo(model, 'disposing', function(){
+				collection.stopListening(model);
+			});
+			return model;
+		};
+
 		return {
 			setSubCollection: setSubCollection,
 			setModel        : setModel,
@@ -150,6 +189,7 @@ App.Storage = (function(){
 			add             : add,
 			remove          : remove,
 			get             : get,
+			newModel        : newModel,
 			collection      : collection,
 		};
 	};

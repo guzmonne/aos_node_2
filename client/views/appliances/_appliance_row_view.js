@@ -15,7 +15,7 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			var createdAt = this.model.get('createdAt');
 			var updatedAt = this.model.get('updatedAt');
 			var closedAt  = this.model.get('closedAt');
-			var model     = this.model.model;
+			var model     = this.model.model_id;
 			if (model){
 				_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
 			}

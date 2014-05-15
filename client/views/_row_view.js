@@ -9,8 +9,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 	
 	initialize: function(){
 		this.listenTo(this.model, 'change' , this.render);
-		this.listenTo(this.model, 'sync'   , this.render);
-		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(app, 'model:show:active',   this.activate);
 		this.listenTo(app, 'model:show:inactive', this.deactivate);
 		_.debounce(this.render, 100);

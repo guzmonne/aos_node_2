@@ -25,33 +25,4 @@ describe("App.Views.ClientShowView", function(){
 		this.view = undefined;
 		$('#page-wrapper').empty();
 	});
-
-	describe("renderServiceRequests()", function(){
-		it("should do nothing if 'serviceRequests' is defined on the view", function(){
-			this.view.serviceRequests = "foo";
-			this.view.renderServiceRequests();
-			expect(this.view.serviceRequests).toEqual("foo");
-		});
-
-		it("should create a new 'ServiceRequestIndex' view with a 'Service Requests Collection'", function(){
-			spyOn(App.Views.ServiceRequestIndexView.prototype, 'initialize').and.callThrough();
-			spyOn(App.Collections.ServiceRequests.prototype, 'initialize').and.callThrough();
-			this.view.renderServiceRequests();
-			expect(App.Views.ServiceRequestIndexView.prototype.initialize).toHaveBeenCalled();
-			expect(App.Collections.ServiceRequests.prototype.initialize).toHaveBeenCalled();
-		});
-
-		it("should pass the 'client_id' into the 'ServiceRequestIndex' collection", function(){
-			this.view.renderServiceRequests();
-			expect(this.view.serviceRequests.collection.client_id).toEqual('1');
-		});
-
-		it("should fetch the collection data and attach the view on 'success'", function(){
-			spyOn(App.Views.ServiceRequestIndexView.prototype, 'attachTo');
-			spyOn(App.Collections.ServiceRequests.prototype, 'fetch').and.callThrough();
-			this.view.renderServiceRequests();
-			expect(App.Collections.ServiceRequests.prototype.fetch).toHaveBeenCalled();
-			expect(App.Views.ServiceRequestIndexView.prototype.attachTo).toHaveBeenCalled();
-		});
-	});
 });

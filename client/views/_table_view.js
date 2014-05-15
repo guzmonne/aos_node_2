@@ -66,9 +66,4 @@ App.Views.TableView = App.Views.BaseView.extend({
 	onSync: function(){
 		this.collection.fetch(this.fetchOptions);
 	},
-
-	dispose: function(){
-		this.$el.off('resize');
-		Giraffe.dispose.apply(this, arguments);
-	},
 });

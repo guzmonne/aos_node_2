@@ -5,9 +5,9 @@ var ServiceRequestModel = require('../models/service_request').ServiceRequestMod
 var ServiceRequest      = new ServiceRequestModel();
 
 exports.index = function(req, res){
-	var id = req.params.id;
-	if (id){
-		ServiceRequest.findByClientId(id, function(error, service_requests){
+	var client_id = req.query.client_id;
+	if (client_id){
+		ServiceRequest.findByClientId(client_id, function(error, service_requests){
 			res.send(service_requests);
 		});
 	} else {

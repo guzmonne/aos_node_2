@@ -13,13 +13,18 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 
 	renderApplianceIndex: function(){
 		if (!App.defined(this.model)){return;}
-		var el = this.$('#model-appliances');
+		var self = this;
+		var el   = this.$('#model-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			collection   : this.model.appliances,
-			fetchOnRender: false,
-			baseModel    : this.model,
+			synced: true,
+			collection   : app.storage.getSubCollection("appliances", {
+				model_id: this.model.id
+			}, {
+				success: function(){
+					self.appliancesIndex.attachTo(el, {method: 'html'});
+				}
+			}),
 		});
-		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
 
 	serialize: function(){

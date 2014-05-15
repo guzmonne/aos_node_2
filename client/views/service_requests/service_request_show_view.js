@@ -31,20 +31,23 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 
 	renderAppliancesCarousel: function(){
 		if (!this.appliancesCarousel){
-			if (!App.defined(this.model) || 
-				!App.defined(this.model.appliances)
-			){
-				return;
-			}
+			if (!this.model){return;}
+			var self = this;
 			this.appliancesCarousel = new App.Views.ApplianceCarouselView({
-				collection : this.model.appliances,
+				synced: true,
+				collection : app.storage.getSubCollection('appliances', {
+					service_request_id: this.model.id
+				}, {
+					success: function(){
+						self.appliancesCarousel.attachTo(
+							self.$('#' + self.modelName + '-appliances-' + self.timestamp), 
+							{
+								method: 'html',
+							}
+						);
+					}
+				})
 			});
-			this.appliancesCarousel.attachTo(
-				this.$('#' + this.modelName + '-appliances-' + this.timestamp), 
-				{
-					method: 'html',
-				}
-			);
 		}
 	},
 });

@@ -5,29 +5,54 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		'render:show'          : 'showView',
 	},
 
+	viewTree: {
+		"client" : {
+			storage: "clients",
+			model  : "Client",
+		},
+		"service_request": {
+			storage: "service_requests",
+			model  : "ServiceRequest"
+		},
+		"appliance": {
+			storage: "appliances",
+			model  : "Appliance",
+		},
+		"model": {
+			storage: "models",
+			model  : "Model",
+		}, 
+		"user": {
+			storage: "users",
+			model  : "User",
+		}
+	},
+
 	showView: function(doc, id){
-		var docName  = this.titelize(doc);
-		var viewName = docName + 'ShowView';
-		var params   = {
-			model            : docName,
-			viewName         : viewName,
-			portletFrameClass: 'green',
-			options          : {
-				_id: id,
-			},
-		};
+		var treeInfo = this.viewTree[doc];
+		if (!treeInfo) { throw new Error('Invalid doc: "'+ doc +'" on showView'); }
+		if (!id)       { throw new Error('No "id" was passed'); }
+		var params = _.extend({
+			viewName         : treeInfo.model + 'ShowView',
+			viewType         : "show",
+			portletFrameClass: "green",
+			options: {
+				_id: id
+			}
+		}, treeInfo);
 		this.showOrGoTo(params, this.showComparator);
 	},
 
 	docView: function(doc, type){
-		var docName  = this.titelize(doc);
-		var typeName = this.capitaliseFirstLetter(type);
-		var viewName = docName + typeName + 'View';
-		var params   = {
-			viewName: viewName,
-		};
-		if (typeName === "Index"){
-			params.collection = docName + 's';
+		var treeInfo = this.viewTree[doc];
+		if (!treeInfo) { throw new Error('Invalid doc: "'+ doc +'" on showView'); }
+		if (!type)     { throw new Error('No "type" was passed'); }
+		var params = _.extend({
+			viewName : treeInfo.model + this.titelize(type) + 'View',
+			viewType : type,
+		}, treeInfo);
+		if (type === "index"){
+			params.collection = true;
 		}
 		this.showOrGoTo(params);
 	},
@@ -50,60 +75,54 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	showOrGoTo: function(params, comparator){
-		if(	!App.defined(params)										|| 
-				!App.defined(params.viewName)						|| 
-				!App.defined(App.Views[params.viewName])
-		){
-			return;
-		}
-		var viewRef;
+		if (!params)                     { throw new Error('"params" must be defined'); }
+		if (!params.viewName)            { throw new Error('"params.viewName" must be defined'); }
+		if (!App.Views[params.viewName]) { throw new Error('View "App.Views.'+params.viewName+'" is not defined'); } 
+		var renderedView;
 		Backbone.history.navigate((Backbone.history.fragment).replace('render/', ''));
-		params     = (params)     ? params     : {};
-		comparator = (comparator) ? comparator : this.defaultComparator;
-		viewRef    = this.viewIsRendered(comparator, params);
-		if (viewRef){
-			App.scrollTo(viewRef.el);
+		comparator   = (comparator) ? comparator : this.defaultComparator;
+		renderedView = this.viewIsRendered(comparator, params);
+		if (renderedView){
+			App.scrollTo(renderedView.el);
 		} else {
 			this.show(params);
 		}
 	},
 
 	show: function(params){
-		var portletView, fetchOptions, fetch;
-		var viewOptions = {};
-		if(!_.isObject(params) || !App.defined(params.viewName)){
-			return new Error('The viewName option must be set');
-		}
-		if(params.model){
-			var modelOptions  = (params.options) ? (params.options) : {}; 
-			if (_.isString(params.model)){
-				viewOptions.model = new App.Models[params.model](modelOptions);
-				fetch = true;
+		if(!params || !_.isObject(params)){ throw new Error('"params" must be defined'); }
+		var model, collection, fetchOptions, portletView;
+		switch (params.viewType){
+		case "show":
+			if (params.model instanceof Giraffe.Model){ 
+				model = params.model; 
 			} else {
-				viewOptions.model = params.model;
+				model = app.storage.getModel(params.storage, params.options._id, {fetch: false});
+			} 
+			params.view  = new App.Views[params.viewName]({model: model});
+			if (params.fetch === undefined || params.fetch === true){
+				fetchOptions = (params.view.fetchOptions) ? params.view.fetchOptions : {};
+				model.fetch(fetchOptions);
 			}
-			delete params.model;
-			delete params.options;
-		}	
-		if (params.collection){
-			if (_.isString(params.collection)){
-				viewOptions.collection = new App.Collections[params.collection]();
-				fetch = true;
+			break;
+		case "new":
+			if (params.model instanceof Giraffe.Model){
+				model = params.model;
 			} else {
-				viewOptions.collection = params.collection;
+				model = app.storage.newModel(params.storage);
 			}
-			delete params.collection;
-			delete params.options;
+			params.view = new App.Views[params.viewName]({model: model});
+			break;
+		case "index":
+			collection   = app.storage.collection(params.storage);
+			params.view  = new App.Views[params.viewName]({collection: collection});
+			if (params.fetch === undefined || params.fetch === true){
+				fetchOptions = (params.view.fetchOptions) ? params.view.fetchOptions : {};
+				collection.fetch(fetchOptions);
+			}
+			break;
 		}
-		var view = params.view = new App.Views[params.viewName](viewOptions);
-		if (fetch){
-			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
-			fetchOptions.silent = false;
-			if (view.model)      {view.model.fetch(fetchOptions);}
-			if (view.collection) {view.collection.fetch(fetchOptions);}
-			
-		}
-		portletView = new App.Views.PortletView(params);
+		portletView = new App.Views.PortletView(_.pick(params, "view", "viewName", "portletFrameClass", "flash"));
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
 	},

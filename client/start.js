@@ -44,6 +44,10 @@ app.addInitializer(function(options){
 // Add an easy access for the storage on the app object
 app.addInitializer(function(){
 	app.storage = App.Storage.getInstance();
+	app.storage.collection("models").add(models);
+	app.storage.collection("clients").add(clients);
+	clients = undefined;
+	models  = undefined;
 });
 
 // Start Backbone History, Renderer and main router

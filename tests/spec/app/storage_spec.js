@@ -11,6 +11,13 @@ describe('App.Storage', function(){
 		this.storage.remove("service_requests", 2);
 	});
 
+	describe("new(collection)", function(){
+		it("should return a new model", function(){
+			var m = this.storage.newModel("clients");
+			expect(m.isNew()).toBe(true);
+		});
+	});
+
 	describe("setModel(collection, options, context)", function(){
 		it("should throw an error if a collection was not passed", function(){
 			var self = this;

@@ -3,12 +3,10 @@
 // ======================
 var ClientModel = require('../models/client').ClientModel;
 var Client      = new ClientModel();
+var _           = require('underscore');
 
 exports.index = function(req, res){
-	var fields;
-	if (req.query.fields){
-		fields = req.query.fields;
-	}
+	var fields = (_.isString(req.query.fields)) ? req.query.fields : null;
 	Client.findAll(fields, function(error, clients){
 		res.send(clients);
 	});

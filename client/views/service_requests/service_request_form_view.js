@@ -10,9 +10,28 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button[type=submit]'    : 'createServiceRequest',
 		'click button#select-client'   : 'selectClient',
 	},
+
+	initialize: function(){
+		this.listenTo(this.model, 'change:client_name'  , function(){this.updateViewField.apply(this, ['client_name']);});
+		this.listenTo(this.model, 'change:invoiceNumber', function(){this.updateViewField.apply(this, ['invoiceNumber']);});
+		this.model.appliances = new App.Collections.Appliances();
+		this.listenTo(this.model.appliances, 'change', this.setAppliances);
+		this.listenTo(this.model.appliances, 'remove', this.setAppliances);
+		this.listenTo(this, 'disposing', function(){
+			this.model.appliances.dispose();
+			this.model.appliances = undefined;
+		});
+	},
+
+	setAppliances: function(){
+		this.model.set('appliances', this.model.appliances.toJSON());
+	},
 	
-	afterRequest: function(){
+	afterRender: function(){
 		this.$el.tooltip();
+		if (this.model && this.model.get('client_name') && this.model.get('client_id')){
+			this.$('.btn-success').attr('disabled', false);
+		}
 	},
 
 	serviceRequestSuccessFlash: function(){
@@ -41,46 +60,32 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	clientSelected: function(model){
 		this.model.set('client_id', model.get('_id'));
 		this.model.set('client_name', model.get('name'));
-		this.render();
-	},
-
-	deleteAppliance: function(e){
-		e.preventDefault();
-		var self       = this;
-		var index      = e.currentTarget.dataset.index;
-		var appliances = this.model.appliances;
-		var appliance  = appliances.at(index);
-		appliances.trigger('appliance:deleted');
-		appliances.remove(appliance);
-		this.$('#appliance-views').empty();
-		_.each(appliances.models, function(model){
-			self.appendApplianceForm({
-				model      : model,
-				firstRender: false,
-			});
-		});
-		if(appliances.length === 0){this.$('button[type=submit]').attr('disabled', true);}
+		this.$('.btn-success').attr('disabled', false);
 	},
 
 	singleApplianceForm: function(e){
 		e.preventDefault();
-		var appliances = this.model.appliances;
-		var model = new App.Models.Appliance({
+		var model = app.storage.newModel("appliances");
+		model.set({
 			client_name: this.model.get('client_name'),
-			client_id  : this.model.get('client_id'),
+			client_id  : this.model.get('client_id')
 		});
 		this.$('button[type=submit]').attr('disabled', false);
-		appliances.add(model);
-		this.appendApplianceForm({model: model});
+		this.model.appliances.add(model);
+		this.appendApplianceForm(model);
 	},
 
-	appendApplianceForm: function(options){
-		if(!App.defined(options.model)){return new Error('No model was passed in the options.');}
+	appendApplianceForm: function(model, view){
 		var appliances = this.model.appliances;
-		var view       = new App.Views.ApplianceSingleFormView(options);
-		var index      = appliances.indexOf(options.model);
-		var style      = '';
-		if ((index % 2) === 1){style = 'background-color: #E6E6E6';}
+		if (model && !view){
+			view = new App.Views.ApplianceSingleFormView({ model : model });
+			view.listenTo(view.model, 'remove', function(){ view.dispose(); });
+			this.addChild(view);
+		} else if (!model && view) {
+			model = view.model;
+		}
+		var index = appliances.indexOf(model);
+		var style = (index % 2) ? 'background-color: #fff' : 'background-color: #E6E6E6';
 		this.$('#appliance-views').append(this.formContainer({
 			index: index,
 			style: style
@@ -88,6 +93,22 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
 		if(index === (appliances.length - 1)){
 			App.scrollTo(view.$el);
+		}
+	},
+
+	deleteAppliance: function(e){
+		e.preventDefault();
+		var self       = this;
+		var index      = e.currentTarget.dataset.index;
+		var appliance  = this.model.appliances.at(index);
+		appliance.dispose();
+		this.$('#appliance-views').empty();
+		_.each(this.children, function(view){
+			self.appendApplianceForm(null, view);
+			view.tagsinput();
+		});
+		if(this.model.appliances.length === 0){//
+			this.$('button[type=submit]').attr('disabled', true);
 		}
 	},
 
@@ -101,21 +122,18 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		this.model.save(this.model.serialize(), {
+		this.model.save(null, {
 			success: function(model, response, options){
-				// This event serves to purposes:
-				// 1. It let the single appliance forms to close
-				// 2. If the client show view is opened and it is 
-				// managing a service request collection then we add
-				// this model to it.
-				app.trigger('service_request:create:success', model);
 				var route = 'service_request/show/' + model.id;
-				//Backbone.history.navigate(route, {trigger: true});
+				Backbone.history.navigate(route);
+				self.stopListening(model.appliances);
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
+					viewType         : 'show',
 					model            : model,
+					fetch            : false,
 					portletFrameClass: 'green',
-					flash            : self.serviceRequestSuccessFlash()
+				flash            : self.serviceRequestSuccessFlash()
 				});
 				self.invoke('closePortletView');
 			},
@@ -123,8 +141,10 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('client_id', this.$('[name=client_id]').val());
-		this.model.set('client_name', this.$('[name=client_name]').val());
-		this.model.set('invoiceNumber', this.$('[name=invoiceNumber]').val());
+		this.model.set(_.pick(this.$('form').formParams(),
+			'client_id',
+			'client_name',
+			'invoiceNumber'
+		));
 	},
 });

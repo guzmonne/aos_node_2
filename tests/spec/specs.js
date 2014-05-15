@@ -19,6 +19,84 @@ describe("App", function() {
   });
 });
 
+describe("App.Views.Renderer", function(){
+	describe("showView(doc, id)", function(){
+		it("should throw an error if the 'doc' is not defined on the viewTree", function(){
+			expect(function(){app.Renderer.showView("error", 2);}).toThrowError('Invalid doc: "error" on showView');
+		});
+
+		it("should throw an error if no 'id' is passed", function(){
+			expect(function(){app.Renderer.showView("client");}).toThrowError('No "id" was passed');
+		});
+
+		it("should call the 'showOrGoTo()' method with the params taken from the 'viewTree'", function(){
+			var object = {
+				storage          : "clients",
+				model            : "Client",
+				viewName         : "ClientShowView",
+				portletFrameClass: "green",
+				viewType         : "show",
+				options          : {
+					_id: 1
+				}
+			};
+			spyOn(app.Renderer, 'showOrGoTo');
+			app.Renderer.showView("client", 1);
+			expect(app.Renderer.showOrGoTo).toHaveBeenCalledWith(object, app.Renderer.showComparator);		
+		});
+	});
+
+	describe("docView(doc, type)", function(){
+		it("should throw an error if the 'doc' is not defined on the viewTree", function(){
+			expect(function(){app.Renderer.docView("error", "index");}).toThrowError('Invalid doc: "error" on showView');
+		});
+
+		it("should throw an error if no 'type' is passed", function(){
+			expect(function(){app.Renderer.docView("client");}).toThrowError('No "type" was passed');
+		});
+
+		it("should call the 'showOrGoTo()' method with the params taken from the 'viewTree'", function(){
+			var object1 = {
+				storage          : "clients",
+				model            : "Client",
+				viewName         : "ClientIndexView",
+				viewType         : "index",
+				collection       : true,
+			};
+			var object2 = {
+				storage          : "clients",
+				model            : "Client",
+				viewName         : "ClientNewView",
+				viewType         : "new",
+			};
+			spyOn(app.Renderer, 'showOrGoTo');
+			app.Renderer.docView("client", "index");
+			expect(app.Renderer.showOrGoTo).toHaveBeenCalledWith(object1);		
+			app.Renderer.docView("client", "new");
+			expect(app.Renderer.showOrGoTo).toHaveBeenCalledWith(object2);		
+		});
+	});
+
+	describe('showOrGoTo(params, comparator)', function(){
+		it("should throw an error if 'params' is not defined", function(){
+			expect(function(){app.Renderer.showOrGoTo();}).toThrowError('"params" must be defined');
+		});
+
+		it("should throw an error if 'params.viewName' is not defined", function(){
+			expect(function(){app.Renderer.showOrGoTo({});}).toThrowError('"params.viewName" must be defined');
+		});
+
+		it("should throw an error if the view to be call is not defined", function(){
+			expect(function(){app.Renderer.showOrGoTo({viewName: "ErrorView"});}).toThrowError('View "App.Views.ErrorView" is not defined');
+		});
+	});
+
+	describe("show(params)", function(){
+		it("should throw an error if 'params' is not defined", function(){
+			expect(function(){app.Renderer.show();}).toThrowError('"params" must be defined');
+		});
+	});
+});
 describe('App.Storage', function(){
 	beforeEach(function(){
 		this.storage = App.Storage.getInstance();
@@ -30,6 +108,13 @@ describe('App.Storage', function(){
 		this.storage.remove("clients", 1);
 		this.storage.remove("service_requests", 1);
 		this.storage.remove("service_requests", 2);
+	});
+
+	describe("new(collection)", function(){
+		it("should return a new model", function(){
+			var m = this.storage.newModel("clients");
+			expect(m.isNew()).toBe(true);
+		});
 	});
 
 	describe("setModel(collection, options, context)", function(){
@@ -1104,34 +1189,5 @@ describe("App.Views.ClientShowView", function(){
 		this.view.dispose();
 		this.view = undefined;
 		$('#page-wrapper').empty();
-	});
-
-	describe("renderServiceRequests()", function(){
-		it("should do nothing if 'serviceRequests' is defined on the view", function(){
-			this.view.serviceRequests = "foo";
-			this.view.renderServiceRequests();
-			expect(this.view.serviceRequests).toEqual("foo");
-		});
-
-		it("should create a new 'ServiceRequestIndex' view with a 'Service Requests Collection'", function(){
-			spyOn(App.Views.ServiceRequestIndexView.prototype, 'initialize').and.callThrough();
-			spyOn(App.Collections.ServiceRequests.prototype, 'initialize').and.callThrough();
-			this.view.renderServiceRequests();
-			expect(App.Views.ServiceRequestIndexView.prototype.initialize).toHaveBeenCalled();
-			expect(App.Collections.ServiceRequests.prototype.initialize).toHaveBeenCalled();
-		});
-
-		it("should pass the 'client_id' into the 'ServiceRequestIndex' collection", function(){
-			this.view.renderServiceRequests();
-			expect(this.view.serviceRequests.collection.client_id).toEqual('1');
-		});
-
-		it("should fetch the collection data and attach the view on 'success'", function(){
-			spyOn(App.Views.ServiceRequestIndexView.prototype, 'attachTo');
-			spyOn(App.Collections.ServiceRequests.prototype, 'fetch').and.callThrough();
-			this.view.renderServiceRequests();
-			expect(App.Collections.ServiceRequests.prototype.fetch).toHaveBeenCalled();
-			expect(App.Views.ServiceRequestIndexView.prototype.attachTo).toHaveBeenCalled();
-		});
 	});
 });

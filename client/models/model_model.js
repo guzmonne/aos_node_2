@@ -8,36 +8,6 @@ App.Models.Model = App.Models.BaseModel.extend({
 		return u;
 	},
 
-	awake: function(attributes, options){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-	},
-
-	// This function gets called when the model is being synced with the server
-	parse: function(response){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-		if (App.defined(response.appliances)){
-			this.setAppliances(response.appliances);
-		}
-		return response;
-	},
-
-	setAppliances: function(array){
-		var self = this;
-		if (_.isArray(array)){
-			this.set('appliancesCount', array.length);
-			if(!_.isString(array[0])){
-				_.each(array, function(appliance){
-					self.appliances.add(app.pushToStorage('Appliances', appliance));
-				});
-			}
-		}
-		return this;
-	},
-
 	defaults: function(){
 		return {
 			'createdBy'  : 'Guzmán Monné',

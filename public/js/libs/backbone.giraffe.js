@@ -711,7 +711,7 @@
       if (view != null ? view[methodName] : void 0) {
         return view[methodName].apply(view, args);
       } else {
-        error('No such method name in view hierarchy', methodName, args, this);
+        //error('No such method name in view hierarchy', methodName, args, this);
         return false;
       }
     };

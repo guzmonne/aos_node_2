@@ -10,14 +10,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 	initialize: function(){
 		this.awake.apply(this, arguments);
 		if(!this.modelName){return new Error('View must have a modelName defined');}
-		if(!App.defined(this.model)){
-			var titelizeModelName = this.titelize(this.modelName);
-			if (App.defined(App.Models[titelizeModelName])){
-				this.model = new App.Models[titelizeModelName]();
-			} else {
-				this.model = new Giraffe.Model();
-			}
-		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
 		this.bindEvents.apply(this);

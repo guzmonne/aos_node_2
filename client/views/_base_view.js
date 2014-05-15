@@ -29,7 +29,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	afterSync: function(){
-		this.invoke('stopSpin');
+		this.invoke("stopSpin");
 	},
 
 	// !!!
@@ -253,4 +253,24 @@ App.Views.BaseView = Giraffe.View.extend({
 	updateViewField: function(field){
 		this.$('[name='+ field +']').val(this.model.get(field));
 	},
+
+	updateViewText: function(field){
+		this.$('[name='+ field +']').text(this.model.get(field));
+	},
+
+	invoke: function() {
+    var args, methodName, view;
+		methodName = arguments[0]; 
+		args       = (2 <= arguments.length) ? Array.prototype.slice.call(arguments, 1) : [];
+		view       = this;
+    while (view && !view[methodName]) {
+      view = view.parent;
+    }
+    if (view !== null ? view[methodName] : void 0) {
+      return view[methodName].apply(view, args);
+    } else {
+      //error('No such method name in view hierarchy', methodName, args, this);
+      return false;
+    }
+  }
 });

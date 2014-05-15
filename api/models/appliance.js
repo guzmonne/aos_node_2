@@ -131,20 +131,28 @@ ApplianceModel.prototype.create = function(params, callback){
 // Get all appliances
 // ------------------
 ApplianceModel.prototype.findAll = function(callback){
-	Appliance.find({}, function(err, appliances){
-		if (err){return callback(err);}
-		async.each(appliances, function(appliance, cb){
-			appliance.populate({
-				path  : 'model_id',
-				select: 'brand model category subcategory _id'
-			}, function(err, appliance){
-				cb(null, appliance);
-			});
-		}, function(err, results){
+	Appliance.find({})
+		.exec(function(err, appliances){
 			if (err){return callback(err);}
-			// Return the populated service request
 			callback(null, appliances);
 		});
+};
+// Find all appliances by model_id
+// -------------------------------
+ApplianceModel.prototype.findByModelId = function(model_id, callback){
+	Appliance.find({'model_id': model_id}, function(err, appliances){
+		if(err){return callback(err);}
+		if(appliances === null){return callback({msg: 'No Appliance found'});}
+		callback(null, appliances);
+	});
+};
+// Find all appliances by model_id
+// -------------------------------
+ApplianceModel.prototype.findByServiceRequestId = function(service_request_id, callback){
+	Appliance.find({'service_request_id': service_request_id}, function(err, appliances){
+		if(err){return callback(err);}
+		if(appliances === null){return callback({msg: 'No Appliance found'});}
+		callback(null, appliances);
 	});
 };
 // Update appliance by id
@@ -167,17 +175,11 @@ ApplianceModel.prototype.updateById = function(id, params, callback){
 // Show appliance
 // --------------
 ApplianceModel.prototype.show = function(id, callback){
-	console.log(id);
-	Appliance.findById(id, function(err, appliance){
-		if (err){return callback(err);}
-		if (appliance === null){return callback();}
-		appliance.populate({
-			path  : 'model_id',
-			select: 'brand model category subcategory _id'
-		}, function(err, appliance){
+	Appliance.findById(id)
+		.exec(function(err, appliance){
+			if (err){return callback(err);}
 			callback(null, appliance);
 		});
-	});
 };
 // =======
 // EXPORTS

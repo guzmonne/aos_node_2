@@ -7,12 +7,6 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	tableCollection: 'ServiceRequests',
 	modelView      : App.Views.ServiceRequestRowView,
 
-	appStorage: 'serviceRequests',
-
-	appEvents: {
-		"service_request:create:success": 'checkCreatedModel', 
-	},
-
 	events:{
 		'click button#new-service-request': 'newServiceRequest',
 	},
@@ -41,22 +35,12 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			client_name: parentModel.get('name'),
 			client_id  : parentModel.get('_id')
 		};
-		var model = new App.Models.ServiceRequest(object);
+		var model = new app.storage.newModel("service_requests").set(object);
 		app.Renderer.show({
 			viewName: 'ServiceRequestNewView',
-			model: model
+			viewType: 'new',
+			storage : "service_requests",
+			model   : model
 		});
-	},
-
-	checkCreatedModel: function(model){
-		if (this.collection === app.serviceRequests){ return; }
-		if (
-			App.defined(this.parent)												&&
-			App.defined(this.parent.model)									&&
-			this.parent.model instanceof App.Models.Client	&&
-			this.parent.model.id === model.get('client_id')
-		){
-			this.collection.add(model);
-		}
 	},
 });

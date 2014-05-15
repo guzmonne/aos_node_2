@@ -10,6 +10,7 @@ var config        = require('./siteConf.js');
 var RedisStore    = require('connect-redis')(express);
 var mongoose      = require('mongoose');
 var autoIncrement = require('mongoose-auto-increment');
+var async         = require('async');
 
 // ==================
 // MONGODB & MONGOOSE
@@ -101,14 +102,39 @@ var models          = require('./api/controllers/model');
 var users           = require('./api/controllers/user');
 
 // ======
+// MODELS
+// ======
+var ModelModel  = require('./api/models/model').ModelModel;
+var Model       = new ModelModel();
+var ClientModel = require('./api/models/client').ClientModel;
+var Client      = new ClientModel();
+
+// ======
 // ROUTES
 // ======
 // Index
 // -----
 app.get('/', function(req, res){
-	res.render('index', { 
-  	csrf : req.csrfToken()
-  });
+	async.parallel({
+		models: function(callback){
+			Model.findAll("-appliances", function(err, models){
+				if (err){return callback(err);}
+				callback(null, JSON.stringify(models));
+			});
+		},
+		clients: function(callback){
+			Client.findAll("-service_requests", function(err, clients){
+				if (err){return callback(err);}
+				callback(null, JSON.stringify(clients));
+			});
+		}
+	}, function(err, results){
+		res.render('index', {
+			csrf   : req.csrfToken(),
+			clients: results.clients,
+			models : results.models
+		});
+	});
 });
 // Client
 // ------
@@ -118,7 +144,6 @@ app.post('/api/clients'    , client.create);
 app.put( '/api/clients/:id', client.update);
 // Service Requests
 // ----------------
-app.get('/api/service_requests/client/:id', service_request.index);
 app.get('/api/service_requests'           , service_request.index);
 app.get('/api/service_requests/:id'       , service_request.show);
 app.post('/api/service_requests'          , service_request.create);

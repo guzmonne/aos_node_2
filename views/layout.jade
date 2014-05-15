@@ -10,7 +10,7 @@ html(lang="en")
 
 		// CSRF
 		script.
-			var csrf = "#{csrf}"
+			var csrf = "#{csrf}";
 
 		script(src='/js/libs/jquery.min.js')
 		script(src='/js/libs/bootstrap.js')
@@ -28,6 +28,10 @@ html(lang="en")
 		script(src='/js/templates-helpers.js')
 		script(src='/js/templates.js')
 		script(src='/js/client.js')
+
+		script.
+			var models  = !{models}; 
+			var clients = !{clients};
 
 		link(rel='stylesheet', href='/css/bootstrap.min.css')
 		link(rel='stylesheet', href='/css/animate.css')

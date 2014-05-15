@@ -102,7 +102,7 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 			}
 		});
 		this.model.dispose();
-		this.model = new App.Models.Model();
+		this.model = app.storage.newModel("models");
 		this.cleanForm();
 	},
 

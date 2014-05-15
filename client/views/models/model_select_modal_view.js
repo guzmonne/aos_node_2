@@ -10,7 +10,10 @@ App.Views.ModelSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		this.modelIndex = new App.Views.ModelIndexView();
+		this.modelIndex = new App.Views.ModelIndexView({
+			collection: app.storage.getCollection("models"),
+			synced    : true,
+		});
 		this.modelIndex.selection  = true;
 		this.modelIndex.parentView = this.parentView;
 		this.modelIndex.attachTo('#model-index');

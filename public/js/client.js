@@ -155,22 +155,34 @@ App.Storage = (function(){
 			collection    = colls[collection];
 			subCollection = new collection.constructor();
 			options       = (options) ? options : {};
+			context       = (context) ? context : this; 
 			subCollection.set(collection.set(objects, {remove: false}));
 			if (options.filter){
+				var filter, matches;
+				var getFilter = function(){
+					if(_.isFunction(options.filter)){
+						return options.filter.apply(context);
+					} else {
+						return options.filter;
+					}
+				};
 				subCollection.listenTo(collection, 'add', function(model){
-					var matches = _.matches(_.result(options, 'filter'));
+					filter  = getFilter();
+					matches = _.matches(filter);
 					if(matches(model.attributes)){
 						subCollection.add(model);
 					}
 				});
 				subCollection.listenTo(collection, 'remove', function(model){
-					var matches = _.matches(_.result(options, 'filter'));
+					filter  = getFilter();
+					matches = _.matches(filter);
 					if(matches(model.attributes)){
 						subCollection.remove(model);
 					}
 				});
-				_.each(_.keys(_.result(options, 'filter')), function(key){
-					var matches = _.matches(_.result(options, 'filter'));
+				filter = getFilter();
+				_.each(_.keys(filter), function(key){
+					matches = _.matches(filter);
 					subCollection.listenTo(collection, 'change:' + key, function(model){
 						if(!matches(model.attributes) && subCollection.get(model)){
 							subCollection.remove(model);
@@ -187,7 +199,7 @@ App.Storage = (function(){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
 			if (!condition && !_.isObject(condition)) { throw new Error('A "condition" must be passed'); }
-			var success, fetch, conModels;
+			var success, fetch, conModels, matches;
 			collection    = colls[collection];
 			conModels     = collection.where(condition);
 			subCollection = new collection.constructor(conModels);
@@ -195,13 +207,25 @@ App.Storage = (function(){
 			context       = (context) ? context : this;
 			fetch         = (options.fetch === false) ? false : true;
 			options.data  = condition;
+			// add models fetched from the server to the subCollection
 			if (options.success){ success = options.success; }
 			options.success = function(){
 				conModels = collection.where(condition);
-				subCollection.set(conModels);
+				subCollection.set(conModels, {remove: false});
 				if (success){ success.apply(context, arguments); }
 			}; 
 			if (fetch === true){ collection.fetch(options); }
+			// set subCollection events
+			matches = _.matches(condition);
+			subCollection.listenTo(collection, "add", function(model){
+				if (matches(model.attributes)){ subCollection.add(model); }
+			});
+			subCollection.listenTo(collection, "change", function(model){
+				if (!matches(model.attributes)){subCollection.remove(model);}
+			});
+			subCollection.listenTo(collection, "remove", function(model){
+				subCollection.remove(model);
+			});
 			return subCollection;
 		};
 
@@ -226,6 +250,21 @@ App.Storage = (function(){
 			return colls[collection].remove(colls[collection].get(id));
 		};
 
+		var newModel = function(collection){
+			if (!collection)        { throw new Error('No "collection" was passed'); }
+			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
+			var model;
+			collection = colls[collection];
+			model      = new collection.model();
+			collection.listenTo(model, 'change:_id', function(){
+				collection.add(model);
+			});
+			collection.listenTo(model, 'disposing', function(){
+				collection.stopListening(model);
+			});
+			return model;
+		};
+
 		return {
 			setSubCollection: setSubCollection,
 			setModel        : setModel,
@@ -235,6 +274,7 @@ App.Storage = (function(){
 			add             : add,
 			remove          : remove,
 			get             : get,
+			newModel        : newModel,
 			collection      : collection,
 		};
 	};
@@ -282,15 +322,9 @@ App.Mixins.SelectModel = {
 	// ------------ 
 	// !!!
 	modelSelected: function(model){
-		this.model.tempModel = this.model.model.clone();
-		this.exchangeModel(model);
-		this.render();
-	},
-
-	exchangeModel: function(model){
-		this.model.model = model;
 		this.model.set('model_id', model.id);
 	},
+
 	// !!!
 	// Type: Object
 	// -----
@@ -302,11 +336,26 @@ App.Mixins.SelectModel = {
 	// !!!
 	serialize: function(){
 		var object = this.model.toJSON();
-		var model  = this.model.model;
+		var model  = this.model.model_id;
 		if (model){
 			_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
 		}
 		return object;
+	},
+
+	setModelDetails: function(){
+		this.$('[name=brand]').val(this.model.model_id.get('brand'));
+		this.$('[name=model]').val(this.model.model_id.get('model'));
+		this.$('[name=category]').val(this.model.model_id.get('category'));
+		this.$('[name=subcategory]').val(this.model.model_id.get('subcategory'));
+	},
+
+	setAccessories: function(){
+		var self = this;
+		var accessories = this.model.get('accessories');
+		_.each(accessories, function(accessory){
+			self.$('[name=accessories]').tagsinput("add", accessory);
+		});
 	},
 };
 // !!!
@@ -349,7 +398,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
-	constructor: function(){
+	constructor: function(attributes, options){
 		this.children = [];
 		if (this.childs){this.createChilds.apply(this, arguments);}
 		Giraffe.Model.apply(this, arguments);
@@ -399,7 +448,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 						options               = {};
 						objects               = (attrs[child.attribute]) ? attrs[child.attribute] : {};
 						options.filter        = child.filter;
-						self[child.attribute] = app.storage.setSubCollection(collection, objects, options);
+						self[child.attribute] = app.storage.setSubCollection(collection, objects, options, self);
 					}
 			} else {
 				throw new Error('A "child" must have either a "name" or a "filter" value');
@@ -421,8 +470,8 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	},
 
 	parse: function(response){
-		var self = this;
 		if (this.childs){
+			var self = this;
 			var attributes = _.map(this.childs, function(child){
 				return child.attribute;
 			});
@@ -452,51 +501,19 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 	urlRoot: '/api/appliances',
 	name   : 'appliance',
 
+	constructor: function(){
+		this.listenTo(this, 'change:model_id', function(){
+			this.model_id = app.storage.getModel("models", this.get('model_id'), {fetch: false});
+		});
+		Giraffe.Model.apply(this, arguments);
+	},
+
 	defaults: function(){
 		return {
 			'status'            : 'Pendiente',
 			'createdBy'         : 'Guzman Monne',
 			'updatedBy'         : 'Guzman Monne',
 		};
-	},
-
-	awake: function(options){
-		this.setModel(options);
-	},
-
-	customUpdate: function(otherModel){
-		this.set(otherModel.attributes, {silent: true});
-		this.model = otherModel.model;
-	},
-
-	parse: function(response){
-		var result = this.setModel(response);
-		return result;
-	},
-
-	childUpdated: function(){
-		this.trigger('updated');
-	},
-
-	setModel: function(response){
-		var result      = (response) ? response : null;
-		var modelParams = {};
-		if (result){
-			if (_.isObject(result.model_id)){
-				modelParams = result.model_id;
-				if (result.model_id._id){
-					result.model_id = result.model_id._id;
-				}
-			}
-		}		
-		if (this.model){
-			this.model.set(modelParams);
-		} else {
-			var model  = new App.Models.Model(modelParams);
-			this.model = model;
-			this.listenTo(this.model, 'updated', this.childUpdated);
-		}
-		return result;
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
@@ -553,36 +570,6 @@ App.Models.Model = App.Models.BaseModel.extend({
 		return u;
 	},
 
-	awake: function(attributes, options){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-	},
-
-	// This function gets called when the model is being synced with the server
-	parse: function(response){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-		if (App.defined(response.appliances)){
-			this.setAppliances(response.appliances);
-		}
-		return response;
-	},
-
-	setAppliances: function(array){
-		var self = this;
-		if (_.isArray(array)){
-			this.set('appliancesCount', array.length);
-			if(!_.isString(array[0])){
-				_.each(array, function(appliance){
-					self.appliances.add(app.pushToStorage('Appliances', appliance));
-				});
-			}
-		}
-		return this;
-	},
-
 	defaults: function(){
 		return {
 			'createdBy'  : 'Guzmán Monné',
@@ -593,12 +580,6 @@ App.Models.Model = App.Models.BaseModel.extend({
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	awake: function(attributes, options){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-	},
-
 	defaults: function(){
 		return {
 			'status'        : 'Pendiente',
@@ -607,19 +588,9 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		};
 	},
 
-	childs: [
-		{
-			attribute: 'appliances',
-			type: 'collection',
-			filter: function(){
-				return {service_request_id: this.id};
-			}
-		},
-	],
-
 	serialize: function(){
 		var attributes = this.toJSON();
-		attributes.appliances = this.appliances.toJSON();
+		attributes.appliancesCount = this.get('appliances').length;
 		return attributes;
 	},
 });
@@ -645,8 +616,6 @@ App.Collections.BaseCollection = Giraffe.Collection.extend({
 
 	initialize: function(options){
 		this.awake.apply(this, arguments);
-		//this.listenTo(app, 'active', function(){console.log(this.modelName, this.length);});
-		//this.listenTo(app, this.modelName + ':model:created', this.checkModel);
 	},
 
 	checkModel: function(attrs){
@@ -657,11 +626,6 @@ App.Collections.BaseCollection = Giraffe.Collection.extend({
 			this.add(new this.model(attrs));
 		} 
 	},
-
-	//setParent: function(parent){
-	//	this.parent = parent;
-	//	this.listenTo(parent, 'disposed', this.dispose);
-  //},
 });
 App.Collections.Appliances = Giraffe.Collection.extend({
 	url: '/api/appliances',
@@ -738,7 +702,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	afterSync: function(){
-		this.invoke('stopSpin');
+		this.invoke("stopSpin");
 	},
 
 	// !!!
@@ -962,6 +926,26 @@ App.Views.BaseView = Giraffe.View.extend({
 	updateViewField: function(field){
 		this.$('[name='+ field +']').val(this.model.get(field));
 	},
+
+	updateViewText: function(field){
+		this.$('[name='+ field +']').text(this.model.get(field));
+	},
+
+	invoke: function() {
+    var args, methodName, view;
+		methodName = arguments[0]; 
+		args       = (2 <= arguments.length) ? Array.prototype.slice.call(arguments, 1) : [];
+		view       = this;
+    while (view && !view[methodName]) {
+      view = view.parent;
+    }
+    if (view !== null ? view[methodName] : void 0) {
+      return view[methodName].apply(view, args);
+    } else {
+      //error('No such method name in view hierarchy', methodName, args, this);
+      return false;
+    }
+  }
 });
 App.Views.CarouselView = App.Views.BaseView.extend({
 	template: HBS.carousel_template,
@@ -1084,7 +1068,7 @@ App.Views.NewView = App.Views.BaseView.extend({
 	renderForm: function(){
 		if(!App.defined(this.formViewName)){return new Error('formViewName not defined');}
 		this.formView = new App.Views[this.formViewName]({
-			model: new App.Models[this.modelName]()
+			model: this.model,
 		});
 		this.formView.attachTo(this.$el, {method: 'html'});
 	},
@@ -1100,8 +1084,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 	
 	initialize: function(){
 		this.listenTo(this.model, 'change' , this.render);
-		this.listenTo(this.model, 'sync'   , this.render);
-		this.listenTo(this.model, 'updated', this.render);
 		this.listenTo(app, 'model:show:active',   this.activate);
 		this.listenTo(app, 'model:show:inactive', this.deactivate);
 		_.debounce(this.render, 100);
@@ -1152,16 +1134,9 @@ App.Views.ShowView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		if (!this.model){return;}
-		if (this.sync)  {this.listenTo(this.model, 'sync'   , this.update);}
-		if (this.change){this.listenTo(this.model, 'updated', this.render);}
 		this.listenTo(app, 'row:rendered', this.checkEventCaller);
 		this.listenTo(this, 'disposing', this.modelShowInactive);
 		this.modelShowActive();
-	},
-
-	update: function(){
-		this.render();
 	},
 
 	// !!!
@@ -1223,14 +1198,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 	initialize: function(){
 		this.awake.apply(this, arguments);
 		if(!this.modelName){return new Error('View must have a modelName defined');}
-		if(!App.defined(this.model)){
-			var titelizeModelName = this.titelize(this.modelName);
-			if (App.defined(App.Models[titelizeModelName])){
-				this.model = new App.Models[titelizeModelName]();
-			} else {
-				this.model = new Giraffe.Model();
-			}
-		}
 		this.timestamp = _.uniqueId();
 		this.createTabs();
 		this.bindEvents.apply(this);
@@ -1364,11 +1331,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	onSync: function(){
 		this.collection.fetch(this.fetchOptions);
 	},
-
-	dispose: function(){
-		this.$el.off('resize');
-		Giraffe.dispose.apply(this, arguments);
-	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
 	
@@ -1377,29 +1339,54 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		'render:show'          : 'showView',
 	},
 
+	viewTree: {
+		"client" : {
+			storage: "clients",
+			model  : "Client",
+		},
+		"service_request": {
+			storage: "service_requests",
+			model  : "ServiceRequest"
+		},
+		"appliance": {
+			storage: "appliances",
+			model  : "Appliance",
+		},
+		"model": {
+			storage: "models",
+			model  : "Model",
+		}, 
+		"user": {
+			storage: "users",
+			model  : "User",
+		}
+	},
+
 	showView: function(doc, id){
-		var docName  = this.titelize(doc);
-		var viewName = docName + 'ShowView';
-		var params   = {
-			model            : docName,
-			viewName         : viewName,
-			portletFrameClass: 'green',
-			options          : {
-				_id: id,
-			},
-		};
+		var treeInfo = this.viewTree[doc];
+		if (!treeInfo) { throw new Error('Invalid doc: "'+ doc +'" on showView'); }
+		if (!id)       { throw new Error('No "id" was passed'); }
+		var params = _.extend({
+			viewName         : treeInfo.model + 'ShowView',
+			viewType         : "show",
+			portletFrameClass: "green",
+			options: {
+				_id: id
+			}
+		}, treeInfo);
 		this.showOrGoTo(params, this.showComparator);
 	},
 
 	docView: function(doc, type){
-		var docName  = this.titelize(doc);
-		var typeName = this.capitaliseFirstLetter(type);
-		var viewName = docName + typeName + 'View';
-		var params   = {
-			viewName: viewName,
-		};
-		if (typeName === "Index"){
-			params.collection = docName + 's';
+		var treeInfo = this.viewTree[doc];
+		if (!treeInfo) { throw new Error('Invalid doc: "'+ doc +'" on showView'); }
+		if (!type)     { throw new Error('No "type" was passed'); }
+		var params = _.extend({
+			viewName : treeInfo.model + this.titelize(type) + 'View',
+			viewType : type,
+		}, treeInfo);
+		if (type === "index"){
+			params.collection = true;
 		}
 		this.showOrGoTo(params);
 	},
@@ -1422,60 +1409,54 @@ App.Views.Renderer = App.Views.BaseView.extend({
 	},
 
 	showOrGoTo: function(params, comparator){
-		if(	!App.defined(params)										|| 
-				!App.defined(params.viewName)						|| 
-				!App.defined(App.Views[params.viewName])
-		){
-			return;
-		}
-		var viewRef;
+		if (!params)                     { throw new Error('"params" must be defined'); }
+		if (!params.viewName)            { throw new Error('"params.viewName" must be defined'); }
+		if (!App.Views[params.viewName]) { throw new Error('View "App.Views.'+params.viewName+'" is not defined'); } 
+		var renderedView;
 		Backbone.history.navigate((Backbone.history.fragment).replace('render/', ''));
-		params     = (params)     ? params     : {};
-		comparator = (comparator) ? comparator : this.defaultComparator;
-		viewRef    = this.viewIsRendered(comparator, params);
-		if (viewRef){
-			App.scrollTo(viewRef.el);
+		comparator   = (comparator) ? comparator : this.defaultComparator;
+		renderedView = this.viewIsRendered(comparator, params);
+		if (renderedView){
+			App.scrollTo(renderedView.el);
 		} else {
 			this.show(params);
 		}
 	},
 
 	show: function(params){
-		var portletView, fetchOptions, fetch;
-		var viewOptions = {};
-		if(!_.isObject(params) || !App.defined(params.viewName)){
-			return new Error('The viewName option must be set');
-		}
-		if(params.model){
-			var modelOptions  = (params.options) ? (params.options) : {}; 
-			if (_.isString(params.model)){
-				viewOptions.model = new App.Models[params.model](modelOptions);
-				fetch = true;
+		if(!params || !_.isObject(params)){ throw new Error('"params" must be defined'); }
+		var model, collection, fetchOptions, portletView;
+		switch (params.viewType){
+		case "show":
+			if (params.model instanceof Giraffe.Model){ 
+				model = params.model; 
 			} else {
-				viewOptions.model = params.model;
+				model = app.storage.getModel(params.storage, params.options._id, {fetch: false});
+			} 
+			params.view  = new App.Views[params.viewName]({model: model});
+			if (params.fetch === undefined || params.fetch === true){
+				fetchOptions = (params.view.fetchOptions) ? params.view.fetchOptions : {};
+				model.fetch(fetchOptions);
 			}
-			delete params.model;
-			delete params.options;
-		}	
-		if (params.collection){
-			if (_.isString(params.collection)){
-				viewOptions.collection = new App.Collections[params.collection]();
-				fetch = true;
+			break;
+		case "new":
+			if (params.model instanceof Giraffe.Model){
+				model = params.model;
 			} else {
-				viewOptions.collection = params.collection;
+				model = app.storage.newModel(params.storage);
 			}
-			delete params.collection;
-			delete params.options;
+			params.view = new App.Views[params.viewName]({model: model});
+			break;
+		case "index":
+			collection   = app.storage.collection(params.storage);
+			params.view  = new App.Views[params.viewName]({collection: collection});
+			if (params.fetch === undefined || params.fetch === true){
+				fetchOptions = (params.view.fetchOptions) ? params.view.fetchOptions : {};
+				collection.fetch(fetchOptions);
+			}
+			break;
 		}
-		var view = params.view = new App.Views[params.viewName](viewOptions);
-		if (fetch){
-			fetchOptions        = (params.view.fetchOptions) ? params.view.fetchOptions : {};
-			fetchOptions.silent = false;
-			if (view.model)      {view.model.fetch(fetchOptions);}
-			if (view.collection) {view.collection.fetch(fetchOptions);}
-			
-		}
-		portletView = new App.Views.PortletView(params);
+		portletView = new App.Views.PortletView(_.pick(params, "view", "viewName", "portletFrameClass", "flash"));
 		this.appendToContent(portletView);
 		App.scrollTo(portletView.el);
 	},
@@ -1513,7 +1494,7 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			var createdAt = this.model.get('createdAt');
 			var updatedAt = this.model.get('updatedAt');
 			var closedAt  = this.model.get('closedAt');
-			var model     = this.model.model;
+			var model     = this.model.model_id;
 			if (model){
 				_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
 			}
@@ -1546,12 +1527,22 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
-		this.listenTo(this.model, 'updated', this.render);
-		this.listenTo(this.model, 'sync'   , this.render);
-		this.listenTo(this, 'disposing', this.selectModelOff);
 		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'setAccessories', 'setModelDetails');
 		this.$el.on('click', 'button#select-model', this.selectModel);
+		this.listenTo(this      , 'disposing'              , this.selectModelOff);
+		this.listenTo(this.model, 'change:id'              , function(){this.updateViewField.apply(this, ['id']);});
+		this.listenTo(this.model, 'change:status'          , function(){this.updateViewField.apply(this, ['status']);});
+		this.listenTo(this.model, 'change:serial'          , function(){this.updateViewField.apply(this, ['serial']);});
+		this.listenTo(this.model, 'change:observations'    , function(){this.updateViewField.apply(this, ['observations']);});
+		this.listenTo(this.model, 'change:repairement_type', function(){this.updateViewField.apply(this, ['repairement_type']);});
+		this.listenTo(this.model, 'change:cost'            , function(){this.updateViewField.apply(this, ['cost']);});
+		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewText.apply(this, ['defect']);});
+		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
+		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
+		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
+		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
+		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
 	},
 
 	afterRender: function(){
@@ -1588,7 +1579,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		var self    = this;
 		e.preventDefault();
 		this.saveModel();
-		this.model.save({}, {
+		this.model.save(null, {
 			success: function(){
 				self.invoke('showMessage', {
 					title  : 'Equipo Actualizado',
@@ -1597,40 +1588,44 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
-		//this.model.modelUpdated();
 		this.editMode = false;
+		this.blockForm();
+		this.toggleButtons();
 	},
 
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
-		if (this.tempModel){
-			this.exchangeModel(this.tempModel);
-			this.tempModel.dispose();
+		if (this.model._previousAttributes.model_id){
+			this.model.set('model_id', this.model._previousAttributes.model_id);
 		}
 		this.render();
 	},
 
 	saveModel: function(){
-		this.model.set('serial'      , this.$('[name=serial]').val()      , {silent: true});
-		this.model.set('observations', this.$('[name=observations]').val(), {silent: true});
-		// If the repairement type has change and equals "Garantía" then the cost = 0
-		if(
-			this.model.get('repairement_type') !== this.$('[name=repairement_type]').val() &&
-			this.$('[name=repairement_type]').val() === 'Garantía'
-		){
-			this.model.set('cost', 0, {silent: true});
+		this.setRepType();
+		this.model.set(_.pick(this.$('form').formParams(), 
+			'serial',
+			'observations',
+			'repairement_type', 
+			'defect',
+			'accessories',
+			'status',
+			'replacements',
+			'dispose',
+			'solution',
+			'technician_id'
+		));
+	},
+
+	setRepType: function(){
+		var oldRepType = this.model.get('repairement_type');
+		var newRepType = this.$('[name=repairement_type]').val();
+		if((oldRepType !== newRepType) && (newRepType === "Garantía")){
+			this.model.set('cost', 0);
 		} else {
-			this.model.set('cost', this.$('[name=cost]').val(), {silent: true});
+			this.model.set('cost', this.$('[name=cost]').val());
 		}
-		this.model.set('repairement_type', this.$('[name=repairement_type]').val()        , {silent: true});
-		this.model.set('defect'          , this.$('[name=defect]').val()                  , {silent: true});
-		this.model.set('accessories'     , this.$('[name=accessories]').tagsinput('items'), {silent: true});
-		this.model.set('status'          , this.$('[name=status]').val()                  , {silent: true});
-		this.model.set('replacements'    , this.$('[name=replacements]').val()            , {silent: true});
-		this.model.set('diagnose'        , this.$('[name=diagnose]').val()                , {silent: true});
-		this.model.set('solution'        , this.$('[name=solution]').val()                , {silent: true});
-		this.model.set('technician_id'   , this.$('[name=technician_id]').val()           , {silent: true});
 	},
 
 	selectModelOff: function(){
@@ -1645,8 +1640,6 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	tableEl        : '#appliances-table',
 	tableCollection: 'Appliances',
 	modelView      : App.Views.ApplianceRowView,
-
-	appStorage: 'appliances',
 });
 App.Views.ApplianceShowView = App.Views.ShowView.extend({
 	template : HBS.appliance_show_template,
@@ -1659,11 +1652,20 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 	},
 
 	awake: function(){
-		this.listenToOnce(this.model, 'sync', this.render);
+		this.listenTo(this.model, 'change:client_name', function(){
+			this.updateViewText.apply(this, ['client_name']);
+			this.invoke('setHeader');
+		});
+		this.listenTo(this.model, 'change:service_request_id', function(){
+			this.$('[name=service_request_id]').attr('href', '#render/service_request/show/' + this.model.get('service_request_id'));
+		});
+		this.listenTo(this.model, 'change:client_id', function(){
+			this.$('[name=client_name]').attr('href', '#render/client/show/' + this.model.get('client_id'));
+		});
 	},
 
 	afterRender: function(){
-		if (!this.formView && this.model.hasChanged()){
+		if (!this.formView){
 			this.formView = new App.Views.ApplianceEditFormView({
 				model: this.model,
 			});
@@ -1686,30 +1688,49 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	firstRender: true,
 
 	events: {
-		'focus .bootstrap-tagsinput input'   : 'activateTags',
-		'focusout .bootstrap-tagsinput input': 'deactivateTags',
+		'submit form'                        : function(e){e.preventDefault();},
+		//'focus .bootstrap-tagsinput input'   : 'activateTags',
+		//'focusout .bootstrap-tagsinput input': 'deactivateTags',
 	},
 
 	initialize: function(){
-		if (!App.defined(this.model)){
-			this.model = new App.Models.Appliance();
-		}
-		var collection = this.model.collection;
-		if (App.defined(collection)){
-			this.listenTo(collection, 'appliance:deleted', this.saveAndDispose);
-			this.listenTo(collection, 'service_request:create:success', this.dispose);
-		}
 		_.extend(this, App.Mixins.SelectModel);
-		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'setAccessories', 'setModelDetails');
 		this.$el.on('click', 'button#select-model', this.selectModel);
-		this.listenTo(this, 'disposing', this.selectModelOff);
+		this.listenTo(this      , 'disposing'              , this.selectModelOff);
+		this.listenTo(this.model, 'change:id'              , function(){this.updateViewField.apply(this, ['id']);});
+		this.listenTo(this.model, 'change:status'          , function(){this.updateViewField.apply(this, ['status']);});
+		this.listenTo(this.model, 'change:serial'          , function(){this.updateViewField.apply(this, ['serial']);});
+		this.listenTo(this.model, 'change:observations'    , function(){this.updateViewField.apply(this, ['observations']);});
+		this.listenTo(this.model, 'change:repairement_type', function(){this.updateViewField.apply(this, ['repairement_type']);});
+		this.listenTo(this.model, 'change:cost'            , function(){this.updateViewField.apply(this, ['cost']);});
+		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewText.apply(this, ['defect']);});
+		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
+		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
+		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
+		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
+		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
+		this.listenTo(this, 'disposing', this.removeTagsinput);
 	},
 
 	afterRender: function(){
-		this.$('[name=accessories]').tagsinput();
+		this.tagsinput();
 		this.$('[name=serial]').focus();
 	},
+
+	tagsinput: function(){
+		var self = this;
+		this.removeTagsinput();
+		this.$('[name=accessories]').tagsinput();
+		this.$('.bootstrap-tagsinput input').on("focus"   , function(e){ self.activateTags(e); });
+		this.$('.bootstrap-tagsinput input').on("focusout", function(e){ self.deactivateTags(e); });
+	},
+
+	removeTagsinput: function(){
+		this.$('.bootstrap-tagsinput input').off('focus');
+		this.$('.bootstrap-tagsinput input').off('focusout');
+		this.$('.bootstrap-tagsinput').remove();
+	}, 
 
 	saveAndDispose: function(){
 		this.saveModel();
@@ -1717,11 +1738,13 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('serial', this.$('[name=serial]').val());
-		this.model.set('observations', this.$('[name=observations]').val());
-		this.model.set('repairement_type', this.$('[name=repairement_type]').val());
-		this.model.set('defect', this.$('[name=defect]').val());
-		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'));
+		this.model.set(_.pick(this.$('form').formParams(),
+			'serial',
+			'observations',
+			'repairement_type',
+			'defect'
+		));
+		this.model.set('accessories', this.$('[name=accessories]').tagsinput('items'), {silent: true});
 	},
 
 	selectModelOff: function(){
@@ -1736,6 +1759,10 @@ App.Views.ClientDetailsView = App.Views.ShowView.extend({
 	template: HBS.client_details_template,
 
 	className: 'row',
+
+	awake: function(){
+		this.listenTo(this.model, 'sync', this.render);
+	},
 
 	afterRender: function(){
 		this.invoke('setHeader');
@@ -1874,7 +1901,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 				});
 			},
 		});
-		this.model = new App.Models.Client();
+		this.model = app.storage.newModel("clients");
 		this.bindEvents();
 		this.render();
 		this.$('[name=name]').focus();
@@ -1906,8 +1933,7 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	tableEl        : '#clients-table',
 	tableCollection: 'Clients',
 	modelView      : App.Views.ClientRowView,
-
-	appStorage      : 'clients',
+	
 	fetchOptions		: {
 		data: {
 			fields: '-service_requests'
@@ -1917,7 +1943,6 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 App.Views.ClientNewView = App.Views.NewView.extend({	
 	name        : "Nuevo Cliente",
 	formViewName: "ClientFormView",
-	modelName   : "Client",
 });
 App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 	template: HBS.client_select_modal_template,
@@ -1931,7 +1956,10 @@ App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		this.clientIndex = new App.Views.ClientIndexView();
+		this.clientIndex = new App.Views.ClientIndexView({
+			collection: app.storage.getCollection("clients"),
+			synced: true,
+		});
 		this.clientIndex.selection = true;
 		this.clientIndex.attachTo('#client-index');
 	},
@@ -1976,13 +2004,17 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 		if (!App.defined(this.serviceRequests)){
 			var self = this;
 			this.serviceRequests = new App.Views.ServiceRequestIndexView({
-				collection: new App.Collections.ServiceRequests()
-			});
-			this.serviceRequests.collection.client_id = this.model.id;
-			this.serviceRequests.collection.fetch({
-				success: function(){
-					self.serviceRequests.attachTo(this.$('#client-service_requests-'+ self.timestamp), {method: 'html'});
-				}
+				collection: app.storage.getSubCollection("service_requests", {
+					client_id: this.model.id,
+				}, {
+					success: function(){
+						self.serviceRequests.attachTo(
+							self.$('#client-service_requests-'+ self.timestamp), 
+							{method: 'html'}
+						);
+					}
+				}),
+				synced: true,
 			});
 		}
 	},
@@ -2377,13 +2409,18 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 
 	renderApplianceIndex: function(){
 		if (!App.defined(this.model)){return;}
-		var el = this.$('#model-appliances');
+		var self = this;
+		var el   = this.$('#model-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			collection   : this.model.appliances,
-			fetchOnRender: false,
-			baseModel    : this.model,
+			synced: true,
+			collection   : app.storage.getSubCollection("appliances", {
+				model_id: this.model.id
+			}, {
+				success: function(){
+					self.appliancesIndex.attachTo(el, {method: 'html'});
+				}
+			}),
 		});
-		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
 
 	serialize: function(){
@@ -2498,7 +2535,7 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 			}
 		});
 		this.model.dispose();
-		this.model = new App.Models.Model();
+		this.model = app.storage.newModel("models");
 		this.cleanForm();
 	},
 
@@ -2549,7 +2586,10 @@ App.Views.ModelSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
-		this.modelIndex = new App.Views.ModelIndexView();
+		this.modelIndex = new App.Views.ModelIndexView({
+			collection: app.storage.getCollection("models"),
+			synced    : true,
+		});
 		this.modelIndex.selection  = true;
 		this.modelIndex.parentView = this.parentView;
 		this.modelIndex.attachTo('#model-index');
@@ -2559,6 +2599,12 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 	name: function(){
 		if (this.model){
 			return 'Equipos con modelo ' + this.model.get('model');
+		}
+	},
+
+	fetchOptions: {
+		data: {
+			fields: '-appliances',
 		}
 	},
 	
@@ -2607,8 +2653,7 @@ App.Views.ServiceRequestRowView = App.Views.RowView.extend({
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
-			object = this.model.toJSON();
-			var appliances = this.model.appliances;
+			object = this.model.serialize();
 			var createdAt = this.model.get('createdAt');
 			if (App.defined(createdAt)){
 				object.createdAt = this.model.dateDDMMYYYY(createdAt);
@@ -2623,6 +2668,19 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 
 	awake: function(){
 		_.once(this.renderApplianceIndex);
+		this.listenTo(this.model, 'change:client_name', function(){this.updateViewText.apply(this, ['client_name']);});
+		this.listenTo(this.model, 'change:status', function(){this.updateViewText.apply(this, ['status']);});
+		this.listenTo(this.model, 'change:invoiceNumber', function(){
+			this.updateViewText.apply(this, ['invoiceNumber']);
+			if (this.model.get('invoiceNumber') === ''){ 
+				this.$('[name=invoiceText]').addClass("hide"); 
+			} else {
+				this.$('[name=invoiceText]').removeClass("hide");
+			}
+		});
+		this.listenTo(this.model, 'change:client_id', function(){
+			this.$('[name=client_name]').attr('href', '#render/client/show/' + this.model.get('client_id'));
+		});
 	},
 
 	afterRender: function(){
@@ -2632,12 +2690,18 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 
 	renderApplianceIndex: function(){
 		if (!App.defined(this.model)){return;}
+		var self = this;
 		var el = this.$('#service-request-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			collection   : this.model.appliances,
 			synced       : true,
+			collection   : app.storage.getSubCollection("appliances", {
+				service_request_id: this.model.id,
+			}, {
+				success: function(){
+					self.appliancesIndex.attachTo(el, {method: 'html'});
+				}
+			}),
 		});
-		this.appliancesIndex.attachTo(el, {method: 'html'});
 	},
 
 	serialize: function(){
@@ -2660,9 +2724,28 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		'click button[type=submit]'    : 'createServiceRequest',
 		'click button#select-client'   : 'selectClient',
 	},
+
+	initialize: function(){
+		this.listenTo(this.model, 'change:client_name'  , function(){this.updateViewField.apply(this, ['client_name']);});
+		this.listenTo(this.model, 'change:invoiceNumber', function(){this.updateViewField.apply(this, ['invoiceNumber']);});
+		this.model.appliances = new App.Collections.Appliances();
+		this.listenTo(this.model.appliances, 'change', this.setAppliances);
+		this.listenTo(this.model.appliances, 'remove', this.setAppliances);
+		this.listenTo(this, 'disposing', function(){
+			this.model.appliances.dispose();
+			this.model.appliances = undefined;
+		});
+	},
+
+	setAppliances: function(){
+		this.model.set('appliances', this.model.appliances.toJSON());
+	},
 	
-	afterRequest: function(){
+	afterRender: function(){
 		this.$el.tooltip();
+		if (this.model && this.model.get('client_name') && this.model.get('client_id')){
+			this.$('.btn-success').attr('disabled', false);
+		}
 	},
 
 	serviceRequestSuccessFlash: function(){
@@ -2691,46 +2774,32 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	clientSelected: function(model){
 		this.model.set('client_id', model.get('_id'));
 		this.model.set('client_name', model.get('name'));
-		this.render();
-	},
-
-	deleteAppliance: function(e){
-		e.preventDefault();
-		var self       = this;
-		var index      = e.currentTarget.dataset.index;
-		var appliances = this.model.appliances;
-		var appliance  = appliances.at(index);
-		appliances.trigger('appliance:deleted');
-		appliances.remove(appliance);
-		this.$('#appliance-views').empty();
-		_.each(appliances.models, function(model){
-			self.appendApplianceForm({
-				model      : model,
-				firstRender: false,
-			});
-		});
-		if(appliances.length === 0){this.$('button[type=submit]').attr('disabled', true);}
+		this.$('.btn-success').attr('disabled', false);
 	},
 
 	singleApplianceForm: function(e){
 		e.preventDefault();
-		var appliances = this.model.appliances;
-		var model = new App.Models.Appliance({
+		var model = app.storage.newModel("appliances");
+		model.set({
 			client_name: this.model.get('client_name'),
-			client_id  : this.model.get('client_id'),
+			client_id  : this.model.get('client_id')
 		});
 		this.$('button[type=submit]').attr('disabled', false);
-		appliances.add(model);
-		this.appendApplianceForm({model: model});
+		this.model.appliances.add(model);
+		this.appendApplianceForm(model);
 	},
 
-	appendApplianceForm: function(options){
-		if(!App.defined(options.model)){return new Error('No model was passed in the options.');}
+	appendApplianceForm: function(model, view){
 		var appliances = this.model.appliances;
-		var view       = new App.Views.ApplianceSingleFormView(options);
-		var index      = appliances.indexOf(options.model);
-		var style      = '';
-		if ((index % 2) === 1){style = 'background-color: #E6E6E6';}
+		if (model && !view){
+			view = new App.Views.ApplianceSingleFormView({ model : model });
+			view.listenTo(view.model, 'remove', function(){ view.dispose(); });
+			this.addChild(view);
+		} else if (!model && view) {
+			model = view.model;
+		}
+		var index = appliances.indexOf(model);
+		var style = (index % 2) ? 'background-color: #fff' : 'background-color: #E6E6E6';
 		this.$('#appliance-views').append(this.formContainer({
 			index: index,
 			style: style
@@ -2738,6 +2807,22 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
 		if(index === (appliances.length - 1)){
 			App.scrollTo(view.$el);
+		}
+	},
+
+	deleteAppliance: function(e){
+		e.preventDefault();
+		var self       = this;
+		var index      = e.currentTarget.dataset.index;
+		var appliance  = this.model.appliances.at(index);
+		appliance.dispose();
+		this.$('#appliance-views').empty();
+		_.each(this.children, function(view){
+			self.appendApplianceForm(null, view);
+			view.tagsinput();
+		});
+		if(this.model.appliances.length === 0){//
+			this.$('button[type=submit]').attr('disabled', true);
 		}
 	},
 
@@ -2751,21 +2836,18 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		this.model.save(this.model.serialize(), {
+		this.model.save(null, {
 			success: function(model, response, options){
-				// This event serves to purposes:
-				// 1. It let the single appliance forms to close
-				// 2. If the client show view is opened and it is 
-				// managing a service request collection then we add
-				// this model to it.
-				app.trigger('service_request:create:success', model);
 				var route = 'service_request/show/' + model.id;
-				//Backbone.history.navigate(route, {trigger: true});
+				Backbone.history.navigate(route);
+				self.stopListening(model.appliances);
 				app.Renderer.show({
 					viewName         : 'ServiceRequestShowView',
+					viewType         : 'show',
 					model            : model,
+					fetch            : false,
 					portletFrameClass: 'green',
-					flash            : self.serviceRequestSuccessFlash()
+				flash            : self.serviceRequestSuccessFlash()
 				});
 				self.invoke('closePortletView');
 			},
@@ -2773,9 +2855,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.model.set('client_id', this.$('[name=client_id]').val());
-		this.model.set('client_name', this.$('[name=client_name]').val());
-		this.model.set('invoiceNumber', this.$('[name=invoiceNumber]').val());
+		this.model.set(_.pick(this.$('form').formParams(),
+			'client_id',
+			'client_name',
+			'invoiceNumber'
+		));
 	},
 });
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
@@ -2786,12 +2870,6 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	tableEl        : '#service_requests-table',
 	tableCollection: 'ServiceRequests',
 	modelView      : App.Views.ServiceRequestRowView,
-
-	appStorage: 'serviceRequests',
-
-	appEvents: {
-		"service_request:create:success": 'checkCreatedModel', 
-	},
 
 	events:{
 		'click button#new-service-request': 'newServiceRequest',
@@ -2821,27 +2899,24 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			client_name: parentModel.get('name'),
 			client_id  : parentModel.get('_id')
 		};
-		var model = new App.Models.ServiceRequest(object);
+		var model = new app.storage.newModel("service_requests").set(object);
 		app.Renderer.show({
 			viewName: 'ServiceRequestNewView',
-			model: model
+			viewType: 'new',
+			storage : "service_requests",
+			model   : model
 		});
 	},
-
-	checkCreatedModel: function(model){
-		if (this.collection === app.serviceRequests){ return; }
-		if (
-			App.defined(this.parent)												&&
-			App.defined(this.parent.model)									&&
-			this.parent.model instanceof App.Models.Client	&&
-			this.parent.model.id === model.get('client_id')
-		){
-			this.collection.add(model);
-		}
-	},
 });
-App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
+App.Views.ServiceRequestNewView = App.Views.NewView.extend({
 	className: "row",
+	formViewName: "ServiceRequestFormView",
+
+	initialize: function(){
+		this.listenTo(this.model, 'change:client_name', function(){
+			this.invoke('setHeader');
+		});
+	},
 	
 	name: function(){
 		var clientName, clientID;
@@ -2853,30 +2928,6 @@ App.Views.ServiceRequestNewView = App.Views.BaseView.extend({
 			return "Nueva Orden de Servicio para " + clientName;
 		} else {
 			return result;
-		}
-	},
-
-	initialize: function(){
-		if (!App.defined(this.model)){
-			this.model = new App.Models.ServiceRequest();
-		}
-	},
-
-	afterRender: function(){
-		this.renderForm();
-	},
-
-	renderForm: function(){
-		this.serviceRequestForm = new App.Views.ServiceRequestFormView({
-			model: this.model
-		});
-		this.serviceRequestForm.attachTo(this.$el, {method: 'html'});
-		this.listenTo(this.serviceRequestForm.model, 'change:client_name', this.updateName);
-	},
-
-	updateName: function(){
-		if(this.parent){
-			this.parent.setHeader(this.name());
 		}
 	},
 });
@@ -2913,20 +2964,23 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 
 	renderAppliancesCarousel: function(){
 		if (!this.appliancesCarousel){
-			if (!App.defined(this.model) || 
-				!App.defined(this.model.appliances)
-			){
-				return;
-			}
+			if (!this.model){return;}
+			var self = this;
 			this.appliancesCarousel = new App.Views.ApplianceCarouselView({
-				collection : this.model.appliances,
+				synced: true,
+				collection : app.storage.getSubCollection('appliances', {
+					service_request_id: this.model.id
+				}, {
+					success: function(){
+						self.appliancesCarousel.attachTo(
+							self.$('#' + self.modelName + '-appliances-' + self.timestamp), 
+							{
+								method: 'html',
+							}
+						);
+					}
+				})
 			});
-			this.appliancesCarousel.attachTo(
-				this.$('#' + this.modelName + '-appliances-' + this.timestamp), 
-				{
-					method: 'html',
-				}
-			);
 		}
 	},
 });
@@ -2956,7 +3010,7 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 			},
 		});
 		this.model.dispose();
-		this.model = new App.Models.User();
+		this.model = app.storage.newModel("users");
 		this.cleanForm();
 	},
 
@@ -3052,6 +3106,10 @@ app.addInitializer(function(options){
 // Add an easy access for the storage on the app object
 app.addInitializer(function(){
 	app.storage = App.Storage.getInstance();
+	app.storage.collection("models").add(models);
+	app.storage.collection("clients").add(clients);
+	clients = undefined;
+	models  = undefined;
 });
 
 // Start Backbone History, Renderer and main router

@@ -1,12 +1,6 @@
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
 
-	awake: function(attributes, options){
-		if(!App.defined(this.appliances)){
-			this.appliances = new App.Collections.Appliances();
-		}
-	},
-
 	defaults: function(){
 		return {
 			'status'        : 'Pendiente',
@@ -15,19 +9,9 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		};
 	},
 
-	childs: [
-		{
-			attribute: 'appliances',
-			type: 'collection',
-			filter: function(){
-				return {service_request_id: this.id};
-			}
-		},
-	],
-
 	serialize: function(){
 		var attributes = this.toJSON();
-		attributes.appliances = this.appliances.toJSON();
+		attributes.appliancesCount = this.get('appliances').length;
 		return attributes;
 	},
 });

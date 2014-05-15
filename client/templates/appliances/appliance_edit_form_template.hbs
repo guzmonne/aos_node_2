@@ -6,16 +6,16 @@
 	<div class="row">
 		<div class="col-md-6">
 			<div class="form-group">
-				<label for="id" class="col-sm-3 control-label">ID</label>
-				<div class="col-sm-9">
+				<label for="id" class="col-sm-2 control-label">ID</label>
+				<div class="col-sm-10">
 					<input disabled type="text" class="form-control" name="id" value="{{id}}">
 				</div>
 			</div>
 		</div>
 		<div class="col-md-6">
 			<div class="form-group {{statusClass status 'appliance'}}">
-				<label for="status" class="col-sm-4 control-label">Estado</label>
-				<div class="col-sm-8">
+				<label for="status" class="col-sm-2 col-md-4 control-label">Estado</label>
+				<div class="col-sm-10 col-md-8">
 				  <select disabled type="text" class="form-control" name="status" value="{{status}}">
 				  	<option value="Pendiente" {{selected? "Pendiente" status}}>Pendiente</option>
 				  	<option value="Abierto"   {{selected? "Abierto"   status}}>Abierto</option>
@@ -41,34 +41,34 @@
 	<div class="row">
 		<div class="col-md-6">
 			<div class="form-group">
-				<label for="brand" class="col-sm-3 control-label">Marca</label>
-				<div class="col-sm-9">
+				<label for="brand" class="col-sm-2 control-label">Marca</label>
+				<div class="col-sm-10">
 					<input type="text" class="form-control" name="brand" placeholder="e.j: Punktal" value="{{brand}}" disabled>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="model" class="col-sm-3 control-label">Modelo</label>
-				<div class="col-sm-9">
+				<label for="model" class="col-sm-2 control-label">Modelo</label>
+				<div class="col-sm-10">
 					<input type="text" class="form-control" name="model" placeholder="e.j: PKT1020" value="{{model}}" disabled>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="serial" class="col-sm-3 control-label">Serie</label>
-				<div class="col-sm-9">
+				<label for="serial" class="col-sm-2 control-label">Serie</label>
+				<div class="col-sm-10">
 					<input type="text" class="form-control" name="serial" placeholder="e.j: AXE102032" value="{{serial}}">
 				</div>
 			</div>
 		</div>
 		<div class="col-md-6">
 			<div class="form-group">
-				<label for="category" class="col-sm-4 control-label">Categoría</label>
-				<div class="col-sm-8">
+				<label for="category" class="col-sm-2 col-md-4 control-label">Categoría</label>
+				<div class="col-sm-10 col-md-8">
 					<input type="text" class="form-control" name="category" placeholder="e.j: Electrodomestico" value="{{category}}" disabled>
 				</div>
 			</div>
 			<div class="form-group">
-				<label for="subcategory" class="col-sm-4 control-label">Subcategoría</label>
-				<div class="col-sm-8">
+				<label for="subcategory" class="col-sm-2 col-md-4 control-label">Subcategoría</label>
+				<div class="col-sm-10 col-md-8">
 					<input type="text" class="form-control" name="subcategory" placeholder="e.j: Plancha" value="{{subcategory}}" disabled>
 				</div>
 			</div>
@@ -115,7 +115,7 @@
 				<label for="technician_name" class="col-sm-2 control-label">Tecnico</label>
 				<div class="col-sm-10">
 					<select class="form-control" name="technician_id" value={{technician_id}}>
-						<option value="1"    {{selected? "Guzmán Monné"    technician_id}}>Guzmán Monné</option>
+						<option value="1" {{selected? "Guzmán Monné" technician_id}}>Guzmán Monné</option>
 						<option value="2" {{selected? "Felipe Monné" technician_id}}>Felipe Monné</option>
 					</select>	
 				</div>
@@ -137,10 +137,10 @@
 	<div class="row">
 		<div class="col-md-6">
 			<div class="form-group">
-				<label for="repairement_type" class="col-sm-4 control-label">Reparación</label>
-				<div class="col-sm-8">
+				<label for="repairement_type" class="col-sm-2 col-md-4 control-label">Reparación</label>
+				<div class="col-sm-10 col-md-8">
 					<select class="form-control" name="repairement_type" value={{repairment_type}}>
-						<option value="Garantía"    {{selected? "Garantía"    repairement_type}}>Garantía</option>
+						<option value="Garantía"    {{selected? "Garantía" repairement_type}}>Garantía</option>
 						<option value="Presupuesto" {{selected? "Presupuesto" repairement_type}}>Presupuesto</option>
 					</select>	
 				</div>
@@ -148,8 +148,8 @@
 		</div>
 		<div class="col-md-6">
 			<div class="form-group has-feedback" id="cost-form-group">
-				<label for="cost" class="col-sm-4 control-label">Presupuesto</label>
-				<div class="col-sm-8">
+				<label for="cost" class="col-sm-2 col-md-4 control-label">Presupuesto</label>
+				<div class="col-sm-10 col-md-8">
 				  <div class="input-group">
 					  <span class="input-group-addon">$</span>
 				  	<input type="number" min="0" step="1" class="form-control text-right" name="cost" placeholder="ej. 100.00" value="{{cost}}">

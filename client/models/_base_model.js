@@ -2,7 +2,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
-	constructor: function(){
+	constructor: function(attributes, options){
 		this.children = [];
 		if (this.childs){this.createChilds.apply(this, arguments);}
 		Giraffe.Model.apply(this, arguments);
@@ -52,7 +52,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 						options               = {};
 						objects               = (attrs[child.attribute]) ? attrs[child.attribute] : {};
 						options.filter        = child.filter;
-						self[child.attribute] = app.storage.setSubCollection(collection, objects, options);
+						self[child.attribute] = app.storage.setSubCollection(collection, objects, options, self);
 					}
 			} else {
 				throw new Error('A "child" must have either a "name" or a "filter" value');
@@ -74,8 +74,8 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	},
 
 	parse: function(response){
-		var self = this;
 		if (this.childs){
+			var self = this;
 			var attributes = _.map(this.childs, function(child){
 				return child.attribute;
 			});

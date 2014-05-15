@@ -20,7 +20,7 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 			},
 		});
 		this.model.dispose();
-		this.model = new App.Models.User();
+		this.model = app.storage.newModel("users");
 		this.cleanForm();
 	},
 

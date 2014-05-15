@@ -14,12 +14,22 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	initialize: function(){
-		this.listenTo(this.model, 'updated', this.render);
-		this.listenTo(this.model, 'sync'   , this.render);
-		this.listenTo(this, 'disposing', this.selectModelOff);
 		_.extend(this, App.Mixins.SelectModel);
-		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'exchangeModel');
+		_.bindAll(this, 'selectModel', 'modelSelected', 'serialize', 'setAccessories', 'setModelDetails');
 		this.$el.on('click', 'button#select-model', this.selectModel);
+		this.listenTo(this      , 'disposing'              , this.selectModelOff);
+		this.listenTo(this.model, 'change:id'              , function(){this.updateViewField.apply(this, ['id']);});
+		this.listenTo(this.model, 'change:status'          , function(){this.updateViewField.apply(this, ['status']);});
+		this.listenTo(this.model, 'change:serial'          , function(){this.updateViewField.apply(this, ['serial']);});
+		this.listenTo(this.model, 'change:observations'    , function(){this.updateViewField.apply(this, ['observations']);});
+		this.listenTo(this.model, 'change:repairement_type', function(){this.updateViewField.apply(this, ['repairement_type']);});
+		this.listenTo(this.model, 'change:cost'            , function(){this.updateViewField.apply(this, ['cost']);});
+		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewText.apply(this, ['defect']);});
+		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
+		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
+		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
+		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
+		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
 	},
 
 	afterRender: function(){
@@ -56,7 +66,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		var self    = this;
 		e.preventDefault();
 		this.saveModel();
-		this.model.save({}, {
+		this.model.save(null, {
 			success: function(){
 				self.invoke('showMessage', {
 					title  : 'Equipo Actualizado',
@@ -65,40 +75,44 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 				});
 			}
 		});
-		//this.model.modelUpdated();
 		this.editMode = false;
+		this.blockForm();
+		this.toggleButtons();
 	},
 
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
-		if (this.tempModel){
-			this.exchangeModel(this.tempModel);
-			this.tempModel.dispose();
+		if (this.model._previousAttributes.model_id){
+			this.model.set('model_id', this.model._previousAttributes.model_id);
 		}
 		this.render();
 	},
 
 	saveModel: function(){
-		this.model.set('serial'      , this.$('[name=serial]').val()      , {silent: true});
-		this.model.set('observations', this.$('[name=observations]').val(), {silent: true});
-		// If the repairement type has change and equals "Garantía" then the cost = 0
-		if(
-			this.model.get('repairement_type') !== this.$('[name=repairement_type]').val() &&
-			this.$('[name=repairement_type]').val() === 'Garantía'
-		){
-			this.model.set('cost', 0, {silent: true});
+		this.setRepType();
+		this.model.set(_.pick(this.$('form').formParams(), 
+			'serial',
+			'observations',
+			'repairement_type', 
+			'defect',
+			'accessories',
+			'status',
+			'replacements',
+			'dispose',
+			'solution',
+			'technician_id'
+		));
+	},
+
+	setRepType: function(){
+		var oldRepType = this.model.get('repairement_type');
+		var newRepType = this.$('[name=repairement_type]').val();
+		if((oldRepType !== newRepType) && (newRepType === "Garantía")){
+			this.model.set('cost', 0);
 		} else {
-			this.model.set('cost', this.$('[name=cost]').val(), {silent: true});
+			this.model.set('cost', this.$('[name=cost]').val());
 		}
-		this.model.set('repairement_type', this.$('[name=repairement_type]').val()        , {silent: true});
-		this.model.set('defect'          , this.$('[name=defect]').val()                  , {silent: true});
-		this.model.set('accessories'     , this.$('[name=accessories]').tagsinput('items'), {silent: true});
-		this.model.set('status'          , this.$('[name=status]').val()                  , {silent: true});
-		this.model.set('replacements'    , this.$('[name=replacements]').val()            , {silent: true});
-		this.model.set('diagnose'        , this.$('[name=diagnose]').val()                , {silent: true});
-		this.model.set('solution'        , this.$('[name=solution]').val()                , {silent: true});
-		this.model.set('technician_id'   , this.$('[name=technician_id]').val()           , {silent: true});
 	},
 
 	selectModelOff: function(){

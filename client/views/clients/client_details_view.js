@@ -3,6 +3,10 @@ App.Views.ClientDetailsView = App.Views.ShowView.extend({
 
 	className: 'row',
 
+	awake: function(){
+		this.listenTo(this.model, 'sync', this.render);
+	},
+
 	afterRender: function(){
 		this.invoke('setHeader');
 	},

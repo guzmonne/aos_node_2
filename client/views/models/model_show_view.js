@@ -4,6 +4,12 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 			return 'Equipos con modelo ' + this.model.get('model');
 		}
 	},
+
+	fetchOptions: {
+		data: {
+			fields: '-appliances',
+		}
+	},
 	
 	modelId  : null,
 	modelName: 'model',
