@@ -14,7 +14,6 @@ App.Storage = (function(){
 			return this.getCollection(collection, {fetch: false});
 		};
 
-
 		var getCollection = function(collection, options, context){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
 			if (!colls[collection]) { throw new Error('Collection "'+collection+'" is not defined'); }
@@ -133,17 +132,17 @@ App.Storage = (function(){
 			}; 
 			if (fetch === true){ collection.fetch(options); }
 			// set subCollection events
-			matches = _.matches(condition);
+			matches = (options.matches) ? options.matches : _.matches(condition);
 			subCollection.listenTo(collection, "add", function(model){
 				if (matches(model.attributes) && !subCollection.get(model.id)){
-					subCollection.add(model); 
+					subCollection.add(model, {merge: true}); 
 				}
 			});
-			//subCollection.listenTo(subCollection, "change", function(model){
-			//	if (!matches(model.attributes)){
-			//		subCollection.remove(model, {silent: true});
-			//	}
-			//});
+			subCollection.listenTo(subCollection, "change", function(model){
+				if (!matches(model.attributes)){
+					subCollection.remove(model);
+				}
+			});
 			subCollection.listenTo(collection, "change", function(model){
 				if (matches(model.attributes) && !subCollection.get(model.id)){
 					subCollection.add(model); 
@@ -151,7 +150,7 @@ App.Storage = (function(){
 			});
 			subCollection.listenTo(collection, "remove", function(model){
 				if(subCollection.get(model.id)){
-					subCollection.remove(model, {silent: true});
+					subCollection.remove(model);
 				}
 			});
 			return subCollection;
@@ -192,6 +191,19 @@ App.Storage = (function(){
 			});
 			return model;
 		};
+
+		// Techs Collection Event Handlers
+		var isTech = function(attributes){
+			var permissions = attributes.permissions;
+			if (permissions && permissions.roles && permissions.roles.isTech === true){
+				return true;
+			}
+			return false;
+		};
+		colls.techs = getSubCollection("users", {techs: true}, {
+			fetch  : false, 
+			matches: isTech
+		});
 
 		return {
 			setSubCollection: setSubCollection,

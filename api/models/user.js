@@ -93,6 +93,15 @@ UserModel.prototype.findAll = function(fields, callback){
 		callback(null, models);
 	});
 };
+// Get all users with role technician
+UserModel.prototype.findTechnicians = function(callback){
+	User.find({"permissions.roles.isTech": true})
+		.select("-service_requests")
+		.exec(function(err, users){
+			if (err){return callback(err);}
+			callback(null, users);
+		});
+};
 // Update model by id
 UserModel.prototype.updateById = function(id, params, callback){
 	var object = pickParams(params);
@@ -114,8 +123,17 @@ UserModel.prototype.findById = function(id, fields, callback){
 		callback(null, model);
 	});
 };
-
+// Changes an appliance from one user to another.
+UserModel.prototype.switchTechniciansId = function(oldUser, newUser, appliance_id, callback){
+	User.update({_id: oldUser}, {$pull: {appliances: appliance_id}}, function(err, result){
+		if(err){callback(err);}
+	});
+	User.update({_id: newUser}, {$push: {appliances: appliance_id}}, function(err, result){
+		if(err){callback(err);}
+	});
+};
 // =======
 // EXPORTS
 // =======
 exports.UserModel = UserModel;
+exports.User = new UserModel();

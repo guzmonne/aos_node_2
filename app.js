@@ -108,6 +108,8 @@ var ModelModel  = require('./api/models/model').ModelModel;
 var Model       = new ModelModel();
 var ClientModel = require('./api/models/client').ClientModel;
 var Client      = new ClientModel();
+var UserModel   = require('./api/models/user').UserModel;
+var User        = new UserModel();
 
 // ======
 // ROUTES
@@ -127,12 +129,19 @@ app.get('/', function(req, res){
 				if (err){return callback(err);}
 				callback(null, JSON.stringify(clients));
 			});
-		}
+		},
+		techs: function(callback){
+			User.findTechnicians(function(err, techs){
+				if (err){return callback(err);}
+				callback(null, JSON.stringify(techs));
+			});
+		},
 	}, function(err, results){
 		res.render('index', {
 			csrf   : req.csrfToken(),
 			clients: results.clients,
-			models : results.models
+			models : results.models,
+			techs  : results.techs,
 		});
 	});
 });
@@ -160,14 +169,16 @@ app.get( '/api/models/:id', models.show);
 app.put( '/api/models/:id', models.update);
 // Users
 // -----
-app.get('/api/users' , users.index);
-app.post('/api/users', users.create);
+app.get( '/api/users'     , users.index);
+app.get( '/api/users/:id' , users.show);
+app.post('/api/users'     , users.create);
+app.put( '/api/users/:id' , users.update);
 
 // =============
 // DEFAULT ROUTE
 // =============
 app.use(function(req, res){
-  res.render('400');
+  res.render('errors/400');
 });
 
 // ===========================

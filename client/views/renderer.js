@@ -25,6 +25,10 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		"user": {
 			storage: "users",
 			model  : "User",
+		},
+		"tech": {
+			storage: "techs",
+			model  : "Tech"
 		}
 	},
 

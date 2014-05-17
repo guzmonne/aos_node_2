@@ -179,6 +179,7 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('textarea').attr('readonly', true);
 		this.$('select').attr('disabled', true);
 		this.$('span[data-role=remove]').attr('data-role', 'not-remove');
+		this.$('input[type=checkbox]').attr('disabled', true);
 	},
 
 	// !!!
@@ -194,6 +195,7 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('textarea').attr('readonly', false);
 		this.$('select').attr('disabled', false);
 		this.$('span[data-role=not-remove]').attr('data-role', 'remove');
+		this.$('input[type=checkbox]').attr('disabled', false);
 	},
 
 	// !!!
@@ -250,8 +252,16 @@ App.Views.BaseView = Giraffe.View.extend({
 	//	app.trigger(this.modelName + ':show:active', this.model.id);
 	//},
 
-	updateViewField: function(field){
-		this.$('[name='+ field +']').val(this.model.get(field));
+	updateViewField: function(fieldName, value){
+		value = (value) ? value : this.model.get(fieldName); 
+		var field = this.$('[name='+ fieldName +']:input');
+		if (!field){ return; }
+		if (field.attr('type') === "checkbox"){
+			return field.prop("checked", value);
+		}
+		if (field.is('input') || field.is('select') || field.is('textarea')){ 
+			return field.val(value);
+		}
 	},
 
 	updateViewText: function(field){

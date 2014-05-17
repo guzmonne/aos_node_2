@@ -1,11 +1,13 @@
 App.Views.TabView = App.Views.BaseView.extend({
 	template: HBS.tabs_template,
 
-	tabs      : {},
-	tabDetails: {},
-	activeView: null,
+	tabs              : {},
+	tabDetails        : {},
+	activeView        : null,
 
 	events: {},
+
+	bindEvents: function(){},
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
@@ -15,8 +17,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		this.bindEvents.apply(this);
 		this.listenTo(this.model, 'sync', this.setHeader);
 	},
-
-	bindEvents: function(){},
 	
 	createTabs: function(){
 		var self   = this;
@@ -24,7 +24,8 @@ App.Views.TabView = App.Views.BaseView.extend({
 			modelName: this.modelName,
 			tab      : [],
 		};
-		_.forEach(this.tabs, function(tab, index){
+		var tabs = _.result(self, 'tabs');
+		_.forEach(tabs, function(tab, index){
 			var tabFunction;
 			var tabDetails = {
 				href : self.modelName + "-" + tab.id + "-" + self.timestamp,
@@ -43,7 +44,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 			}
 			if(tab.active){
 				tabDetails.active = true;
-				self.activeView = tabFunction;
+				self.activeView   = tabFunction;
 			} else {
 				self["renderTab" + index] = tabFunction;
 				self.events['click #' + self.modelName + "-" + tab.id] = "renderTab" + index;
@@ -68,10 +69,16 @@ App.Views.TabView = App.Views.BaseView.extend({
 	serialize: function(){
 		return this.tabDetails;
 	},
-
-	setHeader: function(){
-		if (App.defined(this.parent) && _.isFunction(this.parent.setHeader)){
-			this.parent.setHeader();
-		}
-	}
 });
+
+//{{#each tab}}
+//<li {{#if active}}class="active"{{/if}}>
+//	<a href="#{{href}}" data-toggle="tab" id="{{id}}">
+//		{{title}}
+//	</a>
+//</li>
+//{{/each}}
+
+//{{#each tab}}
+//  <div class="tab-pane fade in {{#if active}}active{{/if}} {{#if class}}{{class}}{{/if}}" id="{{href}}"></div>
+//{{/each}}

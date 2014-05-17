@@ -146,7 +146,7 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 		if (err){return callback(err);}
 		// if an options object is passed with the populate argumemt set to true then we
 		// populate the model with its appliances, else we just return it
-		if (_.isObject(options) && options.populate === true){
+		if (_.isObject(options) && options.populate === true && model !== null){
 			model.populate({
 				path  : 'appliances',
 			}, function(err, model){
@@ -159,7 +159,7 @@ ModelModel.prototype.findById = function(id, fields, callback, options){
 };
 
 // Changes an appliance from one model to another.
-ModelModel.prototype.switchAppliancesId = function(oldModel, newModel, appliance_id){
+ModelModel.prototype.switchAppliancesId = function(oldModel, newModel, appliance_id, callback){
 	Model.update({_id: oldModel}, {$pull: {appliances: appliance_id}}, function(err, result){
 		if(err){callback(err);}
 	});

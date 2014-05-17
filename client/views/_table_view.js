@@ -45,7 +45,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.$('table').append(this.tbody);
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
 		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
-		//this.stopListening(this.collection, 'add', this.append);
+		this.stopListening(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'add', this.append);
 	},
 

@@ -1,0 +1,24 @@
+<div class="col-lg-12">
+  <span class="pull-right">
+    <a href="#render/user/index" class="pull-right text-muted">
+      <i class="fa fa-list fa-3x"></i>
+    </a>
+  </span>
+  <h1>
+    {{name}}
+    <small>{{email}}</small>
+  </h1>
+  <hr>
+  <div class="row">
+  	<div class="col-lg-12">
+  		<h3>Permisos:</h3>
+  	</div>
+		<div class="col-sm-6">
+			<h4>Roles</h4>
+			<ul>
+				{{#if permissions.roles.isAdmin}}<li>Administrador</li>{{/if}}
+				{{#if permissions.roles.isTech}}<li>Tecnico</li>{{/if}}
+			</ul>
+		</div>
+  </div>
+</div>

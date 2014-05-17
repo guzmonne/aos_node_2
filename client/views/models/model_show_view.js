@@ -10,8 +10,7 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 			fields: '-appliances',
 		}
 	},
-	
-	modelId  : null,
+
 	modelName: 'model',
 
 	awake: function(){

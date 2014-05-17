@@ -46,8 +46,10 @@ app.addInitializer(function(){
 	app.storage = App.Storage.getInstance();
 	app.storage.collection("models").add(models);
 	app.storage.collection("clients").add(clients);
+	app.storage.collection("users").add(techs);
 	clients = undefined;
 	models  = undefined;
+	techs   = undefined;
 });
 
 // Start Backbone History, Renderer and main router

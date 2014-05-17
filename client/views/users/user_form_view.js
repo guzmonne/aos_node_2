@@ -1,10 +1,7 @@
-App.Views.UserFormView = App.Views.BaseView.extend({
+App.Views.UserFormView = App.Views.FormView.extend({
 	template: HBS.user_form_template,
-
-	events: {
-		'click .checkbox label': 'toggleCheckBox',
-		'submit form'          : 'createModel',
-	},
+	storage : 'models',
+	focus   : '[name=name]',
 
 	initialize: function(){
 		this.bindEvents();
@@ -13,26 +10,18 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 	bindEvents: function(){
 		this.listenTo(this.model, 'change:name' , function(){this.updateViewField.apply(this, ['name']);});
 		this.listenTo(this.model, 'change:email', function(){this.updateViewField.apply(this, ['email']);});
-		this.listenTo(this.model, 'change:admin', function(){this.updateViewField.apply(this, ['admin']);});
-		this.listenTo(this.model, 'change:tech' , function(){this.updateViewField.apply(this, ['tech']);});
+		this.listenTo(this.model, 'change:permissions', this.updateRoleField);
 	},
 
-	createModel: function(e){
-		var self = this;
-		e.preventDefault();
-		this.saveModel();
-		this.model.save({}, {
-			success: function(){
-				self.invoke('showMessage', {
-					title  : 'Usuario Creado',
-					message: 'El nuevo Usuario se ha creado con exito.',
-					class  : 'success',
-				});
-			},
-		});
-		this.model = app.storage.newModel("users");
-		this.bindEvents();
-		this.cleanForm();
+	afterRender: function(){
+		App.Views.FormView.prototype.afterRender.apply(this, arguments);
+	},
+
+	updateRoleField: function(role){
+		var permissions = this.model.get("permissions");
+		this.$('[name=isTech]' ).prop("checked", permissions.roles.isTech);
+		this.$('[name=isAdmin]').prop("checked", permissions.roles.isAdmin);
+		this.model.trigger("roles:change");
 	},
 
 	saveModel: function(){
@@ -41,25 +30,12 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 		this.model.set(attrs);
 	},
 
-	cleanForm: function(){
-		this.$('[name=name]').val('').focus();
-		this.$('[name=email]').val('');
-		this.$('[name=admin]').removeAttr('checked');
-		this.$('[name=tech]').removeAttr('checked');
-	},
-
 	getPermissions: function(){
 		return {
 			roles: {
-				isAdmin: this.$('[name=admin]').is(':checked'),
-				isTech : this.$('[name=tech]').is(':checked'),
+				isAdmin: this.$('[name=isAdmin]').is(':checked'),
+				isTech : this.$('[name=isTech]').is(':checked'),
 			}
 		};
-	},
-
-	toggleCheckBox: function(e){
-		var name     = e.target.htmlFor;
-		var checkbox = this.$('[name='+name+']');
-		checkbox.prop("checked", !checkbox.prop('checked'));
 	},
 });

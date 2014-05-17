@@ -1,6 +1,9 @@
 // Set Template Strategies for all views to JST
 Giraffe.View.setTemplateStrategy('jst');
 
+// Delete calling dispose on model when it is removed from a collection.
+delete Giraffe.Collection.prototype._removeReference;
+
 window.App = {
 	Models     : {},
 	Collections: {},
@@ -98,7 +101,6 @@ App.Storage = (function(){
 		var collection = function(collection){
 			return this.getCollection(collection, {fetch: false});
 		};
-
 
 		var getCollection = function(collection, options, context){
 			if (!collection)        { throw new Error('No "collection" was passed'); }
@@ -218,17 +220,17 @@ App.Storage = (function(){
 			}; 
 			if (fetch === true){ collection.fetch(options); }
 			// set subCollection events
-			matches = _.matches(condition);
+			matches = (options.matches) ? options.matches : _.matches(condition);
 			subCollection.listenTo(collection, "add", function(model){
 				if (matches(model.attributes) && !subCollection.get(model.id)){
-					subCollection.add(model); 
+					subCollection.add(model, {merge: true}); 
 				}
 			});
-			//subCollection.listenTo(subCollection, "change", function(model){
-			//	if (!matches(model.attributes)){
-			//		subCollection.remove(model, {silent: true});
-			//	}
-			//});
+			subCollection.listenTo(subCollection, "change", function(model){
+				if (!matches(model.attributes)){
+					subCollection.remove(model);
+				}
+			});
 			subCollection.listenTo(collection, "change", function(model){
 				if (matches(model.attributes) && !subCollection.get(model.id)){
 					subCollection.add(model); 
@@ -236,7 +238,7 @@ App.Storage = (function(){
 			});
 			subCollection.listenTo(collection, "remove", function(model){
 				if(subCollection.get(model.id)){
-					subCollection.remove(model, {silent: true});
+					subCollection.remove(model);
 				}
 			});
 			return subCollection;
@@ -277,6 +279,19 @@ App.Storage = (function(){
 			});
 			return model;
 		};
+
+		// Techs Collection Event Handlers
+		var isTech = function(attributes){
+			var permissions = attributes.permissions;
+			if (permissions && permissions.roles && permissions.roles.isTech === true){
+				return true;
+			}
+			return false;
+		};
+		colls.techs = getSubCollection("users", {techs: true}, {
+			fetch  : false, 
+			matches: isTech
+		});
 
 		return {
 			setSubCollection: setSubCollection,
@@ -518,6 +533,9 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 	constructor: function(){
 		this.listenTo(this, 'change:model_id', function(){
 			this.model_id = app.storage.getModel("models", this.get('model_id'), {fetch: false});
+		});
+		this.listenTo(this, 'change:technician_id', function(){
+			this.technician = app.storage.getModel("techs", this.get('technician_id'), {fetch: false});
 		});
 		Giraffe.Model.apply(this, arguments);
 	},
@@ -857,6 +875,7 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('textarea').attr('readonly', true);
 		this.$('select').attr('disabled', true);
 		this.$('span[data-role=remove]').attr('data-role', 'not-remove');
+		this.$('input[type=checkbox]').attr('disabled', true);
 	},
 
 	// !!!
@@ -872,6 +891,7 @@ App.Views.BaseView = Giraffe.View.extend({
 		this.$('textarea').attr('readonly', false);
 		this.$('select').attr('disabled', false);
 		this.$('span[data-role=not-remove]').attr('data-role', 'remove');
+		this.$('input[type=checkbox]').attr('disabled', false);
 	},
 
 	// !!!
@@ -928,8 +948,16 @@ App.Views.BaseView = Giraffe.View.extend({
 	//	app.trigger(this.modelName + ':show:active', this.model.id);
 	//},
 
-	updateViewField: function(field){
-		this.$('[name='+ field +']').val(this.model.get(field));
+	updateViewField: function(fieldName, value){
+		value = (value) ? value : this.model.get(fieldName); 
+		var field = this.$('[name='+ fieldName +']:input');
+		if (!field){ return; }
+		if (field.attr('type') === "checkbox"){
+			return field.prop("checked", value);
+		}
+		if (field.is('input') || field.is('select') || field.is('textarea')){ 
+			return field.val(value);
+		}
 	},
 
 	updateViewText: function(field){
@@ -1028,6 +1056,154 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 		this.$rangeOutput.val(rangeVal);
 	},
 });
+App.Views.FormView = App.Views.BaseView.extend({
+	edit  : false,
+	editOn: false,
+	focus : '',
+
+	createSuccessMessage: {
+		title  : 'Exito',
+		message: 'Se han guardado los datos con exito',
+		class  : 'success',
+	},
+
+	createErrorMessage: {
+		title  : 'Error',
+		message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
+		class  : 'danger',
+	},
+	
+	updateSuccessMessage: {
+		title  : 'Exito',
+		message: 'Se han actualizado los cambios con exito',
+		class  : 'success',
+	},
+
+	updateErrorMessage: {
+		title  : 'Error',
+		message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
+		class  : 'danger',
+	},
+
+	constructor: function(){
+		if (this.formEvents){
+			_.extend(this.events, this.formEvents);
+		}
+		App.Views.BaseView.apply(this, arguments);
+	},
+
+	initialize: function(){
+		this.awake.apply(this, arguments);
+		this.bindEvents.apply(this, arguments);
+		_.once(this.editForm);
+		_.once(this.newForm);
+	},
+
+	bindEvents: function(){},
+	awake: function(){},
+
+	events: {
+		'submit form'             : 'submitForm',
+		'click button#reset-model': 'reRender',
+		'click button#edit-model' : 'editModel',
+		'click .checkbox label'   : 'toggleCheckBox',
+	},
+
+	reRender: function(e){
+		if (e){e.preventDefault();}
+		this.editOn = false;
+		this.render();
+	},
+
+	afterRender: function(){
+		if (this.edit){
+			this.editForm();
+		} else {
+			this.newForm();
+		}
+	},
+
+	newForm: function(){
+		this.$('#edit-model').remove();
+	},
+
+	editForm: function(){
+		this.$('#save-model').remove();
+		this.blockForm();
+	},
+
+	editModel: function(e){
+		if (e){e.preventDefault();}
+		this.editOn = (this.editOn) ? false : true;
+		if (this.editOn){
+			this.unblockForm();
+			this.$(this.focus).focus();
+		} else {
+			this.blockForm();
+		}
+		this.$('.btn').toggleClass('hide');
+	},
+
+	submitForm: function(e){
+		if (e){e.preventDefault();}
+		if (this.edit){
+			this.updateModel();
+		} else {
+			this.createModel();
+		}
+	},
+
+	createModel: function(e){
+		var self = this;
+		if (e){e.preventDefault();}
+		this.saveModel();
+		this.model.save({}, {
+			success: function(model){
+				self.invoke('showMessage', self.createSuccessMessage);
+			},
+			error: function(model){
+				self.invoke('showMessage', self.createErrorMessage);
+			}
+		});
+		this.model = app.storage.newModel(self.storage);
+		this.bindEvents();
+		this.cleanForm();
+	},
+
+	updateModel: function(e){
+		var self = this;
+		if (e){e.preventDefault();}
+		this.saveModel();
+		this.model.save({}, {
+			success: function(model){
+				self.invoke('showMessage', self.updateSuccessMessage);
+			},
+			error: function(model){
+				self.invoke('showMessage', self.updateErrorMessage);
+			}
+		});
+		this.editModel();
+	},
+
+	saveModel: function(){
+		this.model.set(this.$('form').formParams());
+	},
+
+	cleanForm: function(){
+		this.$('input').val('');
+		this.$('textare').text('');
+		this.$('input[type=checkbox]').val(false);
+		this.$('input[type=radio]').val(false);
+		this.$(this.focus).focus();
+	},
+
+	toggleCheckBox: function(e){
+		var name     = e.target.htmlFor;
+		var checkbox = this.$('[name='+name+']');
+		if (checkbox.attr("disabled")){return;}
+		checkbox.prop("checked", !checkbox.prop('checked'));
+	},
+});
 App.Views.ModalView = App.Views.BaseView.extend({
 	template: HBS.modal_base_layout_template,
 	
@@ -1090,6 +1266,7 @@ App.Views.RowView = App.Views.BaseView.extend({
 	
 	initialize: function(){
 		this.listenTo(this.model, 'change' , this.render);
+		this.listenTo(this.model, 'remove', this.invokeRemoveRow);
 		this.listenTo(app, 'model:show:active',   this.activate);
 		this.listenTo(app, 'model:show:inactive', this.deactivate);
 	},
@@ -1194,11 +1371,13 @@ App.Views.ShowView = App.Views.BaseView.extend({
 App.Views.TabView = App.Views.BaseView.extend({
 	template: HBS.tabs_template,
 
-	tabs      : {},
-	tabDetails: {},
-	activeView: null,
+	tabs              : {},
+	tabDetails        : {},
+	activeView        : null,
 
 	events: {},
+
+	bindEvents: function(){},
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
@@ -1208,8 +1387,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		this.bindEvents.apply(this);
 		this.listenTo(this.model, 'sync', this.setHeader);
 	},
-
-	bindEvents: function(){},
 	
 	createTabs: function(){
 		var self   = this;
@@ -1217,7 +1394,8 @@ App.Views.TabView = App.Views.BaseView.extend({
 			modelName: this.modelName,
 			tab      : [],
 		};
-		_.forEach(this.tabs, function(tab, index){
+		var tabs = _.result(self, 'tabs');
+		_.forEach(tabs, function(tab, index){
 			var tabFunction;
 			var tabDetails = {
 				href : self.modelName + "-" + tab.id + "-" + self.timestamp,
@@ -1236,7 +1414,7 @@ App.Views.TabView = App.Views.BaseView.extend({
 			}
 			if(tab.active){
 				tabDetails.active = true;
-				self.activeView = tabFunction;
+				self.activeView   = tabFunction;
 			} else {
 				self["renderTab" + index] = tabFunction;
 				self.events['click #' + self.modelName + "-" + tab.id] = "renderTab" + index;
@@ -1261,13 +1439,19 @@ App.Views.TabView = App.Views.BaseView.extend({
 	serialize: function(){
 		return this.tabDetails;
 	},
-
-	setHeader: function(){
-		if (App.defined(this.parent) && _.isFunction(this.parent.setHeader)){
-			this.parent.setHeader();
-		}
-	}
 });
+
+//{{#each tab}}
+//<li {{#if active}}class="active"{{/if}}>
+//	<a href="#{{href}}" data-toggle="tab" id="{{id}}">
+//		{{title}}
+//	</a>
+//</li>
+//{{/each}}
+
+//{{#each tab}}
+//  <div class="tab-pane fade in {{#if active}}active{{/if}} {{#if class}}{{class}}{{/if}}" id="{{href}}"></div>
+//{{/each}}
 App.Views.TableView = App.Views.BaseView.extend({
 	rowViewOptions: {},
 	fetchOptions	: {},
@@ -1315,7 +1499,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.$('table').append(this.tbody);
 		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
 		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
-		//this.stopListening(this.collection, 'add', this.append);
+		this.stopListening(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'add', this.append);
 	},
 
@@ -1364,6 +1548,10 @@ App.Views.Renderer = App.Views.BaseView.extend({
 		"user": {
 			storage: "users",
 			model  : "User",
+		},
+		"tech": {
+			storage: "techs",
+			model  : "Tech"
 		}
 	},
 
@@ -1501,10 +1689,8 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			var createdAt = this.model.get('createdAt');
 			var updatedAt = this.model.get('updatedAt');
 			var closedAt  = this.model.get('closedAt');
-			var model     = this.model.model_id;
-			if (model){
-				_.extend(object, model.pick('brand', 'category', 'subcategory', 'model'));
-			}
+			if (this.model.model_id)  { _.extend(object, this.model.model_id.pick('brand', 'category', 'subcategory', 'model')); }
+			if (this.model.technician){ object.technician_name = this.model.technician.get('name'); }
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
@@ -1542,19 +1728,26 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:status'          , function(){this.updateViewField.apply(this, ['status']);});
 		this.listenTo(this.model, 'change:serial'          , function(){this.updateViewField.apply(this, ['serial']);});
 		this.listenTo(this.model, 'change:observations'    , function(){this.updateViewField.apply(this, ['observations']);});
-		this.listenTo(this.model, 'change:repairement_type', function(){this.updateViewField.apply(this, ['repairement_type']);});
 		this.listenTo(this.model, 'change:cost'            , function(){this.updateViewField.apply(this, ['cost']);});
-		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewText.apply(this, ['defect']);});
+		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewField.apply(this, ['defect']);});
 		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
 		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
 		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
+		this.listenTo(this.model, 'change:repairement_type', function(){
+			this.updateViewField.apply(this, ['repairement_type']);
+			this.changeRepairementType();	
+		});
+		this.listenTo(this.model, 'change:technician_id'   , this.fillTechnicianField);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
+		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
+		this.listenTo(app.storage.collection("techs"), 'remove', this.fillTechnicianField);
 	},
 
 	afterRender: function(){
 		this.$('[name=accessories]').tagsinput();
 		this.$('[name=replacements]').tagsinput();
+		this.fillTechnicianField();
 		if(!this.editMode){
 			this.blockForm();
 			this.toggleButtons();
@@ -1566,12 +1759,42 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.$('button').toggleClass('hide');
 	},
 
+	fillTechnicianField: function(){
+		var technicians = _.map(app.storage.collection("techs").models, function(model){
+			return {id: model.id, name: model.get("name")};
+		});
+		var field = self.$('[name=technician_id]');
+		field.empty();
+		_.each(technicians, function(technician){
+			if (!technician.id || !technician.name){return;}
+			field.append(
+				'<option value="'+technician.id+'">'+technician.name+'</option>'
+			);
+		});
+		field.prepend(
+				'<option value="" selected></option>'
+		);
+		this.changeTechnician();
+	},
+
 	changeRepairementType: function(){
 		var repairementTypeVal = this.$('[name=repairement_type]').val();
-		if (repairementTypeVal === "Garantía"){
-			this.$('#cost-form-group').hide();
-		} else {
+		if (repairementTypeVal === "Presupuesto"){
 			this.$('#cost-form-group').show();
+		} else {
+			this.$('#cost-form-group').hide();
+		}
+	},
+
+	changeTechnician: function(){
+		var id = this.model.get('technician_id');
+		console.log(id);
+		if (!id || id === '' || id === '1') {
+			this.$('[name=technician_link]').attr('disabled', true);
+		} else {
+			this.$('[name=technician_id]').val(id);
+			this.$('[name=technician_link]').attr('href', '#render/user/show/' + id);
+			this.$('[name=technician_link]').attr('disabled', false);
 		}
 	},
 
@@ -2438,22 +2661,33 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		return result;
 	},
 });
-App.Views.ModelFormView = App.Views.BaseView.extend({
+App.Views.ModelFormView = App.Views.FormView.extend({
 	template: HBS.model_form_template,
+	storage : 'models',
+	focus   : '[name=brand]',
 
-	edit  : false,
-	editOn: false,
-
-	events: {
-		'submit form'             : 'submitForm',
-		'click button#reset-model': 'reRender',
-		'click button#edit-model' : 'editModel',
+	createSuccessMessage: {
+		title  : 'Modelo Creado',
+		message: 'El nuevo modelo se ha creado con exito.',
+		class  : 'success',
 	},
 
-	initialize: function(){
-		this.bindEvents();
-		_.once(this.editForm);
-		_.once(this.newForm);
+	createErrorMessage: {
+		title  : 'Error',
+		message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
+		class  : 'danger',
+	},
+
+	updateSuccessMessage: {
+		title  : 'Modelo Actualizado',
+		message: 'El modelo se ha actualizado con exito',
+		class  : 'success',
+	},
+
+	updateErrorMessage: {
+		title  : 'Error',
+		message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
+		class  : 'danger',
 	},
 
 	bindEvents: function(){
@@ -2462,109 +2696,6 @@ App.Views.ModelFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:category'    , function(){this.updateViewField.apply(this, ['category']);});
 		this.listenTo(this.model, 'change:subcategory' , function(){this.updateViewField.apply(this, ['subcategory']);});
 	},
-
-	reRender: function(e){
-		if (e){e.preventDefault();}
-		this.editOn = false;
-		this.render();
-	},
-
-	afterRender: function(){
-		if (this.edit){
-			this.editForm();
-		} else {
-			this.newForm();
-		}
-	},
-
-	newForm: function(){
-		this.$('#edit-model').remove();
-	},
-
-	editForm: function(){
-		this.$('#save-model').remove();
-		this.blockForm();
-	},
-
-	submitForm: function(e){
-		if (e){e.preventDefault();}
-		if (this.edit){
-			this.updateModel();
-		} else {
-			this.createModel();
-		}
-	},
-
-	editModel: function(e){
-		if (e){e.preventDefault();}
-		this.editOn = (this.editOn) ? false : true;
-		if (this.editOn){
-			this.unblockForm();
-		} else {
-			this.blockForm();
-		}
-		this.$('.btn').toggleClass('hide');
-	},
-
-	updateModel: function(e){
-		var self = this;
-		if (e){e.preventDefault();}
-		this.saveModel();
-		this.model.save({}, {
-			success: function(model){
-				self.invoke('showMessage', {
-					title  : 'Modelo Actualizado',
-					message: 'El modelo se ha actualizado con exito',
-					class  : 'success',
-				});
-			},
-			error: function(model){
-				self.invoke('showMessage', {
-					title  : 'Error',
-					message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
-					class  : 'danger',
-				});
-			}
-		});
-		this.editModel();
-	},
-
-	createModel: function(e){
-		var self = this;
-		if (e){e.preventDefault();}
-		this.saveModel();
-		this.model.save({}, {
-			success: function(model){
-				self.invoke('showMessage', {
-					title  : 'Modelo Creado',
-					message: 'El nuevo modelo se ha creado con exito.',
-					class  : 'success',
-				});
-			},
-			error: function(model){
-				self.invoke('showMessage', {
-					title  : 'Error',
-					message: 'Ha ocurrido un error. Por favor vuelva a intentar en unos minutos',
-					class  : 'danger',
-				});
-			}
-		});
-		this.model = app.storage.newModel("models");
-		this.bindEvents();
-		this.cleanForm();
-	},
-
-	saveModel: function(){
-		this.model.set(this.$('form').formParams());
-	},
-
-	cleanForm: function(){
-		this.$('[name=brand]').val('');
-		this.$('[name=model]').val('');
-		this.$('[name=category]').val('');
-		this.$('[name=subcategory]').val('');
-		this.$('[name=brand]').focus();
-	}
 });
 App.Views.ModelIndexView = App.Views.TableView.extend({
 	template : HBS.model_index_template,
@@ -2619,8 +2750,7 @@ App.Views.ModelShowView = App.Views.TabView.extend({
 			fields: '-appliances',
 		}
 	},
-	
-	modelId  : null,
+
 	modelName: 'model',
 
 	awake: function(){
@@ -2972,6 +3102,7 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 	bindEvents: function(){
 		// Interacts with Row View to activate it
 		this.listenTo(app, this.modelName + ':row:rendered', this.announceEntrance);
+		this.listenTo(this.model, 'sync', function(){this.invoke('setHeader');});
 	},
 
 	renderAppliancesCarousel: function(){
@@ -3000,13 +3131,41 @@ App.Views.UserRowView = App.Views.RowView.extend({
 	template : HBS.user_row_template,
 	modelName: 'user',
 });
-App.Views.UserFormView = App.Views.BaseView.extend({
-	template: HBS.user_form_template,
+App.Views.TechIndexView = App.Views.TableView.extend({
+	template : HBS.tech_index_template,
+	className: "row",
+	name     : "Tecnicos",
+	
+	tableEl        : '#techs-table',
+	modelView      : App.Views.UserRowView,
 
-	events: {
-		'click .checkbox label': 'toggleCheckBox',
-		'submit form'          : 'createModel',
+	fetchOptions: {
+		data: {
+			techs: true,
+		}
+	}
+});
+App.Views.UserDetailsView = App.Views.ShowView.extend({
+	template: HBS.user_details_template,
+	className: 'row',
+
+	afterRender: function(){
+		this.invoke('setHeader');
+		this.listenTo(this.model, 'sync', this.render);
 	},
+
+	serialize: function(){
+		var result = (App.defined(this.model)) ? this.model.toJSON() : {};
+		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
+		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
+		result.timestamp = this.timestamp;
+		return result;
+	},
+});
+App.Views.UserFormView = App.Views.FormView.extend({
+	template: HBS.user_form_template,
+	storage : 'models',
+	focus   : '[name=name]',
 
 	initialize: function(){
 		this.bindEvents();
@@ -3015,26 +3174,18 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 	bindEvents: function(){
 		this.listenTo(this.model, 'change:name' , function(){this.updateViewField.apply(this, ['name']);});
 		this.listenTo(this.model, 'change:email', function(){this.updateViewField.apply(this, ['email']);});
-		this.listenTo(this.model, 'change:admin', function(){this.updateViewField.apply(this, ['admin']);});
-		this.listenTo(this.model, 'change:tech' , function(){this.updateViewField.apply(this, ['tech']);});
+		this.listenTo(this.model, 'change:permissions', this.updateRoleField);
 	},
 
-	createModel: function(e){
-		var self = this;
-		e.preventDefault();
-		this.saveModel();
-		this.model.save({}, {
-			success: function(){
-				self.invoke('showMessage', {
-					title  : 'Usuario Creado',
-					message: 'El nuevo Usuario se ha creado con exito.',
-					class  : 'success',
-				});
-			},
-		});
-		this.model = app.storage.newModel("users");
-		this.bindEvents();
-		this.cleanForm();
+	afterRender: function(){
+		App.Views.FormView.prototype.afterRender.apply(this, arguments);
+	},
+
+	updateRoleField: function(role){
+		var permissions = this.model.get("permissions");
+		this.$('[name=isTech]' ).prop("checked", permissions.roles.isTech);
+		this.$('[name=isAdmin]').prop("checked", permissions.roles.isAdmin);
+		this.model.trigger("roles:change");
 	},
 
 	saveModel: function(){
@@ -3043,26 +3194,13 @@ App.Views.UserFormView = App.Views.BaseView.extend({
 		this.model.set(attrs);
 	},
 
-	cleanForm: function(){
-		this.$('[name=name]').val('').focus();
-		this.$('[name=email]').val('');
-		this.$('[name=admin]').removeAttr('checked');
-		this.$('[name=tech]').removeAttr('checked');
-	},
-
 	getPermissions: function(){
 		return {
 			roles: {
-				isAdmin: this.$('[name=admin]').is(':checked'),
-				isTech : this.$('[name=tech]').is(':checked'),
+				isAdmin: this.$('[name=isAdmin]').is(':checked'),
+				isTech : this.$('[name=isTech]').is(':checked'),
 			}
 		};
-	},
-
-	toggleCheckBox: function(e){
-		var name     = e.target.htmlFor;
-		var checkbox = this.$('[name='+name+']');
-		checkbox.prop("checked", !checkbox.prop('checked'));
 	},
 });
 App.Views.UserIndexView = App.Views.TableView.extend({
@@ -3071,15 +3209,117 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 	name     : "Usuarios",
 	
 	tableEl        : '#users-table',
-	tableCollection: 'Users',
 	modelView      : App.Views.UserRowView,
-
-	appStorage  : 'users',
 });
 App.Views.UserNewView = App.Views.NewView.extend({
 	name        : "Nuevo Usuario",
 	formViewName: "UserFormView",
 	modelName   : "User",
+});
+App.Views.UserShowView = App.Views.TabView.extend({
+	name: function(){
+		var permissions = this.model.get("permissions");
+		if (permissions && permissions.roles && permissions.roles.isTech === true){
+			return 'Tecnico: ' + this.model.get('name');
+		}
+		return 'Usuario: ' + this.model.get('name');
+	},
+
+	modelId  : null,
+	modelName: 'user',
+
+	awake: function(){
+		this.listenTo(this.model, "roles:change", this.techTab);
+	},
+
+	techTab: function(){
+		var self = this;
+		var tab  = this.$('#user-appliances');
+		var permissions = this.model.get("permissions");
+		if (!permissions || !permissions.roles)                       { return; }
+		if (this.appliancesIndex && permissions.roles.isTech === true){ return; }
+		if (permissions.roles.isTech === true && tab.length > 0)      { return; }
+		if (permissions.roles.isTech === true && tab.length === 0){
+			this.$('#user-edit').parent().before(
+				'<li><a href="#user-appliances-'+this.timestamp+'" data-toggle="tab" id="user-appliances">Equipos</a></li>'
+			);
+			this.$('#user-edit-' + this.timestamp).before(
+				'<div class="tab-pane fade in air-t" id="user-appliances-'+this.timestamp+'"></div>'
+			);
+			this.$('#user-appliances').on("click", function(e){
+				self.$('#user-appliances').off("click");
+				self.renderAppliances();
+			});
+			return;
+		}
+		if (permissions.roles.isTech === false && tab){
+			tab.parent().remove();
+			if (this.appliancesIndex){ this.appliancesIndex.dispose(); this.appliancesIndex = undefined; }
+			this.$('#user-appliances-'+this.timestamp).remove();
+		}
+	},
+
+	tabs: function(){
+		var tabs = [
+			{
+				id    : 'details',
+				title : 'Detalle',
+				view  : 'UserDetailsView',
+				active: true,
+			},
+			{
+				id            : 'edit',
+				title         : 'Editar Datos',
+				class         : 'air-t',
+				renderFunction: function(){
+					this.renderEditForm();
+				},
+			}
+		];
+		var permissions = this.model.get("permissions");
+		if (permissions && permissions.roles && permissions.roles.isTech === true){
+			tabs.splice(1, 0, {
+				id: 'appliances',
+				title: 'Equipos',
+				class : 'air-t',
+				renderFunction: function(){
+					this.renderAppliances();
+				},
+			});
+		}
+		return tabs;
+	},
+
+	renderAppliances: function(){
+		if (!App.defined(this.model) || App.defined(this.appliancesIndex)){return;}
+		var self = this;
+		var el   = this.$('#user-appliances-'+ this.timestamp);
+		this.appliancesIndex = new App.Views.ApplianceIndexView({
+			synced: true,
+			collection   : app.storage.getSubCollection("appliances", {
+				technician_id: this.model.id
+			}, {
+				success: function(){
+					self.appliancesIndex.attachTo(el, {method: 'html'});
+				}
+			}),
+		});
+	},
+
+	renderEditForm: function(){
+		if(App.defined(this.editForm)){return;}
+		this.editForm = new App.Views.UserFormView({
+			model    : this.model,
+			edit     : true,
+			className: 'row',
+		});
+		this.editForm.attachTo(this.$('#user-edit-'+ this.timestamp), {method: 'html'});
+	},
+
+	bindEvents: function(){
+		// Interacts with Row View to activate it
+		this.listenTo(app, this.modelName + ':row:rendered', this.announceEntrance);
+	},
 });
 App.Routers.MainRouter = Giraffe.Router.extend({
 	triggers: {
@@ -3137,8 +3377,10 @@ app.addInitializer(function(){
 	app.storage = App.Storage.getInstance();
 	app.storage.collection("models").add(models);
 	app.storage.collection("clients").add(clients);
+	app.storage.collection("users").add(techs);
 	clients = undefined;
 	models  = undefined;
+	techs   = undefined;
 });
 
 // Start Backbone History, Renderer and main router

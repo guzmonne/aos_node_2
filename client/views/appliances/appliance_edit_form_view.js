@@ -22,19 +22,26 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:status'          , function(){this.updateViewField.apply(this, ['status']);});
 		this.listenTo(this.model, 'change:serial'          , function(){this.updateViewField.apply(this, ['serial']);});
 		this.listenTo(this.model, 'change:observations'    , function(){this.updateViewField.apply(this, ['observations']);});
-		this.listenTo(this.model, 'change:repairement_type', function(){this.updateViewField.apply(this, ['repairement_type']);});
 		this.listenTo(this.model, 'change:cost'            , function(){this.updateViewField.apply(this, ['cost']);});
-		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewText.apply(this, ['defect']);});
+		this.listenTo(this.model, 'change:defect'          , function(){this.updateViewField.apply(this, ['defect']);});
 		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
 		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
 		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
+		this.listenTo(this.model, 'change:repairement_type', function(){
+			this.updateViewField.apply(this, ['repairement_type']);
+			this.changeRepairementType();	
+		});
+		this.listenTo(this.model, 'change:technician_id'   , this.fillTechnicianField);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
+		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
+		this.listenTo(app.storage.collection("techs"), 'remove', this.fillTechnicianField);
 	},
 
 	afterRender: function(){
 		this.$('[name=accessories]').tagsinput();
 		this.$('[name=replacements]').tagsinput();
+		this.fillTechnicianField();
 		if(!this.editMode){
 			this.blockForm();
 			this.toggleButtons();
@@ -46,12 +53,42 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.$('button').toggleClass('hide');
 	},
 
+	fillTechnicianField: function(){
+		var technicians = _.map(app.storage.collection("techs").models, function(model){
+			return {id: model.id, name: model.get("name")};
+		});
+		var field = self.$('[name=technician_id]');
+		field.empty();
+		_.each(technicians, function(technician){
+			if (!technician.id || !technician.name){return;}
+			field.append(
+				'<option value="'+technician.id+'">'+technician.name+'</option>'
+			);
+		});
+		field.prepend(
+				'<option value="" selected></option>'
+		);
+		this.changeTechnician();
+	},
+
 	changeRepairementType: function(){
 		var repairementTypeVal = this.$('[name=repairement_type]').val();
-		if (repairementTypeVal === "Garantía"){
-			this.$('#cost-form-group').hide();
-		} else {
+		if (repairementTypeVal === "Presupuesto"){
 			this.$('#cost-form-group').show();
+		} else {
+			this.$('#cost-form-group').hide();
+		}
+	},
+
+	changeTechnician: function(){
+		var id = this.model.get('technician_id');
+		console.log(id);
+		if (!id || id === '' || id === '1') {
+			this.$('[name=technician_link]').attr('disabled', true);
+		} else {
+			this.$('[name=technician_id]').val(id);
+			this.$('[name=technician_link]').attr('href', '#render/user/show/' + id);
+			this.$('[name=technician_link]').attr('disabled', false);
 		}
 	},
 

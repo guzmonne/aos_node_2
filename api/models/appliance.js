@@ -7,6 +7,7 @@ var timestamps    = require('mongoose-timestamp');
 var _             = require('underscore');
 var ModelModel    = require('../models/model').ModelModel;
 var Model         = new ModelModel();
+var User          = require('../models/user').User;
 var async         = require('async');
 
 // =======
@@ -37,7 +38,6 @@ var Appliance = new Schema({
 	'inStock'        : Boolean,
 	'departuredAt'   : Date,
 	'repairedAt'     : Date,
-	'technician_name': String,
 	'technician_id'  : String,
 	'createdBy'      : String,
 	'updatedBy'      : String,
@@ -89,7 +89,6 @@ function pickParams(params){
 		,'inStock' 
 		,'departuredAt'
 		,'repairedAt'
-		,'technician_name' 
 		,'technician_id' 
 		,'createdBy' 
 		,'updatedBy' 
@@ -155,17 +154,29 @@ ApplianceModel.prototype.findByServiceRequestId = function(service_request_id, c
 		callback(null, appliances);
 	});
 };
+// Find all appliances by model_id
+// -------------------------------
+ApplianceModel.prototype.findByTechnicianId = function(technician_id, callback){
+	Appliance.find({'technician_id': technician_id}, function(err, appliances){
+		if(err){return callback(err);}
+		if(appliances === null){return callback({msg: 'No Appliance found'});}
+		callback(null, appliances);
+	});
+};
 // Update appliance by id
 // ----------------------
-ApplianceModel.prototype.updateById = function(id, params, callback){
+ApplianceModel.prototype.update = function(id, params, callback){
 	var object = pickParams(params);
 	Appliance.findById(id, function(err, appliance){
+		if (appliance === null){err = {err: "No appliance found"};}
 		if (err){return callback(err);}
-		var oldModel = appliance.model_id;
-		var newModel = object.model_id;
-		if (oldModel !== newModel){
-			Model.switchAppliancesId(oldModel, newModel, appliance._id);
-		}
+		var oldModel, newModel, oldTech, newTech; 
+		oldModel = appliance.model_id;
+		newModel = object.model_id;
+		oldTech  = appliance.technician_id;
+		newTech  = object.technician_id;
+		if (oldModel !== newModel){ Model.switchAppliancesId(oldModel, newModel, appliance._id, callback);}
+		if (oldTech  !== newTech) { User.switchTechniciansId(oldTech, newTech, appliance._id, callback); }
 		appliance.update(object, function(err, result){
 			if (err){return callback(err);}
 			callback(null, null);

@@ -31,15 +31,15 @@
 		<div class="row">
 			<div class="col-md-6">
 				<div class="checkbox">
-					<label for="admin" class="col-sm-12">
-						<input type="checkbox" name="admin" {{#if admin}} selected {{/if}}> Administrador
+					<label for="isAdmin" class="col-sm-12">
+						<input type="checkbox" name="isAdmin" {{#is permissions.roles.isAdmin true}} checked {{/is}}> Administrador
 					</label>
 				</div>
 			</div>
 			<div class="col-md-6">
 				<div class="checkbox">
-					<label for="tech" class="col-sm-12">
-						<input type="checkbox" name="tech" {{#if tech}} selected {{/if}}> Tecnico
+					<label for="isTech" class="col-sm-12">
+						<input type="checkbox" name="isTech" {{#is permissions.roles.isTech true}} checked {{/is}}> Tecnico
 					</label>
 				</div>
 			</div>
@@ -58,6 +58,18 @@
 	      <button type="submit" id="save-model" class="btn btn-primary">
 	      	<i class="fa fa-save"></i>
 	      	 Guardar
+	      </button>
+	      <button type="submit" id="save-changes-model" class="btn btn-warning hide">
+	      	<i class="fa fa-save"></i>
+	      	 Guardar Cambios
+	      </button>
+	      <button id="edit-model" class="btn btn-primary">
+	      	<i class="fa fa-pencil"></i>
+	      	 Editar
+	      </button>
+	      <button id="reset-model" class="btn btn-inverse hide pull-right">
+	      	<i class="fa fa-reply"></i>
+	      	 Reestablecer
 	      </button>
 	    </div>
 		</div>

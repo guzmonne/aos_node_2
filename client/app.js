@@ -1,6 +1,9 @@
 // Set Template Strategies for all views to JST
 Giraffe.View.setTemplateStrategy('jst');
 
+// Delete calling dispose on model when it is removed from a collection.
+delete Giraffe.Collection.prototype._removeReference;
+
 window.App = {
 	Models     : {},
 	Collections: {},
