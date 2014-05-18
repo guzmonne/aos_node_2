@@ -637,20 +637,9 @@ App.Models.User = App.Models.BaseModel.extend({
 	},
 });
 App.Collections.BaseCollection = Giraffe.Collection.extend({
-	modelName  : '',
-	modelFilter: {},
-
-	url: function(){
-		return '/api/' + this.modelName;
-	},
-
-	awake: function(){},
-
-	initialize: function(options){
-		this.awake.apply(this, arguments);
-	},
+	comparator: 'id',
 });
-App.Collections.Appliances = Giraffe.Collection.extend({
+App.Collections.Appliances = App.Collections.BaseCollection.extend({
 	url: '/api/appliances',
 	model: App.Models.Appliance,
 });
@@ -993,30 +982,40 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 	},
 
 	events: {
-		'change $range': 'moveCarousel',
-		'click $next'  : 'updateRange',
-		'click $prev'  : 'updateRange',
+		'change $range' : 'moveCarouselTo',
+		'click  $next'  : 'updateRange',
+		'click  $prev'  : 'updateRange',
 	},
 
 	initialize: function(){
-		if (this.air){
-			this.$el.addClass("air-t");
-		}
+		if (this.air){ this.$el.addClass("air-t"); }
 	},
 
 	afterRender: function(){
+		this.collection.sort();
+		this.createCarousel();
+	},
+
+	slideTo: function(index){
+		//this.$range.val(index);
+		this.moveCarouselTo(index);
+	},
+
+	createCarousel: function(){
 		var view;
 		var carouselItemView = App.Views[this.carouselItemView];
-		var options = (this.carouselItemViewOptions) ? this.carouselItemViewOptions : {}; 
+		var options          = (this.carouselItemViewOptions) ? this.carouselItemViewOptions : {};
+		var length           = this.collection.length;
 		if(!App.defined(carouselItemView)){return;}
 		if (!this.collection){return;}
-		for(var i = 0; i < this.collection.length; i++){
+		for(var i = 0; i < length; i++){
 			options.model     = this.collection.at(i);
 			options.className = (i === 0) ? "item active" : "item";
 			view              = new carouselItemView(options);
 			view.attachTo(this.$('#carousel-items-' + this.cid));
 		}
-		this.$range.attr("max", this.collection.length);
+		this.$range.attr("max", length);
+		this.$rangeOutput.val( '1/' + this.collection.length);
 		this.$('#carousel-' + this.cid).carousel({
       interval: 0,
       pause: "hover"
@@ -1031,29 +1030,28 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 		return options;
 	},
 
-	moveCarousel: function(){
-		var rangeVal = parseInt(this.$range.val());
-		var slide = rangeVal - 1;
-		this.$rangeOutput.val(rangeVal);
+	moveCarouselTo: function(index){
+		index = (_.isNumber(index)) ? index : parseInt(this.$range.val().match(/([0-9])+/g)[0]);
+		var slide = index - 1;
+		console.log(index);
+		this.$rangeOutput.val(index + '/' + this.collection.length);
+		this.$range.val(index);
 		this.$('#carousel-' + this.cid).carousel(slide);
 	},
 
 	updateRange: function(e){
 		var id = e.currentTarget.id;
-		var rangeVal = parseInt(this.$range.val());
+		var index = parseInt(this.$range.val().match(/([0-9])+/g)[0]);
 		if (id === "next-model"){
-			rangeVal = rangeVal + 1;
-			if (rangeVal > this.collection.length){
-				rangeVal = 1;
-			}
+			index = index + 1;
+			if (index > this.collection.length){ index = 1; }
 		} else if (id === "prev-model"){
-			rangeVal = rangeVal - 1;
-			if (rangeVal <= 0){
-				rangeVal = this.collection.length;
-			}
+			index = index - 1;
+			if (index <= 0){ index = this.collection.length; }
 		}
-		this.$range.val(rangeVal);
-		this.$rangeOutput.val(rangeVal);
+		this.moveCarouselTo(index);
+		//this.$range.val(index);
+		//this.$rangeOutput.val(index + '/' + this.collection.length);
 	},
 });
 App.Views.FormView = App.Views.BaseView.extend({
@@ -1676,12 +1674,6 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
 
-	beforeRender: function(){
-		if (!this.model.get('model') && this.parent.baseModel){
-			this.model.model = this.parent.baseModel;
-		}
-	},
-
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
@@ -1716,7 +1708,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		'focus .bootstrap-tagsinput input'     : 'activateTags',
 		'focusout .bootstrap-tagsinput input'  : 'deactivateTags',
 		'change select[name=status]'           : 'changeStatus',
-		'change select[name=repairement_type]' : 'changeRepairementType',
+		'change select[name=repairement_type]' : 'setRepairementType',
 	},
 
 	initialize: function(){
@@ -1735,9 +1727,9 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
 		this.listenTo(this.model, 'change:repairement_type', function(){
 			this.updateViewField.apply(this, ['repairement_type']);
-			this.changeRepairementType();	
+			this.setRepairementType();	
 		});
-		this.listenTo(this.model, 'change:technician_id'   , this.fillTechnicianField);
+		this.listenTo(this.model, 'change:technician_id'   , this.setTechnician);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
 		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
@@ -1752,7 +1744,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			this.blockForm();
 			this.toggleButtons();
 		}
-		this.changeRepairementType();
+		this.setRepairementType();
 	},
 
 	toggleButtons: function(){
@@ -1763,7 +1755,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		var technicians = _.map(app.storage.collection("techs").models, function(model){
 			return {id: model.id, name: model.get("name")};
 		});
-		var field = self.$('[name=technician_id]');
+		var field = this.$('[name=technician_id]');
 		field.empty();
 		_.each(technicians, function(technician){
 			if (!technician.id || !technician.name){return;}
@@ -1774,10 +1766,10 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		field.prepend(
 				'<option value="" selected></option>'
 		);
-		this.changeTechnician();
+		this.setTechnician();
 	},
 
-	changeRepairementType: function(){
+	setRepairementType: function(){
 		var repairementTypeVal = this.$('[name=repairement_type]').val();
 		if (repairementTypeVal === "Presupuesto"){
 			this.$('#cost-form-group').show();
@@ -1786,10 +1778,9 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		}
 	},
 
-	changeTechnician: function(){
+	setTechnician: function(){
 		var id = this.model.get('technician_id');
-		console.log(id);
-		if (!id || id === '' || id === '1') {
+		if (!id || id === '') {
 			this.$('[name=technician_link]').attr('disabled', true);
 		} else {
 			this.$('[name=technician_id]').val(id);
@@ -2687,22 +2678,54 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 	template: HBS.model_details_template,
 	className: 'row',
 
-	awake: function(){
-		_.once(this.renderApplianceIndex);
+	ui: {
+		$formView : "#form-view",
+		$tableView: "#table-view",
+		$carousel : "#model-appliances-carousel",
+		$table    : "#model-appliances-table",
+	},
+
+	events: {
+		'click $tableView': 'changeView',
+		'click $formView' : 'changeView',
+		'click a'         : 'slideToAppliance',
 	},
 
 	afterRender: function(){
+		this.$el.tooltip();
 		this.renderApplianceIndex();
 		this.invoke('setHeader');
 	},
 
+	slideToAppliance: function(e){
+		var id, index, model, view, collection, el = this.$(e.target).closest('a'); 
+		if (el.attr('id') !== "appliance-details"){ return; }
+		if (e) {e.preventDefault();}
+		id = el.data('id');
+		this.changeView();
+		view       = this.appliancesCarousel;
+		collection = view.collection;
+		model      = collection.get(id);
+		if (!model){return this.changeView();} 
+		index = collection.indexOf(model);
+		view.slideTo(index + 1);
+	},
+
+	changeView: function(e){
+		if (e) {e.preventDefault();}
+		this.$('[data-view=control]'  ).toggleClass('active');
+		this.$('[data-view=container]').toggleClass('hide');
+		this.renderAppliancesCarousel();
+	},
+
 	renderApplianceIndex: function(){
-		if (!App.defined(this.model)){return;}
+		if (!this.model)         {return;}
+		if (this.appliancesIndex){return;}
 		var self = this;
-		var el   = this.$('#model-appliances');
+		var el   = this.$('#model-appliances-table');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			synced: true,
-			collection   : app.storage.getSubCollection("appliances", {
+			synced    : true,
+			collection: app.storage.getSubCollection("appliances", {
 				model_id: this.model.id
 			}, {
 				success: function(){
@@ -2710,6 +2733,19 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 				}
 			}),
 		});
+	},
+
+	renderAppliancesCarousel: function(){
+		if (!this.model) {return;}
+		if (this.appliancesCarousel){return;}
+		var el   = this.$('#model-appliances-carousel');
+		this.appliancesCarousel = new App.Views.ApplianceCarouselView({
+			synced    : true,
+			collection: app.storage.getSubCollection('appliances', {
+				model_id: this.model.id
+			})
+		});
+		this.appliancesCarousel.attachTo(el, { method: 'html' });
 	},
 
 	serialize: function(){

@@ -254,11 +254,15 @@ function program8(depth0,data) {
   if (stack2 = helpers._id) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0._id); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "\" class=\"btn btn-green\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Mas Información\" style=\"margin-bottom: 3px;\">\n		<i class=\"fa fa-ellipsis-h fa-fw\"></i>\n	</a>\n	<br>\n	<a href=\"#render/service_request/show/";
+    + "\" class=\"btn btn-green\" data-id=";
+  if (stack2 = helpers._id) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0._id); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + " id=\"appliance-details\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Mas Información\" style=\"margin-bottom: 3px;\">\n		<i class=\"fa fa-ellipsis-h fa-fw\"></i>\n	</a>\n	<br>\n	<a href=\"#render/service_request/show/";
   if (stack2 = helpers.service_request_id) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.service_request_id); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "\" class=\"btn btn-green\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Orden de Servicio\" style=\"margin-top: 3px; margin-right: 3px\">\n		<i class=\"fa fa-clipboard fa-fw\"></i>\n	</a>\n</td>";
+    + "\" class=\"btn btn-green\" id=\"appliance-service-request\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Orden de Servicio\" style=\"margin-top: 3px; margin-right: 3px\">\n		<i class=\"fa fa-clipboard fa-fw\"></i>\n	</a>\n</td>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_show_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -833,19 +837,19 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"col-lg-12 carousel slide\">\n	<div class=\"row well well-sm\" style=\"border-radius: 0; margin-bottom:10px\">\n		<div class=\"col-lg-offset-2 col-lg-8 col-md-12\">\n			<h2 class=\"text-center\" style=\"margin-top: 10px\">\n				<a href=\"#carousel-";
-  if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "\" id=\"prev-model\" class=\"btn btn-green pull-left\" data-slide=\"prev\">\n					<i class=\"fa fa-chevron-left\"></i>\n				</a>\n				";
+    + "\" class=\"col-lg-12 carousel slide\">\n	<div class=\"row well well-sm\" style=\"border-radius: 0; margin-bottom:10px\">\n		<div class=\"col-lg-offset-2 col-lg-8 col-md-12\">\n			<h2 class=\"text-center\" style=\"margin-top: 10px\">\n				<button id=\"prev-model\" class=\"btn btn-green pull-left\">\n					<i class=\"fa fa-chevron-left\"></i>\n				</button>\n				";
   if (stack1 = helpers.carouselTitle) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.carouselTitle); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\n				<button type=\"button\" class=\"btn btn-green\" data-toggle=\"collapse\" data-target=\"#range-carousel-selector\">\n					<i class=\"fa fa-bars\"></i>\n				</button>\n				<a href=\"#carousel-";
+    + "\n				<button type=\"button\" class=\"btn btn-green\" data-toggle=\"collapse\" data-target=\"#range-carousel-selector-";
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" id=\"next-model\" class=\"btn btn-green pull-right\" data-slide=\"next\">\n					<i class=\"fa fa-chevron-right\"></i>\n				</a>\n			</h2>\n		</div>\n	</div>\n	<div class=\"row collapse\" id=\"range-carousel-selector\">\n		<div class=\"col-lg-offset-2 col-lg-8 col-md-12\">\n			<div class=\"range range-green\" style=\"margin: 0px 0px 10px 0px\">\n        <input type=\"range\" name=\"range\" min=\"1\" max=\"100\" value=\"1\" id=\"range-selector\">\n        <output id=\"range\">1</output>\n      </div>\n      <hr>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"";
+    + "\">\n					<i class=\"fa fa-bars\"></i>\n				</button>\n				<button id=\"next-model\" class=\"btn btn-green pull-right\">\n					<i class=\"fa fa-chevron-right\"></i>\n				</button>\n			</h2>\n		</div>\n	</div>\n	<div class=\"row collapse\" id=\"range-carousel-selector-";
+  if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\">\n		<div class=\"col-lg-offset-2 col-lg-8 col-md-12\">\n			<div class=\"range range-green\" style=\"margin: 0px 0px 10px 0px\">\n        <input type=\"range\" name=\"range\" min=\"1\" max=\"100\" value=\"1\" id=\"range-selector\">\n        <output id=\"range\"></span></output>\n      </div>\n      <hr>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"";
   if (stack1 = helpers.carouselClassName) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.carouselClassName); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -1099,7 +1103,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack2 = helpers.subcategory) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.subcategory); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</li>\n  		</ul>\n  	</div>\n  </div>\n  <hr style=\"margin: 0\">\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n        <h3>Equipos</h3>\n    </div>\n  </div>\n  <div id=\"model-appliances\"></div>\n</div>\n<div class=\"col-lg-12\">\n<hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el ";
+    + "</li>\n  		</ul>\n  	</div>\n  </div>\n  <hr style=\"margin: 0\">\n  <div class=\"row\">\n    <div class=\"col-sm-12\" style=\"margin-bottom: 10px\">\n        <h3>\n          Equipos \n          <button id=\"form-view\" class=\"btn btn-info pull-right\" data-view=\"control\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Vista Formulario\">\n            <i class=\"fa fa-list fa-fw\"></i>\n          </button>\n          <button id=\"table-view\" class=\"btn btn-info pull-right active\" data-view=\"control\" style=\"margin-right: 10px\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Vista Tabla\">\n            <i class=\"fa fa-table fa-fw\"></i>\n          </button>\n        </h3>\n    </div>\n  </div>\n  <div id=\"model-appliances-table\" data-view=\"container\"></div>\n  <div id=\"model-appliances-carousel\" class=\"hide\" data-view=\"container\"></div>\n</div>\n<div class=\"col-lg-12\">\n<hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el ";
   if (stack2 = helpers.createdAt) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.createdAt); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)

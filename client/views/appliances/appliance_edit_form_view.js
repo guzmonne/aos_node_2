@@ -10,7 +10,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		'focus .bootstrap-tagsinput input'     : 'activateTags',
 		'focusout .bootstrap-tagsinput input'  : 'deactivateTags',
 		'change select[name=status]'           : 'changeStatus',
-		'change select[name=repairement_type]' : 'changeRepairementType',
+		'change select[name=repairement_type]' : 'setRepairementType',
 	},
 
 	initialize: function(){
@@ -29,9 +29,9 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
 		this.listenTo(this.model, 'change:repairement_type', function(){
 			this.updateViewField.apply(this, ['repairement_type']);
-			this.changeRepairementType();	
+			this.setRepairementType();	
 		});
-		this.listenTo(this.model, 'change:technician_id'   , this.fillTechnicianField);
+		this.listenTo(this.model, 'change:technician_id'   , this.setTechnician);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
 		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
@@ -46,7 +46,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			this.blockForm();
 			this.toggleButtons();
 		}
-		this.changeRepairementType();
+		this.setRepairementType();
 	},
 
 	toggleButtons: function(){
@@ -57,7 +57,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		var technicians = _.map(app.storage.collection("techs").models, function(model){
 			return {id: model.id, name: model.get("name")};
 		});
-		var field = self.$('[name=technician_id]');
+		var field = this.$('[name=technician_id]');
 		field.empty();
 		_.each(technicians, function(technician){
 			if (!technician.id || !technician.name){return;}
@@ -68,10 +68,10 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		field.prepend(
 				'<option value="" selected></option>'
 		);
-		this.changeTechnician();
+		this.setTechnician();
 	},
 
-	changeRepairementType: function(){
+	setRepairementType: function(){
 		var repairementTypeVal = this.$('[name=repairement_type]').val();
 		if (repairementTypeVal === "Presupuesto"){
 			this.$('#cost-form-group').show();
@@ -80,10 +80,9 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		}
 	},
 
-	changeTechnician: function(){
+	setTechnician: function(){
 		var id = this.model.get('technician_id');
-		console.log(id);
-		if (!id || id === '' || id === '1') {
+		if (!id || id === '') {
 			this.$('[name=technician_link]').attr('disabled', true);
 		} else {
 			this.$('[name=technician_id]').val(id);

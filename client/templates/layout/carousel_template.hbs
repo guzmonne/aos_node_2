@@ -2,24 +2,24 @@
 	<div class="row well well-sm" style="border-radius: 0; margin-bottom:10px">
 		<div class="col-lg-offset-2 col-lg-8 col-md-12">
 			<h2 class="text-center" style="margin-top: 10px">
-				<a href="#carousel-{{cid}}" id="prev-model" class="btn btn-green pull-left" data-slide="prev">
+				<button id="prev-model" class="btn btn-green pull-left">
 					<i class="fa fa-chevron-left"></i>
-				</a>
+				</button>
 				{{carouselTitle}}
-				<button type="button" class="btn btn-green" data-toggle="collapse" data-target="#range-carousel-selector">
+				<button type="button" class="btn btn-green" data-toggle="collapse" data-target="#range-carousel-selector-{{cid}}">
 					<i class="fa fa-bars"></i>
 				</button>
-				<a href="#carousel-{{cid}}" id="next-model" class="btn btn-green pull-right" data-slide="next">
+				<button id="next-model" class="btn btn-green pull-right">
 					<i class="fa fa-chevron-right"></i>
-				</a>
+				</button>
 			</h2>
 		</div>
 	</div>
-	<div class="row collapse" id="range-carousel-selector">
+	<div class="row collapse" id="range-carousel-selector-{{cid}}">
 		<div class="col-lg-offset-2 col-lg-8 col-md-12">
 			<div class="range range-green" style="margin: 0px 0px 10px 0px">
         <input type="range" name="range" min="1" max="100" value="1" id="range-selector">
-        <output id="range">1</output>
+        <output id="range"></span></output>
       </div>
       <hr>
 		</div>

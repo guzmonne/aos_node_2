@@ -30,11 +30,11 @@
 	{{/if}}
 </td>
 <td class="center-vh">
-	<a href="#render/appliance/show/{{_id}}" class="btn btn-green" data-toggle="tooltip" data-placement="top" title="Mas Información" style="margin-bottom: 3px;">
+	<a href="#render/appliance/show/{{_id}}" class="btn btn-green" data-id={{_id}} id="appliance-details" data-toggle="tooltip" data-placement="top" title="Mas Información" style="margin-bottom: 3px;">
 		<i class="fa fa-ellipsis-h fa-fw"></i>
 	</a>
 	<br>
-	<a href="#render/service_request/show/{{service_request_id}}" class="btn btn-green" data-toggle="tooltip" data-placement="top" title="Orden de Servicio" style="margin-top: 3px; margin-right: 3px">
+	<a href="#render/service_request/show/{{service_request_id}}" class="btn btn-green" id="appliance-service-request" data-toggle="tooltip" data-placement="top" title="Orden de Servicio" style="margin-top: 3px; margin-right: 3px">
 		<i class="fa fa-clipboard fa-fw"></i>
 	</a>
 </td>

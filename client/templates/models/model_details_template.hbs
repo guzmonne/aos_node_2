@@ -26,11 +26,20 @@
   </div>
   <hr style="margin: 0">
   <div class="row">
-    <div class="col-sm-6">
-        <h3>Equipos</h3>
+    <div class="col-sm-12" style="margin-bottom: 10px">
+        <h3>
+          Equipos 
+          <button id="form-view" class="btn btn-info pull-right" data-view="control" data-toggle="tooltip" data-placement="top" title="Vista Formulario">
+            <i class="fa fa-list fa-fw"></i>
+          </button>
+          <button id="table-view" class="btn btn-info pull-right active" data-view="control" style="margin-right: 10px" data-toggle="tooltip" data-placement="top" title="Vista Tabla">
+            <i class="fa fa-table fa-fw"></i>
+          </button>
+        </h3>
     </div>
   </div>
-  <div id="model-appliances"></div>
+  <div id="model-appliances-table" data-view="container"></div>
+  <div id="model-appliances-carousel" class="hide" data-view="container"></div>
 </div>
 <div class="col-lg-12">
 <hr>
