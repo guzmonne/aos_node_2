@@ -2021,7 +2021,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		'click #add-address'             : 'addAddress',
 		'click button.del-address'       : 'delAddress',
 		'click button.edit-address'      : 'editAddress',
-		'click #reset-form'              : 'render',
+		'click #reset-form'              : 'resetForm',
 		'click #update-form'             : 'updateModel',
 		'click #edit-form'               : 'toggleButtons',
 		'submit form'                    : 'createModel',
@@ -2029,6 +2029,15 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.bindEvents();
+		this.cloneModelCollections();
+	},
+
+	cloneModelCollections: function(){
+		if (!this.model){return;}
+		var phones    = this.model.phones;
+		var addresses = this.model.addresses;
+		if(phones)   { this.phonesClone    = this.model.phones.clone(); }
+		if(addresses){ this.addressesClone = this.model.addresses.clone(); }
 	},
 
 	bindEvents: function(){
@@ -2044,6 +2053,49 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.renderPhones();
 		this.renderAddresses();
 		if(!this.model.isNew()){this.blockForm();}
+	},
+
+	resetForm: function(e){
+		e.preventDefault();
+		if (this.model && this.model.phones && this.phonesClone){
+			this.model.phones.reset(this.phonesClone.models);
+		}
+		if (this.model && this.model.addresses && this.addressesClone){
+			this.model.addresses.reset(this.addressesClone.models);
+		}
+		this.render();
+	},
+
+	blockForm: function(){
+		//App.Views.BaseView.prototype.blockForm.apply(this, arguments);
+		this.$('.btn-success, .btn-danger, .btn-warning').hide();
+		this.$('[name=name]'      ).attr("readonly", true);
+		this.$('[name=doc-type]'  ).attr("readonly", true);
+		this.$('[name=doc-number]').attr("readonly", true);
+		this.$('[name=email]'     ).attr("readonly", true);
+		this.$('[name=phone]'     ).hide();
+		this.$('[name=street]'    ).hide();
+		this.$('[name=city]'      ).hide();
+		this.$('[name=department]').hide();
+		this.$('[name=address-edit-row]').hide();
+		this.$('.form-control-under label[for=address]').show();
+		this.$('[data-source-index=0]').toggleClass('col-xs-offset-2');
+	},
+
+	unblockForm: function(){
+		//App.Views.BaseView.prototype.unblockForm.apply(this, arguments);
+		this.$('.btn-success, .btn-danger, .btn-warning').show();
+		this.$('[name=name]'      ).attr("readonly", false);
+		this.$('[name=doc-type]'  ).attr("readonly", false);
+		this.$('[name=doc-number]').attr("readonly", false);
+		this.$('[name=email]'     ).attr("readonly", false);
+		this.$('[name=phone]'     ).show();
+		this.$('[name=street]'    ).show();
+		this.$('[name=city]'      ).show();
+		this.$('[name=department]').show();
+		this.$('[name=address-edit-row]').show();
+		this.$('.form-control-under label[for=address]').hide();
+		this.$('[data-source-index=0]').toggleClass('col-xs-offset-2');
 	},
 
 	toggleButtons: function(){
@@ -2087,6 +2139,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 			addresses : this.model.addresses.toJSON()
 		}));
 		this.$('[name=street]').focus();
+		this.$('.form-control-under label[for=address]').hide();
 	},
 
 	addAddress: function(){
@@ -2095,7 +2148,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		this.model.addresses.add(attrs);
 	},
 
-	delAddress: function(e){
+	delAddress: function(e){//
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
 		this.model.addresses.remove(this.model.addresses.at(index));
@@ -2141,7 +2194,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 		if (e){e.preventDefault();}
 		var self = this;
 		this.setModel();
-		if (!this.model.hasChanged()){return;}
+		this.toggleButtons();
 		this.model.save(null, {
 			success: function(model, response, options){
 				self.invoke('showMessage', {
@@ -2151,7 +2204,13 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 				});
 			},
 		});
-		this.toggleButtons();
+		this.cloneModelCollections();
+	},
+
+	dispose: function(){
+		if (this.phonesClone)   { this.phonesClone.dispose(); }
+		if (this.addressesClone){ this.addressesClone.dispose(); }
+		Giraffe.dispose.apply(this, arguments);
 	},
 
 });

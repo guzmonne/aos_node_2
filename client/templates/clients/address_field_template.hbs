@@ -1,4 +1,4 @@
-<div class="row" style="margin: 0">
+<div class="row" style="margin: 0" name="address-edit-row">
 	<label for="address" class="col-xs-2 control-label">
 		{{#is address.length ">" 1}}
 			Direcciones
@@ -36,6 +36,15 @@
 	<div class="row" data-source-index="{{@index}}" style="margin: 0">
 		<hr>
 		<div class="col-xs-2 form-control-under" style="padding: 0">
+			{{#is @index 0}}
+			<label for="address" class="col-xs-2 control-label">
+				{{#is address.length ">" 1}}
+					Direcciones
+				{{else}}
+					Dirección
+				{{/is}}
+			</label>
+			{{/is}}
 			<button type="button" class="btn btn-warning pull-right edit-address" tabindex = "-1" data-source-index="{{@index}}" style="margin-left: 4px;">
 				<i class="fa fa-pencil"></i>
 			</button>

@@ -357,7 +357,7 @@ function program3(depth0,data) {
 this["HBS"] = this["HBS"] || {};this["HBS"]["address_field_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
+  var buffer = "", stack1, stack2, options, self=this, helperMissing=helpers.helperMissing, functionType="function", escapeExpression=this.escapeExpression;
 
 function program1(depth0,data) {
   
@@ -373,10 +373,14 @@ function program3(depth0,data) {
 
 function program5(depth0,data) {
   
-  var buffer = "", stack1, stack2;
+  var buffer = "", stack1, stack2, options;
   buffer += "\n	<div class=\"row\" data-source-index=\""
     + escapeExpression(((stack1 = ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\" style=\"margin: 0\">\n		<hr>\n		<div class=\"col-xs-2 form-control-under\" style=\"padding: 0\">\n			<button type=\"button\" class=\"btn btn-warning pull-right edit-address\" tabindex = \"-1\" data-source-index=\""
+    + "\" style=\"margin: 0\">\n		<hr>\n		<div class=\"col-xs-2 form-control-under\" style=\"padding: 0\">\n			";
+  options = {hash:{},inverse:self.noop,fn:self.program(6, program6, data),data:data};
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index), 0, options) : helperMissing.call(depth0, "is", ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index), 0, options));
+  if(stack2 || stack2 === 0) { buffer += stack2; }
+  buffer += "\n			<button type=\"button\" class=\"btn btn-warning pull-right edit-address\" tabindex = \"-1\" data-source-index=\""
     + escapeExpression(((stack1 = ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\" style=\"margin-left: 4px;\">\n				<i class=\"fa fa-pencil\"></i>\n			</button>\n			<button type=\"button\" class=\"btn btn-danger pull-right del-address\" tabindex = \"-1\" data-source-index=\""
     + escapeExpression(((stack1 = ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -395,8 +399,29 @@ function program5(depth0,data) {
     + "\" data-name=\"department\" readonly>\n		</div>\n		<label for=\"department\" class=\"col-xs-2 text-muted control-label-under\">\n			Dep.\n		</label>\n	</div>\n";
   return buffer;
   }
+function program6(depth0,data) {
+  
+  var buffer = "", stack1, stack2, options;
+  buffer += "\n			<label for=\"address\" class=\"col-xs-2 control-label\">\n				";
+  options = {hash:{},inverse:self.program(9, program9, data),fn:self.program(7, program7, data),data:data};
+  stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, ((stack1 = (depth0 && depth0.address)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options) : helperMissing.call(depth0, "is", ((stack1 = (depth0 && depth0.address)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options));
+  if(stack2 || stack2 === 0) { buffer += stack2; }
+  buffer += "\n			</label>\n			";
+  return buffer;
+  }
+function program7(depth0,data) {
+  
+  
+  return "\n					Direcciones\n				";
+  }
 
-  buffer += "<div class=\"row\" style=\"margin: 0\">\n	<label for=\"address\" class=\"col-xs-2 control-label\">\n		";
+function program9(depth0,data) {
+  
+  
+  return "\n					Dirección\n				";
+  }
+
+  buffer += "<div class=\"row\" style=\"margin: 0\" name=\"address-edit-row\">\n	<label for=\"address\" class=\"col-xs-2 control-label\">\n		";
   options = {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, ((stack1 = (depth0 && depth0.address)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options) : helperMissing.call(depth0, "is", ((stack1 = (depth0 && depth0.address)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
@@ -501,13 +526,13 @@ function program1(depth0,data) {
 function program3(depth0,data) {
   
   
-  return "\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button type=\"submit\" class=\"btn btn-dark-blue\">\n					<i class=\"fa fa-save\"></i>\n					Crear\n				</button>\n			</div>\n		";
+  return "\n			<div class=\"col-xs-offset-2 col-xs-10\">\n				<button type=\"submit\" class=\"btn btn-dark-blue\">\n					<i class=\"fa fa-save\"></i>\n					Crear\n				</button>\n			</div>\n		";
   }
 
 function program5(depth0,data) {
   
   
-  return "\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button id=\"update-form\" class=\"btn btn-warning update-buttons hide\">\n					<i class=\"fa fa-save\"></i>\n					Actualizar\n				</button>\n			</div>\n			<div class=\"col-xs-offset-2 col-xs-8\">\n				<button id=\"edit-form\" class=\"btn btn-primary update-buttons\">\n					<i class=\"fa fa-pencil\"></i>\n					Editar\n				</button>\n			</div>\n		";
+  return "\n			<div class=\"col-xs-offset-2 col-xs-10\">\n				<button id=\"update-form\" class=\"btn btn-warning update-buttons hide\">\n					<i class=\"fa fa-save\"></i>\n					Guardar Cambios\n				</button>\n				<button id=\"reset-form\" class=\"btn btn-inverse hide update-buttons hide pull-right\">\n		      <i class=\"fa fa-reply\"></i> Reestablecer\n		    </button>\n			</div>\n			<div class=\"col-xs-offset-2 col-xs-10\">\n				<button id=\"edit-form\" class=\"btn btn-primary update-buttons\">\n					<i class=\"fa fa-pencil\"></i>\n					Editar\n				</button>\n			</div>\n		";
   }
 
   buffer += "<form class=\"form-horizontal\">\n	<div class=\"form-group\">\n		<label for=\"name\" class=\"col-xs-2 control-label\">Nombre</label>\n		<div class=\"col-xs-10\">\n			<input type=\"text\" class=\"form-control\" name=\"name\" placeholder=\"e.j: Juan Perez\" value=\"";
@@ -728,9 +753,9 @@ function program5(depth0,data) {
   if (stack2 = helpers.number) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.number); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "\" readonly>\n</div>​<div class=\"col-xs-2\" style=\"padding: 0\">\n	<button type=\"button\" class=\"btn btn-danger form-control-under del-phone-number\" tabindex = \"-1\" data-phone-index=\""
+    + "\" readonly>\n</div>​<div class=\"col-xs-2\" style=\"padding: 0\">\n	<button type=\"button\" class=\"btn btn-danger form-control-under del-phone-number\" tabindex=\"-1\" data-phone-index=\""
     + escapeExpression(((stack1 = ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
-    + "\">\n		<i class=\"fa fa-minus\"></i>\n	</button>\n	<button type=\"button\" class=\"btn btn-warning form-control-under edit-phone-number\" tabindex = \"-1\" data-phone-index=\""
+    + "\">\n		<i class=\"fa fa-minus\"></i>\n	</button>\n	<button type=\"button\" class=\"btn btn-warning form-control-under edit-phone-number\" tabindex=\"-1\" data-phone-index=\""
     + escapeExpression(((stack1 = ((stack1 = data),stack1 == null || stack1 === false ? stack1 : stack1.index)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
     + "\">\n		<i class=\"fa fa-pencil\"></i>\n	</button>\n</div>\n";
   return buffer;
@@ -740,7 +765,7 @@ function program5(depth0,data) {
   options = {hash:{},inverse:self.program(3, program3, data),fn:self.program(1, program1, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, ((stack1 = (depth0 && depth0.phones)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options) : helperMissing.call(depth0, "is", ((stack1 = (depth0 && depth0.phones)),stack1 == null || stack1 === false ? stack1 : stack1.length), ">", 1, options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n</label>\n<div class=\"col-xs-8\">\n	<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"e.j: 099123456\" data-type=\"phone-number\">\n</div>\n<div class=\"col-xs-2\" style=\"padding: 0\">\n	<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" data-for=\"phone\" tabindex = \"-1\">\n		<i class=\"fa fa-plus\"></i>\n	</button>\n</div>\n";
+  buffer += "\n</label>\n<div class=\"col-xs-8\">\n	<input type=\"text\" class=\"form-control\" name=\"phone\" placeholder=\"e.j: 099123456\" data-type=\"phone-number\">\n</div>\n<div class=\"col-xs-2\" style=\"padding: 0\">\n	<button type=\"button\" class=\"btn btn-success\" id=\"add-phone-number\" data-for=\"phone\" tabindex=\"-1\">\n		<i class=\"fa fa-plus\"></i>\n	</button>\n</div>\n";
   stack2 = helpers.each.call(depth0, (depth0 && depth0.phones), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
   return buffer;

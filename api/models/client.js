@@ -115,7 +115,7 @@ ClientModel.prototype.update = function(id, params, callback){
 		}
 		client.save(function(err, client){
 			if (err){return callback(err);}
-			callback(null, client);
+			callback(null, {});
 		})
 	});
 };
