@@ -2,10 +2,6 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
 
-	awake: function(){
-		this.listenTo(this.model.model_id, 'change' , this.render);
-	},
-
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
