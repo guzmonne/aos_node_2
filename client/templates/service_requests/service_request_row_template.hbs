@@ -1,10 +1,21 @@
 <td>{{id}}</td>
 <td>{{client_name}}</td>
-<td>{{invoiceNumber}}</td>
-<td class="text-center">{{appliancesCount}}</td>
+<td>
+	{{#if invoiceNumber}}
+		<dt>Remito</dt>
+		<dd>{{invoiceNumber}}</dd>
+	{{/if}}
+	{{#if appliancesCount}}
+		<p><b>Cant. Eq.: </b>{{appliancesCount}}</p>
+	{{/if}}
+</td>
 <td>{{status}}</td>
-<td>{{createdAt}}</td>
-<td>{{closedAt}}</td>
+<td>
+	<dt>Creado</dt>
+	<dd>{{createdAt}}</dd>
+	<dt>Actualizado</dt>
+	<dd>{{updatedAt}}</dd>
+</td>
 <td class="center-vh">
 	<a href="#render/service_request/show/{{_id}}" id="show-service-request" class="btn btn-green">
 		<i class="fa fa-ellipsis-h fa-lg"></i>

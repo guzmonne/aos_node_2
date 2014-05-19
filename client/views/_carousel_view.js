@@ -62,7 +62,6 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 	moveCarouselTo: function(index){
 		index = (_.isNumber(index)) ? index : parseInt(this.$range.val().match(/([0-9])+/g)[0]);
 		var slide = index - 1;
-		console.log(index);
 		this.$rangeOutput.val(index + '/' + this.collection.length);
 		this.$range.val(index);
 		this.$('#carousel-' + this.cid).carousel(slide);

@@ -1,6 +1,6 @@
 App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	template : HBS.appliance_index_template,
-	className: "row air-b",
+	className: "row",
 	name     : "Equipos",
 	
 	tableEl        : '#appliances-table',
