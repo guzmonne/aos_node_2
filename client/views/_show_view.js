@@ -1,10 +1,9 @@
 App.Views.ShowView = App.Views.BaseView.extend({
-	sync  : true,
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		this.listenTo(app, 'row:rendered', this.checkEventCaller);
-		this.listenTo(this, 'disposing', this.modelShowInactive);
+		this.listenTo(app , 'row:rendered', this.checkEventCaller);
+		this.listenTo(this, 'disposing'   , this.modelShowInactive);
 		this.modelShowActive();
 	},
 

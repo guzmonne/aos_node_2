@@ -8,6 +8,7 @@ App.Views.RowView = App.Views.BaseView.extend({
 	},
 	
 	initialize: function(){
+		this.awake.apply(this, arguments);
 		this.listenTo(this.model, 'change' , this.render);
 		this.listenTo(this.model, 'remove', this.invokeRemoveRow);
 		this.listenTo(app, 'model:show:active',   this.activate);

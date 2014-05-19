@@ -80,4 +80,8 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 			});
 		}
 	},
+
+	onSync: function(){
+		this.sync("model");
+	},
 });

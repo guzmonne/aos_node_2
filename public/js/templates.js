@@ -1136,11 +1136,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n					</div>\n				</div>\n			</div>\n			<div class=\"col-md-6\">\n				<div class=\"form-group\">\n					<label for=\"category\" class=\"col-sm-4 control-label\">Categoría</label>\n					<div class=\"col-sm-8\">\n						<input type=\"text\" class=\"form-control\" name=\"category\" placeholder=\"e.j: Electrodomestico\" value=\"";
+    + "\">\n					</div>\n				</div>\n			</div>\n			<div class=\"col-md-6\">\n				<div class=\"form-group\">\n					<label for=\"category\" class=\"col-xs-3 col-md-4 control-label\">Categoría</label>\n					<div class=\"col-xs-9 col-md-8\">\n						<input type=\"text\" class=\"form-control\" name=\"category\" placeholder=\"e.j: Electrodomestico\" value=\"";
   if (stack1 = helpers.category) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.category); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"subcategory\" class=\"col-sm-4 control-label\">Subcategoría</label>\n					<div class=\"col-sm-8\">\n						<input type=\"text\" class=\"form-control\" name=\"subcategory\" placeholder=\"e.j: Plancha\" value=\"";
+    + "\">\n					</div>\n				</div>\n				<div class=\"form-group\">\n					<label for=\"subcategory\" class=\"col-xs-3 col-md-4 control-label\">Subcategoría</label>\n					<div class=\"col-xs-9 col-md-8\">\n						<input type=\"text\" class=\"form-control\" name=\"subcategory\" placeholder=\"e.j: Plancha\" value=\"";
   if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)

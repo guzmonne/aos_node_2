@@ -50,7 +50,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	tableFetched: function(){
-		this.afterSync();
 		if(this.rendered === true && this.synced === false){ this.appendCollection(); }
 		this.synced = true;
 	},	
@@ -64,6 +63,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	onSync: function(){
-		this.collection.fetch(this.fetchOptions);
+		this.sync("collection", this.fetchOptions);
 	},
 });

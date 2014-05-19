@@ -579,58 +579,12 @@ input, select {
 }
 
 .dropdown-menu.status li a {
-  color: #fff;
   line-height: 30px;
 }
 
-.dropdown-menu.status li a.status-1 {
-  background-color: #9299C7;
-}
-.dropdown-menu.status li a.status-2 {
-  background-color: #FF9F00;
-}
-.dropdown-menu.status li a.status-3 {
-  background-color: #FD6E32;
-}
-.dropdown-menu.status li a.status-4 {
-  background-color: #E0404B;
-}
-.dropdown-menu.status li a.status-5 {
-  background-color: #6BB071;
-}
-.dropdown-menu.status li a.status-6 {
-  background-color: #6C3F77;
-}
-.dropdown-menu.status li a.status-7 {
-  background-color: #476E4D;
-}
-
-.dropdown-menu.status li a.status-1:hover {
-  background-color: #737897;
-}
-
-.dropdown-menu.status li a.status-2:hover {
-  background-color: #EB9A13;
-}
-
-.dropdown-menu.status li a.status-3:hover {
-  background-color: #E7632A;
-}
-
-.dropdown-menu.status li a.status-4:hover {
-  background-color: #BB252F;
-}
-
-.dropdown-menu.status li a.status-5:hover {
-  background-color: #4CAA54;
-}
-
-.dropdown-menu.status li a.status-6:hover {
-  background-color: #50215A;
-}
-
-.dropdown-menu.status li a.status-7:hover {
-  background-color: #2C5F35;
+.dropdown-menu.status li a:hover {
+  background-color: #2a6496;
+  color           : #fff;
 }
 
 /* Checkbox */

@@ -37,26 +37,25 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			if(this.view.canSync()){
 				this.$('#sync i').removeClass('fa-undo').addClass('fa-spinner fa-spin');
 			} else {
-				this.flash = {
+				this.showMessage({
 					title  : 'Atención',
 					message: 'Esta ventana no se puede sincronizar',
 					class  : 'warning',
-					method : 'html' 
-				};
-				this.displayFlash();
+				});
 			}
 		}
 	},
 
-	stopSpin: function(){
+	stopSpin: function(message){
+		message = (message) ? message : {
+			title  : 'Datos Actualizados',
+			message: 'Los datos se han actualizado correctamente',
+			class  : 'success',
+		};
 		if (this.$('#sync i').hasClass('fa-spinner')) {
 			this.$('#sync i').removeClass('fa-spinner fa-spin').addClass('fa-undo');
-			this.showMessage({
-				title  : 'Datos Actualizados',
-				message: 'Los datos se han actualizado correctamente',
-				class  : 'success',
-			});
 		}
+		this.showMessage(message);
 	},
 
 	displayFlash: function(){

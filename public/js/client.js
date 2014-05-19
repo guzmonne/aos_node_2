@@ -703,12 +703,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	canSync: function(){
-		if (App.defined(this.onSync)){
-			this.onSync();
-			return true;
-		} else {
-			return false;
-		}
+		if (App.defined(this.onSync)){ this.onSync(); return true; } else { return false; }
 	},
 
 	// !!!
@@ -719,8 +714,8 @@ App.Views.BaseView = Giraffe.View.extend({
 	// This function should be called after the onSync() method ends to stop the portlet spinner
 	// ------------
 	// !!!
-	afterSync: function(){
-		this.invoke("stopSpin");
+	afterSync: function(message){
+		this.invoke("stopSpin", message);
 	},
 
 	// !!!
@@ -973,7 +968,27 @@ App.Views.BaseView = Giraffe.View.extend({
       //error('No such method name in view hierarchy', methodName, args, this);
       return false;
     }
-  }
+  },
+
+	sync: function(type, options){
+		if (!type){return;}
+		var success, self = this;
+		options        = (options) ? options : {};
+		success        = options.success;
+		options.remove = (options.remove)    ? options.remove    : true;
+		options.add    = (options.add)       ? options.add       : true;
+		options.merge  = (options.merge)     ? options.merge     : true;
+		options.success = function(){
+			if (success) {success.apply(this, arguments);}
+			self.afterSync();
+		};
+		if (type === "model" && this.model){
+			this.model.fetch(options);
+		}
+		if (type === "collection" && this.collection){
+			this.collection.fetch(options);
+		}
+  },
 });
 App.Views.CarouselView = App.Views.BaseView.extend({
 	template: HBS.carousel_template,
@@ -1275,6 +1290,7 @@ App.Views.RowView = App.Views.BaseView.extend({
 	},
 	
 	initialize: function(){
+		this.awake.apply(this, arguments);
 		this.listenTo(this.model, 'change' , this.render);
 		this.listenTo(this.model, 'remove', this.invokeRemoveRow);
 		this.listenTo(app, 'model:show:active',   this.activate);
@@ -1322,12 +1338,11 @@ App.Views.RowView = App.Views.BaseView.extend({
 	},
 });
 App.Views.ShowView = App.Views.BaseView.extend({
-	sync  : true,
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		this.listenTo(app, 'row:rendered', this.checkEventCaller);
-		this.listenTo(this, 'disposing', this.modelShowInactive);
+		this.listenTo(app , 'row:rendered', this.checkEventCaller);
+		this.listenTo(this, 'disposing'   , this.modelShowInactive);
 		this.modelShowActive();
 	},
 
@@ -1514,7 +1529,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	tableFetched: function(){
-		this.afterSync();
 		if(this.rendered === true && this.synced === false){ this.appendCollection(); }
 		this.synced = true;
 	},	
@@ -1528,7 +1542,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	onSync: function(){
-		this.collection.fetch(this.fetchOptions);
+		this.sync("collection", this.fetchOptions);
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -1685,6 +1699,10 @@ App.Views.Renderer = App.Views.BaseView.extend({
 App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
+
+	awake: function(){
+		this.listenTo(this.model.model_id, 'change' , this.render);
+	},
 
 	serialize: function(){
 		var object = {};
@@ -1893,7 +1911,6 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 	template : HBS.appliance_show_template,
 	className: 'row',
 	modelName: 'appliance',
-	sync     : false,
 
 	name: function(){
 		return 'Equipo: #' + this.model.get('id');
@@ -1926,6 +1943,11 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 		var result = this.model.toJSON();
 		result.cid = this.cid;
 		return result;
+	},
+
+	onSync: function(){
+		this.sync("model");
+		if (this.model.model_id){this.model.model_id.fetch({merge: true});}
 	},
 });
 App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
@@ -2546,26 +2568,25 @@ App.Views.PortletView = App.Views.BaseView.extend({
 			if(this.view.canSync()){
 				this.$('#sync i').removeClass('fa-undo').addClass('fa-spinner fa-spin');
 			} else {
-				this.flash = {
+				this.showMessage({
 					title  : 'Atención',
 					message: 'Esta ventana no se puede sincronizar',
 					class  : 'warning',
-					method : 'html' 
-				};
-				this.displayFlash();
+				});
 			}
 		}
 	},
 
-	stopSpin: function(){
+	stopSpin: function(message){
+		message = (message) ? message : {
+			title  : 'Datos Actualizados',
+			message: 'Los datos se han actualizado correctamente',
+			class  : 'success',
+		};
 		if (this.$('#sync i').hasClass('fa-spinner')) {
 			this.$('#sync i').removeClass('fa-spinner fa-spin').addClass('fa-undo');
-			this.showMessage({
-				title  : 'Datos Actualizados',
-				message: 'Los datos se han actualizado correctamente',
-				class  : 'success',
-			});
 		}
+		this.showMessage(message);
 	},
 
 	displayFlash: function(){
@@ -3275,6 +3296,10 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 				})
 			});
 		}
+	},
+
+	onSync: function(){
+		this.sync("model");
 	},
 });
 App.Views.UserRowView = App.Views.RowView.extend({

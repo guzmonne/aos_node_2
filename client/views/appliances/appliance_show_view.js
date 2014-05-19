@@ -2,7 +2,6 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 	template : HBS.appliance_show_template,
 	className: 'row',
 	modelName: 'appliance',
-	sync     : false,
 
 	name: function(){
 		return 'Equipo: #' + this.model.get('id');
@@ -35,5 +34,10 @@ App.Views.ApplianceShowView = App.Views.ShowView.extend({
 		var result = this.model.toJSON();
 		result.cid = this.cid;
 		return result;
+	},
+
+	onSync: function(){
+		this.sync("model");
+		if (this.model.model_id){this.model.model_id.fetch({merge: true});}
 	},
 });

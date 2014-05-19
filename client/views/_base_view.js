@@ -12,12 +12,7 @@ App.Views.BaseView = Giraffe.View.extend({
 	// ------------
 	// !!!
 	canSync: function(){
-		if (App.defined(this.onSync)){
-			this.onSync();
-			return true;
-		} else {
-			return false;
-		}
+		if (App.defined(this.onSync)){ this.onSync(); return true; } else { return false; }
 	},
 
 	// !!!
@@ -28,8 +23,8 @@ App.Views.BaseView = Giraffe.View.extend({
 	// This function should be called after the onSync() method ends to stop the portlet spinner
 	// ------------
 	// !!!
-	afterSync: function(){
-		this.invoke("stopSpin");
+	afterSync: function(message){
+		this.invoke("stopSpin", message);
 	},
 
 	// !!!
@@ -282,5 +277,25 @@ App.Views.BaseView = Giraffe.View.extend({
       //error('No such method name in view hierarchy', methodName, args, this);
       return false;
     }
-  }
+  },
+
+	sync: function(type, options){
+		if (!type){return;}
+		var success, self = this;
+		options        = (options) ? options : {};
+		success        = options.success;
+		options.remove = (options.remove)    ? options.remove    : true;
+		options.add    = (options.add)       ? options.add       : true;
+		options.merge  = (options.merge)     ? options.merge     : true;
+		options.success = function(){
+			if (success) {success.apply(this, arguments);}
+			self.afterSync();
+		};
+		if (type === "model" && this.model){
+			this.model.fetch(options);
+		}
+		if (type === "collection" && this.collection){
+			this.collection.fetch(options);
+		}
+  },
 });
