@@ -13,6 +13,16 @@ window.App = {
 
 	vent: _.extend({}, Backbone.Events),
 
+	statusValue: {
+		"Recibido"     : 1,
+		"En Reparación": 2,
+		"En Espera"    : 3,
+		"Atrasado"     : 4,
+		"Reparado"     : 5,
+		"Entregado"    : 7,
+		"Enviado"      : 6
+	},
+
 	defined: function(object){
 		if (typeof object !== "undefined" && object !== null) {
 			return true;
@@ -1697,6 +1707,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	editMode: false, 
 
 	events: {
+		'click ul.dropdown-menu.status li a'   : "setStatus",
 		'click #edit-appliance'                : "editAppliance",
 		'click #save-appliance'                : "saveAppliance",
 		'click #render-appliance'              : "reRender",
@@ -1712,7 +1723,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.$el.on('click', 'button#select-model', this.selectModel);
 		this.listenTo(this      , 'disposing'              , this.selectModelOff);
 		this.listenTo(this.model, 'change:id'              , function(){this.updateViewField.apply(this, ['id']);});
-		this.listenTo(this.model, 'change:status'          , function(){this.updateViewField.apply(this, ['status']);});
 		this.listenTo(this.model, 'change:serial'          , function(){this.updateViewField.apply(this, ['serial']);});
 		this.listenTo(this.model, 'change:observations'    , function(){this.updateViewField.apply(this, ['observations']);});
 		this.listenTo(this.model, 'change:cost'            , function(){this.updateViewField.apply(this, ['cost']);});
@@ -1727,6 +1737,7 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:technician_id'   , this.setTechnician);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
+		this.listenTo(this.model, 'change:status'          , this.changeStatus);
 		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
 		this.listenTo(app.storage.collection("techs"), 'remove', this.fillTechnicianField);
 	},
@@ -1740,10 +1751,12 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			this.toggleButtons();
 		}
 		this.setRepairementType();
+		this.changeStatus();
 	},
 
 	toggleButtons: function(){
-		this.$('button').toggleClass('hide');
+		this.$('#controls > button').toggleClass('hide');
+		this.$('button#status-dropdown').attr('disabled', !this.$('button#status-dropdown').attr('disabled'));
 	},
 
 	fillTechnicianField: function(){
@@ -1782,6 +1795,19 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			this.$('[name=technician_link]').attr('href', '#render/user/show/' + id);
 			this.$('[name=technician_link]').attr('disabled', false);
 		}
+	},
+
+	changeStatus: function(){
+		var status = this.model.get('status');
+		var value  = App.statusValue[status];
+		var classes = "btn btn-block dropdown-toggle btn-status btn-status-" + value;
+		this.$('button#status-dropdown').removeClass().addClass(classes).text(status);
+	},
+
+	setStatus: function(e){
+		if (e) {e.preventDefault();}
+		var status = this.$(e.target).closest('a').text();
+		this.model.set("status", status);
 	},
 
 	editAppliance: function(e){
@@ -1826,7 +1852,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			'repairement_type', 
 			'defect',
 			'accessories',
-			'status',
 			'replacements',
 			'diagnose',
 			'solution',

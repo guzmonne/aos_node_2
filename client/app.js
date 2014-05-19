@@ -13,6 +13,16 @@ window.App = {
 
 	vent: _.extend({}, Backbone.Events),
 
+	statusValue: {
+		"Recibido"     : 1,
+		"En Reparación": 2,
+		"En Espera"    : 3,
+		"Atrasado"     : 4,
+		"Reparado"     : 5,
+		"Entregado"    : 7,
+		"Enviado"      : 6
+	},
+
 	defined: function(object){
 		if (typeof object !== "undefined" && object !== null) {
 			return true;

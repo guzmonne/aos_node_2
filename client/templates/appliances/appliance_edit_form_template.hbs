@@ -15,13 +15,22 @@
 		<div class="col-md-6">
 			<div class="form-group {{statusClass status 'appliance'}}">
 				<label for="status" class="col-sm-2 col-md-4 control-label">Estado</label>
+				<input type="text" name="status" value="{{status}}" class="hide">
 				<div class="col-sm-10 col-md-8">
-				  <select disabled type="text" class="form-control" name="status" value="{{status}}">
-				  	<option value="Pendiente" {{selected? "Pendiente" status}}>Pendiente</option>
-				  	<option value="Abierto"   {{selected? "Abierto"   status}}>Abierto</option>
-				  	<option value="Atrasado"  {{selected? "Atrasado"  status}}>Atrasado</option>
-				  	<option value="Cerrado"   {{selected? "Cerrado"   status}}>Cerrado</option>
-				  </select>
+					<div class="btn-group" style="display: flex">
+					  <button class="btn btn-block dropdown-toggle" type="button" data-toggle="dropdown" id="status-dropdown" >
+					    <span id="status-text">{{status}}</span> <span class="caret"></span>
+					  </button>
+					  <ul class="dropdown-menu status" style="width: 100%">
+					    <li><a href="#" class="status-2" data-class="2">En Reparación</a></li>
+					    <li><a href="#" class="status-3" data-class="3">En Espera</a></li>
+					    <li><a href="#" class="status-4" data-class="4">Atrasado</a></li>
+					    <li><a href="#" class="status-5" data-class="5">Reparado</a></li>
+					    <li><a href="#" class="status-7" data-class="7">Entregado</a></li>
+					    <li><a href="#" class="status-6" data-class="6">Enviado</a></li>
+					    <li><a href="#" class="status-1" data-class="1">Recibido</a></li>
+					  </ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -142,7 +151,7 @@
 				<label for="repairement_type" class="col-sm-2 col-md-4 control-label">Reparación</label>
 				<div class="col-sm-10 col-md-8">
 					<select class="form-control" name="repairement_type" value={{repairment_type}}>
-						<option value="Garantía"    {{selected? "Garantía" repairement_type}}>Garantía</option>
+						<option value="Garantía"{{selected? "Garantía" repairement_type}}>Garantía</option>
 						<option value="Presupuesto" {{selected? "Presupuesto" repairement_type}}>Presupuesto</option>
 					</select>	
 				</div>
@@ -152,10 +161,10 @@
 			<div class="form-group has-feedback" id="cost-form-group">
 				<label for="cost" class="col-sm-2 col-md-4 control-label">Presupuesto</label>
 				<div class="col-sm-10 col-md-8">
-				  <div class="input-group">
-					  <span class="input-group-addon">$</span>
-				  	<input type="number" min="0" step="1" class="form-control text-right" name="cost" placeholder="ej. 100.00" value="{{cost}}">
-					  <span class="input-group-addon">.00</span>
+				<div class="input-group">
+					<span class="input-group-addon">$</span>
+					<input type="number" min="0" step="1" class="form-control text-right" name="cost" placeholder="ej. 100.00" value="{{cost}}">
+					<span class="input-group-addon">.00</span>
 					</div>
 				</div>
 			</div>
@@ -234,19 +243,19 @@
 	{{! CONTROLES }}
 	{{! ========= }}
 	<div class="row" style="border-radius: 0; margin-bottom: 0">
-    <div class="col-xs-12">
-      <button id="edit-appliance" class="btn btn-primary hide">
-      	<i class="fa fa-pencil"></i>
-      	 Editar
-      </button>
-      <button id="save-appliance" class="btn btn-warning">
-      	<i class="fa fa-save"></i>
-      	 Guardar Cambios
-      </button>
-      <button id="render-appliance" class="btn btn-inverse pull-right">
-      	<i class="fa fa-reply"></i>
-      	 Reestablecer
-      </button>
-    </div>
+<div class="col-xs-12" id="controls">
+<button id="edit-appliance" class="btn btn-primary hide">
+	<i class="fa fa-pencil"></i>
+	 Editar
+</button>
+<button id="save-appliance" class="btn btn-warning">
+	<i class="fa fa-save"></i>
+	 Guardar Cambios
+</button>
+<button id="render-appliance" class="btn btn-inverse pull-right">
+	<i class="fa fa-reply"></i>
+	 Reestablecer
+</button>
+</div>
 	</div>
 </form>
