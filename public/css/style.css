@@ -219,6 +219,16 @@ body {
     color: #fff;
 }
 
+.btn-default-shadow {
+  color: #333;
+  background-color: #fff;
+  border-color: #ccc;
+  background: -webkit-linear-gradient(top, #fff, #dfdfdf);  
+  background: -moz-linear-gradient(top, #fff, #dfdfdf);  
+  background: -ms-linear-gradient(top, #fff, #dfdfdf);
+  background: -o-linear-gradient(top, #fff, #dfdfdf);  
+}
+
 /* Pages */
 
 /* ------------------------------- */
@@ -862,6 +872,10 @@ input[type="checkbox"]:checked:hover:before {
 
 .btn-status {
   color: #fff;
+}
+
+.btn-status:disabled {
+  opacity: 0.9;
 }
 
 .btn-status:focus {

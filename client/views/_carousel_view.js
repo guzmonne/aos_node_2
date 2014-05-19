@@ -8,12 +8,14 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 		$rangeOutput: "output",
 		$next       : "#next-model",
 		$prev       : "#prev-model",
+		$title      : "#carousel-title",
 	},
 
 	events: {
 		'change $range' : 'moveCarouselTo',
 		'click  $next'  : 'updateRange',
 		'click  $prev'  : 'updateRange',
+		'click  $title' : 'scrollToSlides',
 	},
 
 	initialize: function(){
@@ -28,6 +30,11 @@ App.Views.CarouselView = App.Views.BaseView.extend({
 	slideTo: function(index){
 		//this.$range.val(index);
 		this.moveCarouselTo(index);
+	},
+
+	scrollToSlides: function(e){
+		e.preventDefault();
+		App.scrollTo(this.$title);
 	},
 
 	createCarousel: function(){

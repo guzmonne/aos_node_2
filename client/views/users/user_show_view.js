@@ -4,8 +4,8 @@ App.Views.UserShowView = App.Views.TabView.extend({
 	ui: {
 		$formView : "#form-view",
 		$tableView: "#table-view",
-		$carousel : "#tech-appliances-carousel",
-		$table    : "#tech-appliances-table",
+		$carousel : "#appliances-carousel",
+		$table    : "#appliances-table",
 	},
 
 	events: {
@@ -90,8 +90,10 @@ App.Views.UserShowView = App.Views.TabView.extend({
 	changeView: function(e){
 		if (e) {e.preventDefault();}
 		this.$('[data-view=control]'  ).toggleClass('active');
-		this.$('#tech-appliances-table').toggleClass('hide');
-		this.$('#tech-appliances-carousel').toggleClass('hide');
+		this.$('[data-view=control]'  ).toggleClass('btn-default-shadow');
+		this.$('[data-view=control]'  ).toggleClass('btn-info');
+		this.$('#appliances-table'   ).toggleClass('hide');
+		this.$('#appliances-carousel').toggleClass('hide');
 		this.renderAppliancesCarousel();
 	},
 
@@ -115,7 +117,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 		var self = this;
 		var el   = this.$('#user-appliances-'+ this.timestamp);
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			id: "tech-appliances-table",
+			id: "appliances-table",
 			synced: true,
 			collection   : app.storage.getSubCollection("appliances", {
 				technician_id: this.model.id
@@ -131,7 +133,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 	renderAppliancesCarousel: function(){
 		if (!this.model) {return;}
 		if (this.appliancesCarousel){return;}
-		var el   = this.$('#tech-appliances-carousel');
+		var el   = this.$('#appliances-carousel');
 		this.appliancesCarousel = new App.Views.ApplianceCarouselView({
 			synced    : true,
 			collection: app.storage.getSubCollection('appliances', {

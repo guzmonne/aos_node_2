@@ -29,12 +29,16 @@
     <div class="col-sm-12" style="margin-bottom: 10px">
         <h3>
           Equipos 
-          <button id="form-view" class="btn btn-info pull-right" data-view="control" data-toggle="tooltip" data-placement="top" title="Vista Formulario">
-            <i class="fa fa-list fa-fw"></i>
-          </button>
-          <button id="table-view" class="btn btn-info pull-right active" data-view="control" style="margin-right: 10px" data-toggle="tooltip" data-placement="top" title="Vista Tabla">
-            <i class="fa fa-table fa-fw"></i>
-          </button>
+          <div class="pull-right">
+            <div class="btn-group btn-toggle"> 
+              <button id="form-view" class="btn btn-info active" data-view="control" data-toggle="tooltip" data-placement="top" title="Vista Formulario">
+                <i class="fa fa-table fa-fw"></i>
+              </button>
+              <button id="table-view" class="btn btn-default-shadow" data-view="control" data-toggle="tooltip" data-placement="top" title="Vista Tabla">
+                <i class="fa fa-list fa-fw"></i>
+              </button>
+            </div>
+          </div>
         </h3>
     </div>
   </div>

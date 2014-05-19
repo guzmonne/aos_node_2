@@ -38,6 +38,8 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 	changeView: function(e){
 		if (e) {e.preventDefault();}
 		this.$('[data-view=control]'  ).toggleClass('active');
+		this.$('[data-view=control]'  ).toggleClass('btn-default-shadow');
+		this.$('[data-view=control]'  ).toggleClass('btn-info');
 		this.$('[data-view=container]').toggleClass('hide');
 		this.renderAppliancesCarousel();
 	},
