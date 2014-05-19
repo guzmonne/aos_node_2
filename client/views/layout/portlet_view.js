@@ -101,19 +101,16 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	showMessage: function(data){
-		var options = {};
-		var method  = 'prepend';
-		if(App.defined(data.lifetime)){
-			options.lifetime = data.lifetime;
-			delete data.lifetime;
-		}
-		if(data.method){
-			method = data.method;
-			delete data.method;
-		}
-		options.model = new Backbone.Model(data);
-		var callout   = new App.Views.BSCalloutView(options);
-		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
+		var className = (data.class)   ? data.class   : 'success';
+		var title     = (data.title)   ? data.title   : 'Exito';
+		var message   = (data.message) ? data.message : '...'; 
+		$.notify( {
+			title  : title,
+			message: message
+		}, {
+			style    : 'bs-callout',
+			className: className,
+		} );
 	},
 
 	serialize: function(){

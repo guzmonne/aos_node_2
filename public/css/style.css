@@ -1093,73 +1093,71 @@ th, td {
 }
 
 /* BS-CALLOUT */
-.bs-callout {
+.notifyjs-bs-callout-base {
   margin: 20px;
   padding: 20px;
   border-left: 3px solid #ddd;
   background-color: #eee;
-  position: absolute;
-  z-index: 9999;
 }
 
-.bs-callout:hover {
+.notifyjs-bs-callout-base:hover {
   background-color: #D4D4D4;
   border-color: #636363;
 }
 
-.bs-callout h4 {
+.notifyjs-bs-callout-base h4 {
   margin-top: 0;
   margin-bottom: 5px;
 }
 
-.bs-callout p:last-child {
+.notifyjs-bs-callout-base p:last-child {
   margin-bottom: 0; 
 }
 
-.bs-callout code {
+.notifyjs-bs-callout-base code {
   background-color: #fff;
   border-radius: 3px;
 }
 
-.bs-callout-danger:hover {
+.notifyjs-bs-callout-danger:hover {
   background-color: #FBE8E8;
   border-color: #CC3B36;
 }
 
-.bs-callout-danger {
+.notifyjs-bs-callout-danger {
   background-color: #fdf7f7;
   border-color: #d9534f;
 }
 
-.bs-callout-danger h4 {
+.notifyjs-bs-callout-danger h4 {
   color: #d9534f;
 }
 
-.bs-callout-success {
+.notifyjs-bs-callout-success {
   background-color: #E5FFE5;
   border-color: #5BB75B;
 }
 
-.bs-callout-success:hover {
+.notifyjs-bs-callout-success:hover {
   background-color: #E5FFE5;
   border-color: #47CC47;
 }
 
-.bs-callout-success h4 {
+.notifyjs-bs-callout-success h4 {
   color: #317931;
 }
 
-.bs-callout-warning {
+.notifyjs-bs-callout-warning {
   background-color: #fcf8f2;
   border-color: #F1A334;
 }
 
-.bs-callout-warning:hover {
+.notifyjs-bs-callout-warning:hover {
   background-color: #F7EEDF;
   border-color: #f0ad4e;
 }
 
-.bs-callout-warning h4 {
+.notifyjs-bs-callout-warning h4 {
   color: #f0ad4e;
 }
 

@@ -11,10 +11,10 @@ var app = new App.GiraffeApp();
 // Configure Ajax to use CSRF
 app.addInitializer(function(){
 	$.ajaxSetup({
-    headers: {
-      'X-CSRF-Token': csrf
-    }
-  });
+		headers: {
+			'X-CSRF-Token': csrf
+		}
+	});
 });
 
 // Build Nav
@@ -41,7 +41,28 @@ app.addInitializer(function(options){
 	app.GoToTopView.attachTo('#scroller-el');
 });
 
-// Add an easy access for the storage on the app object
+// Setup Notify.js
+app.addInitializer(function(options){
+	$.notify.defaults({
+		globalPosition: 'top right',
+		showAnimation: 'fadeIn',
+		hideAnimation: 'fadeOut',
+		autoHideDelay: 1500,
+		showDuration: 200,
+	});
+	$.notify.addStyle('bs-callout', {
+	html: 
+		"<div>" +
+			"<div class='clearfix'>" +
+				"<h4 class='title' data-notify-text='title'></h4>" +
+				"<p class='message' data-notify-text='message'></p>" +
+			"</div>" +
+		"</div>"
+	});
+});
+
+// Add an easy access for the storage on the app object and populate some
+// basic collections.
 app.addInitializer(function(){
 	app.storage = App.Storage.getInstance();
 	app.storage.collection("models").add(models);

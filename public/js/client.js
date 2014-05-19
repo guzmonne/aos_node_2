@@ -2610,19 +2610,16 @@ App.Views.PortletView = App.Views.BaseView.extend({
 	},
 
 	showMessage: function(data){
-		var options = {};
-		var method  = 'prepend';
-		if(App.defined(data.lifetime)){
-			options.lifetime = data.lifetime;
-			delete data.lifetime;
-		}
-		if(data.method){
-			method = data.method;
-			delete data.method;
-		}
-		options.model = new Backbone.Model(data);
-		var callout   = new App.Views.BSCalloutView(options);
-		this.attach(callout, {el: this.$('#portlet-messages'), method: method});
+		var className = (data.class)   ? data.class   : 'success';
+		var title     = (data.title)   ? data.title   : 'Exito';
+		var message   = (data.message) ? data.message : '...'; 
+		$.notify( {
+			title  : title,
+			message: message
+		}, {
+			style    : 'bs-callout',
+			className: className,
+		} );
 	},
 
 	serialize: function(){
@@ -3550,10 +3547,10 @@ var app = new App.GiraffeApp();
 // Configure Ajax to use CSRF
 app.addInitializer(function(){
 	$.ajaxSetup({
-    headers: {
-      'X-CSRF-Token': csrf
-    }
-  });
+		headers: {
+			'X-CSRF-Token': csrf
+		}
+	});
 });
 
 // Build Nav
@@ -3580,7 +3577,28 @@ app.addInitializer(function(options){
 	app.GoToTopView.attachTo('#scroller-el');
 });
 
-// Add an easy access for the storage on the app object
+// Setup Notify.js
+app.addInitializer(function(options){
+	$.notify.defaults({
+		globalPosition: 'top right',
+		showAnimation: 'fadeIn',
+		hideAnimation: 'fadeOut',
+		autoHideDelay: 1500,
+		showDuration: 200,
+	});
+	$.notify.addStyle('bs-callout', {
+	html: 
+		"<div>" +
+			"<div class='clearfix'>" +
+				"<h4 class='title' data-notify-text='title'></h4>" +
+				"<p class='message' data-notify-text='message'></p>" +
+			"</div>" +
+		"</div>"
+	});
+});
+
+// Add an easy access for the storage on the app object and populate some
+// basic collections.
 app.addInitializer(function(){
 	app.storage = App.Storage.getInstance();
 	app.storage.collection("models").add(models);
