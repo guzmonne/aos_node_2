@@ -2500,6 +2500,14 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		'click #collapse': 'collapseView',
 	},
 
+	initialize: function(){
+		var self = this;
+		this.$el.on('resize', function(e){
+			console.log('resize', self.$el.height());
+			App.scrollTo(self.el);
+		});
+	},
+
 	afterRender: function(options){
 		this.setFrame();
 		this.setMainChildView();
