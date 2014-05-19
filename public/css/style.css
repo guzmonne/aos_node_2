@@ -366,12 +366,12 @@ h1, h2, h3, h4, h5, h5 {
 }
 
 .navbar-static-side a,
-.navbar-static-top a{
+.navbar-fixed-top a{
   color: #fff;
 }
 
 .navbar-static-side a.active,
-.navbar-static-top a.active {
+.navbar-fixed-top a.active {
   background-color: #2c3e50;
 }
 
@@ -412,15 +412,15 @@ body {
 /* ************ */
 /* Navbar Links */
 /* ************ */
-nav.navbar-static-top a:hover {
+nav.navbar-fixed-top a:hover {
   color: #fff !important;
   background: #34495e !important
 }
 
-nav.navbar-static-top a.messages-link {
+nav.navbar-fixed-top a.messages-link {
   background: #16a085 !important
 }
-nav.navbar-static-top a.messages-link:hover {
+nav.navbar-fixed-top a.messages-link:hover {
   color: #16a085 !important;
   background: #22685A !important
 }
@@ -429,10 +429,10 @@ nav .open>a.messages-link:hover {
   color: #16a085 !important;
   background: #22685A !important
 }
-nav.navbar-static-top a.tasks-link {
+nav.navbar-fixed-top a.tasks-link {
   background: #f39c12 !important
 }
-nav.navbar-static-top a.tasks-link:hover {
+nav.navbar-fixed-top a.tasks-link:hover {
   color: #f39c12 !important;
   background: #986008 !important
 }
@@ -441,10 +441,10 @@ nav .open>a.tasks-link:hover {
   color: #f39c12 !important;
   background: #986008 !important
 }
-nav.navbar-static-top a.alerts-link {
+nav.navbar-fixed-top a.alerts-link {
   background: #2980b9 !important
 }
-nav.navbar-static-top a.alerts-link:hover {
+nav.navbar-fixed-top a.alerts-link:hover {
   color: #2980b9 !important;
   background: #255575 !important
 }

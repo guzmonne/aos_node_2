@@ -31,16 +31,12 @@ window.App = {
 
 	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
 
-	scrollTo: function(position){
-		var pos;
+	scrollTo: function(position, offset){
+		position = (_.isNumber(position)) ? position : this.elPosition(position);
+		offset   = (_.isNumber(offset))   ? offset   : 0;
 		var $viewport = $('html, body');
-		if (_.isNumber(position)){
-			pos = position;
-		} else {
-			pos = this.elPosition(position);
-		}
 		$viewport.animate({
-			scrollTop: pos
+			scrollTop: position - 60 - offset
 		}, 500);
 		$viewport.bind("scroll mousedown DOMMouseScroll mousewheel keyup", function(e){
 			if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){

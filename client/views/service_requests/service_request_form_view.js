@@ -92,7 +92,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		}));
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
 		if(index === (appliances.length - 1)){
-			App.scrollTo(view.$el);
+			App.scrollTo(view.$el, 50);
 		}
 	},
 

@@ -31,16 +31,12 @@ window.App = {
 
 	animationEnd: 'animationend webkitAnimationEnd MSAnimationEnd oAnimationEnd',
 
-	scrollTo: function(position){
-		var pos;
+	scrollTo: function(position, offset){
+		position = (_.isNumber(position)) ? position : this.elPosition(position);
+		offset   = (_.isNumber(offset))   ? offset   : 0;
 		var $viewport = $('html, body');
-		if (_.isNumber(position)){
-			pos = position;
-		} else {
-			pos = this.elPosition(position);
-		}
 		$viewport.animate({
-			scrollTop: pos
+			scrollTop: position - 60 - offset
 		}, 500);
 		$viewport.bind("scroll mousedown DOMMouseScroll mousewheel keyup", function(e){
 			if ( e.which > 0 || e.type === "mousedown" || e.type === "mousewheel"){
@@ -2443,7 +2439,7 @@ App.Views.NavView = Giraffe.View.extend({
 	tagName: 'nav',
 	attributes: function(){
 		return {
-			'class': "navbar navbar-inverse navbar-static-top",
+			'class': "navbar navbar-inverse navbar-fixed-top",
 			'role': "navigation", 
 			'style': "margin-bottom: 0" 
 		};
@@ -2498,14 +2494,6 @@ App.Views.PortletView = App.Views.BaseView.extend({
 		'click #close'   : 'closeView',
 		'click #sync'    : 'syncView',
 		'click #collapse': 'collapseView',
-	},
-
-	initialize: function(){
-		var self = this;
-		this.$el.on('resize', function(e){
-			console.log('resize', self.$el.height());
-			App.scrollTo(self.el);
-		});
 	},
 
 	afterRender: function(options){
@@ -3050,7 +3038,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		}));
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
 		if(index === (appliances.length - 1)){
-			App.scrollTo(view.$el);
+			App.scrollTo(view.$el, 50);
 		}
 	},
 

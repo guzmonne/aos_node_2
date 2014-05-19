@@ -3,7 +3,7 @@ App.Views.NavView = Giraffe.View.extend({
 	tagName: 'nav',
 	attributes: function(){
 		return {
-			'class': "navbar navbar-inverse navbar-static-top",
+			'class': "navbar navbar-inverse navbar-fixed-top",
 			'role': "navigation", 
 			'style': "margin-bottom: 0" 
 		};
