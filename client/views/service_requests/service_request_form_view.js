@@ -69,6 +69,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	appendMultipleAppliancesForm: function(){
+		this.model.appliances.client_id = this.model.get('client_id');
 		this.multipleAppliancesForm = new App.Views.ApplianceMultipleFormView({
 			collection: this.model.appliances,
 		});

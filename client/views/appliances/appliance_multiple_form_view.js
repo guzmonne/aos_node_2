@@ -111,7 +111,7 @@ App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
 			if(!options.model_id || options.model_id === ''){return;}
 			for(var i = 0; i < quantity; i++){
 				if (self.details[rowId] && self.details[rowId][i+1]){
-					_.extend(options, self.details[rowId][i+1]);
+					_.extend(options, self.details[rowId][i+1], {client_id: self.collection.client_id});
 				}
 				var model = new App.Models.Appliance(options);
 				self.collection.add(model);

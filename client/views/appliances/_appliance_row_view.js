@@ -14,6 +14,9 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
+			if (!object.client_name && object.client_id){
+				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
+			}
 		}
 		return object;
 	},

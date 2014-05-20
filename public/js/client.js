@@ -1480,6 +1480,10 @@ App.Views.TableView = App.Views.BaseView.extend({
 	rowViewOptions: {},
 	fetchOptions	: {},
 
+	events: {
+		'click ul.pagination li': 'scrollToTable',
+	},
+
 	constructor: function(options){
 		this.rendered = false;
 		this.synced   = (options.synced) ? options.synced : false;
@@ -1490,8 +1494,10 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var self = this;
 		this.awake.apply(this, arguments);
 		this.listenTo(this.collection, 'sync', this.tableFetched);
+		this.listenTo(this, 'disposing', function(){
+			this.$('click ul.pagination li').off('click');
+		});
 		_.bind(this.append, this);
-		_.once(this.activateTable);
 		this.timestamp = _.uniqueId();
 	},
 
@@ -1510,6 +1516,17 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rendered = true;
 	},
 
+	scrollToTable: function(){
+		console.log('scrollToTable');
+		App.scrollTo(this.$('table'));
+	},
+
+	setScrollEvent: function(){
+		var self = this;
+		this.$('click ul.pagination li a').off('click');
+		this.$('click ul.pagination li a').on('click', function(){self.scrollToTable();});
+	},
+
 	appendCollection: function(collection){
 		var self   = this;
 		this.$('tbody').remove();
@@ -1525,6 +1542,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
 		this.stopListening(this.collection, 'add', this.append);
 		this.listenTo(this.collection, 'add', this.append);
+		this.setScrollEvent();
 	},
 
 	tableFetched: function(){
@@ -1538,6 +1556,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var view = new this.modelView(this.rowViewOptions);
 		this.addChild(view);
 		this.oTable.fnAddTr(view.render().el);
+		this.setScrollEvent();
 	},
 
 	onSync: function(){
@@ -1711,6 +1730,10 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
+			console.log(object.client_id);
+			if (!object.client_name && object.client_id){
+				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
+			}
 		}
 		return object;
 	},
@@ -2081,7 +2104,7 @@ App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
 			if(!options.model_id || options.model_id === ''){return;}
 			for(var i = 0; i < quantity; i++){
 				if (self.details[rowId] && self.details[rowId][i+1]){
-					_.extend(options, self.details[rowId][i+1]);
+					_.extend(options, self.details[rowId][i+1], {client_id: self.collection.client_id});
 				}
 				var model = new App.Models.Appliance(options);
 				self.collection.add(model);
@@ -3248,6 +3271,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	appendMultipleAppliancesForm: function(){
+		this.model.appliances.client_id = this.model.get('client_id');
 		this.multipleAppliancesForm = new App.Views.ApplianceMultipleFormView({
 			collection: this.model.appliances,
 		});
