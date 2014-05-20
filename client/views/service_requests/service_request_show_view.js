@@ -43,6 +43,7 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 		if (index === -1) { return; }
 		this.$('#service_request-tabs li:eq(1) a').tab('show');
 		this.appliancesCarousel.slideTo(index + 1);
+		App.scrollTo(this.$('.tab-content'), 30);
 	},
 
 	getApplianceIndex: function(id){

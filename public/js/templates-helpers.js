@@ -121,46 +121,31 @@
         }
     });
 
-    Handlebars.registerHelper('statusClass', function(status, model){
+    Handlebars.registerHelper('statusClass', function(status){
         var className;
-        model = (model) ? model : "serviceRequest";
-        if (model !== "appliance"){
-            switch (status){
-                case "Pendiente":
-                    className = "label-primary";
+        switch (status){
+                case "Recibido":
+                    className = "btn-status-1";
                     break;
-                case "Abierto":
-                    className = "label-info";
+                case "En Reparación":
+                    className = "btn-status-2";
                     break;
-                case "Atrasaodo":
-                    className = "label-danger";
-                    break;
-                case "Cerrado":
-                    className = "label-success";
-                    break;
-                default:
-                    className = "label-default";
-                    break;
-            }
-        } else {
-            switch (status){
-                case "Pendiente":
-                    className = "status-pending";
+                case "En Espera":
+                    className = "btn-status-3";
                     break;
                 case "Atrasado":
-                    className = "status-late";
+                    className = "btn-status-4";
                     break;
-                case "Abierto":
-                    className = "status-opened";
+                case "Reparado":
+                    className = "btn-status-5";
                     break;
-                case "Cerrado":
-                    className = "status-closed";
+                case "Entregado":
+                    className = "btn-status-7";
                     break;
-                default:
-                    className = "status-pending";
+                case "Enviado":
+                    className = "btn-status-6";
                     break;
             }
-        }
         return className;
     });
 

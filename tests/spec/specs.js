@@ -910,7 +910,7 @@ describe("App.Views.TableView", function(){
 describe("App.Views.ApplianceEditFormView", function(){
 	beforeEach(function(){
 		this.view = new App.Views.ApplianceEditFormView({
-			model = new App.Models.Appliance({
+			model : new App.Models.Appliance({
 				model_id: 1,
 				client_id: 1,
 				service_request_id: 1, 

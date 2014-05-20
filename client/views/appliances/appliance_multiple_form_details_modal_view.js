@@ -48,8 +48,12 @@ App.Views.ApplianceMultipleFormDetailsModalView = App.Views.BaseView.extend({
 		var checkbox, column, $el, tabindex;
 		checkbox = this.$(e.target).closest('input');
 		column   = checkbox.data('name');
-		$el       = (column === 'accessories') ? 
-			this.$(".bootstrap-tagsinput input") : this.$("[name="+column+"]");
+		if (column === 'accessories'){
+			$el = this.$(".bootstrap-tagsinput input"); 
+			$el.parent().toggleClass('disabled');
+		} else {
+			$el = this.$("[name="+column+"]");
+		}
 		$el.attr("disabled", !checkbox.prop('checked'));
 	},
 

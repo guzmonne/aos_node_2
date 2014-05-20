@@ -1,7 +1,7 @@
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_edit_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing, self=this;
+  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, self=this, helperMissing=helpers.helperMissing;
 
 function program1(depth0,data) {
   
@@ -18,56 +18,53 @@ function program1(depth0,data) {
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\">\n				</div>\n			</div>\n		</div>\n		<div class=\"col-md-6\">\n			<div class=\"form-group ";
-  options = {hash:{},data:data};
-  buffer += escapeExpression(((stack1 = helpers.statusClass || (depth0 && depth0.statusClass)),stack1 ? stack1.call(depth0, (depth0 && depth0.status), "appliance", options) : helperMissing.call(depth0, "statusClass", (depth0 && depth0.status), "appliance", options)))
-    + "\">\n				<label for=\"status\" class=\"col-sm-2 col-md-4 control-label\">Estado</label>\n				<input type=\"text\" name=\"status\" value=\"";
-  if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+    + "\">\n				</div>\n			</div>\n		</div>\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"status\" class=\"col-sm-2 col-md-4 control-label\">Estado</label>\n				<input type=\"text\" name=\"status\" value=\"";
+  if (stack1 = helpers.status) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.status); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\" class=\"hide\">\n				<div class=\"col-sm-10 col-md-8\">\n					<div class=\"btn-group\" style=\"display: flex\">\n					  <button class=\"btn btn-block dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\" id=\"status-dropdown\" >\n					    <span id=\"status-text\">";
-  if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.status) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.status); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "</span> <span class=\"caret\"></span>\n					  </button>\n					  <ul class=\"dropdown-menu status\" style=\"width: 100%\">\n					    <li><a href=\"#\" class=\"status-2\" data-class=\"2\">En Reparación</a></li>\n					    <li><a href=\"#\" class=\"status-3\" data-class=\"3\">En Espera</a></li>\n					    <li><a href=\"#\" class=\"status-4\" data-class=\"4\">Atrasado</a></li>\n					    <li><a href=\"#\" class=\"status-5\" data-class=\"5\">Reparado</a></li>\n					    <li><a href=\"#\" class=\"status-7\" data-class=\"7\">Entregado</a></li>\n					    <li><a href=\"#\" class=\"status-6\" data-class=\"6\">Enviado</a></li>\n					    <li><a href=\"#\" class=\"status-1\" data-class=\"1\">Recibido</a></li>\n					  </ul>\n					</div>\n				</div>\n			</div>\n		</div>\n	</div>\n\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin-top: 0;\">\n		</div>\n	</div>\n	\n\n	\n	\n	\n	<div class=\"row\">\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"brand\" class=\"col-sm-2 control-label\">Marca</label>\n				<div class=\"col-sm-10\">\n					<input type=\"text\" class=\"form-control\" name=\"brand\" placeholder=\"e.j: Punktal\" value=\"";
-  if (stack2 = helpers.brand) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.brand); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.brand) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.brand); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\" disabled>\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"model\" class=\"col-sm-2 control-label\">Modelo</label>\n				<div class=\"col-sm-10\">\n					<input type=\"text\" class=\"form-control\" name=\"model\" placeholder=\"e.j: PKT1020\" value=\"";
-  if (stack2 = helpers.model) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.model); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\" disabled>\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"serial\" class=\"col-sm-2 control-label\">Serie</label>\n				<div class=\"col-sm-10\">\n					<input type=\"text\" class=\"form-control\" name=\"serial\" placeholder=\"e.j: AXE102032\" value=\"";
-  if (stack2 = helpers.serial) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.serial); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.serial) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.serial); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\">\n				</div>\n			</div>\n		</div>\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"category\" class=\"col-sm-2 col-md-4 control-label\">Categoría</label>\n				<div class=\"col-sm-10 col-md-8\">\n					<input type=\"text\" class=\"form-control\" name=\"category\" placeholder=\"e.j: Electrodomestico\" value=\"";
-  if (stack2 = helpers.category) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.category); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.category) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.category); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\" disabled>\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"subcategory\" class=\"col-sm-2 col-md-4 control-label\">Subcategoría</label>\n				<div class=\"col-sm-10 col-md-8\">\n					<input type=\"text\" class=\"form-control\" name=\"subcategory\" placeholder=\"e.j: Plancha\" value=\"";
-  if (stack2 = helpers.subcategory) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.subcategory); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.subcategory) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.subcategory); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\" disabled>\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<div class=\"col-xs-offset-2 col-xs-10 col-md-offset-4 col-md-8\">\n					<button class=\"btn btn-info btn-block\" tabindex=\"-1\" id=\"select-model\">\n						<i class=\"fa fa-search\"></i> Buscar Equipo\n					</button>\n				</div>\n			</div>\n		</div>\n	</div>\n\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin-top: 0;\">\n		</div>\n	</div>\n	\n\n	\n	\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<div class=\"form-group\">\n				<label for=\"accessories\" class=\"col-sm-2 control-label\">Accesorios</label>\n				<div class=\"col-sm-10\">\n					<select class=\"form-control\" name=\"accessories\" data-role=\"tagsinput\" multiple>\n						";
-  stack2 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack2 || stack2 === 0) { buffer += stack2; }
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "	\n					</select>	\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"observations\" class=\"col-sm-2 control-label\">Observaciones</label>\n				<div class=\"col-sm-10\">\n					<textarea class=\"form-control\" name=\"observations\">";
-  if (stack2 = helpers.observations) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.observations); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.observations) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.observations); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "</textarea>\n				</div>\n			</div>\n			<div class=\"form-group\">\n				<label for=\"technician_name\" class=\"col-xs-2 col-sm-2 control-label\">Tecnico</label>\n				<div class=\"col-xs-8 col-sm-8\">\n					<select class=\"form-control\" name=\"technician_id\" value=";
-  if (stack2 = helpers.technician_id) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.technician_id); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.technician_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.technician_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "></select>\n				</div>\n				<div class=\"col-xs-2 col-sm-2\">\n					<a href=\"#render/tech/show/";
-  if (stack2 = helpers.technician_id) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.technician_id); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.technician_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.technician_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + "\" class=\"btn btn-green pull-right\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Orden de Servicio\" name=\"technician_link\">\n						<i class=\"fa fa-user fa-fw\"></i> Tecnico\n					</a>\n				</div>\n			</div>\n		</div>\n	</div>\n\n	\n	<div class=\"row\">\n		<div class=\"col-lg-12\">\n			<hr style=\"margin-top: 0;\">\n		</div>\n	</div>\n	\n\n	\n	\n	\n	<div class=\"row\">\n		<div class=\"col-md-6\">\n			<div class=\"form-group\">\n				<label for=\"repairement_type\" class=\"col-sm-2 col-md-4 control-label\">Reparación</label>\n				<div class=\"col-sm-10 col-md-8\">\n					<select class=\"form-control\" name=\"repairement_type\" value=";
-  if (stack2 = helpers.repairment_type) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.repairment_type); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
+  if (stack1 = helpers.repairment_type) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.repairment_type); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
     + ">\n						<option value=\"Garantía\"";
   options = {hash:{},data:data};
   buffer += escapeExpression(((stack1 = helpers['selected?'] || (depth0 && depth0['selected?'])),stack1 ? stack1.call(depth0, "Garantía", (depth0 && depth0.repairement_type), options) : helperMissing.call(depth0, "selected?", "Garantía", (depth0 && depth0.repairement_type), options)))
@@ -183,7 +180,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
 
 
-  buffer += "<div class=\"col-lg-12\">\n	<div class=\"row\">\n		<div class=\"col-xs-8\">\n			<h1>\n			  Modelo: ";
+  buffer += "<div class=\"col-lg-12\">\n	<div class=\"row\">\n		<div class=\"col-xs-6\">\n			<h1>\n			  Modelo: ";
   if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -194,7 +191,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</span>\n			</h1>\n			<div class=\"row\">\n				<div class=\"col-xs-2\">\n					<ul class=\"list-unstyled\">\n						<li><strong>Marca</strong></li>\n						<li><strong>Categoría</strong></li>\n						<li><strong>Subcategoría</strong></li>\n					</ul>\n				</div>\n				<div class=\"col-xs-4\">\n					<ul class=\"list-unstyled\">\n			  		<li>";
+    + "</span>\n			</h1>\n			<div class=\"row\">\n				<div class=\"col-xs-4\">\n					<ul class=\"list-unstyled\">\n						<li><strong>Marca</strong></li>\n						<li><strong>Categoría</strong></li>\n						<li><strong>Subcategoría</strong></li>\n					</ul>\n				</div>\n				<div class=\"col-xs-8\">\n					<ul class=\"list-unstyled\">\n			  		<li>";
   if (stack2 = helpers.brand) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.brand); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
@@ -206,7 +203,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack2 = helpers.subcategory) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.subcategory); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</li>\n					</ul>\n				</div>\n			</div>\n		</div>\n		<div class=\"col-xs-4\">\n			<h2>Filtros</h2>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"serial\"> Serie\n				</label>\n			</div>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"accessories\"> Accessorios\n				</label>\n			</div>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"observations\"> Observaciones\n				</label>\n			</div>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"defect\"> Defecto\n				</label>\n			</div>\n		</div>\n	</div>\n	<hr>\n	<table class=\"table table-striped table-bordered table-hover table-office\" style=\"width: 100%\">\n		<thead>\n			<tr>\n				<th style=\"width: 5%\">#</th>\n				<th style=\"width: 15%\">Serie</th>\n				<th style=\"width: 20%\">Accesorios</th>\n				<th style=\"width: 30%\">Observaciones</th>\n				<th style=\"width: 30%\">Defecto</th>\n			</tr>\n		</thead>\n		<tbody></tbody>\n	</table>\n	<hr style=\"margin-bottom: 10px\">\n	<button name=\"save-details\" class=\"btn btn-primary pull-right\">Aceptar</button>\n</div>";
+    + "</li>\n					</ul>\n				</div>\n			</div>\n		</div>\n		<div class=\"col-xs-6\">\n			<h3 style=\"margin-top: 35px; padding-left: 25px\">Filtros</h3>\n			<div class=\"col-xs-6\">\n				<div class=\"checkbox\">\n					<label class=\"col-sm-12\">\n						<input type=\"checkbox\" checked data-name=\"serial\"> Serie\n					</label>\n				</div>\n				<div class=\"checkbox\">\n					<label class=\"col-sm-12\">\n						<input type=\"checkbox\" checked data-name=\"accessories\"> Accessorios\n					</label>\n				</div>\n			</div>\n			<div class=\"col-xs-6\">\n				<div class=\"checkbox\">\n					<label class=\"col-sm-12\">\n						<input type=\"checkbox\" checked data-name=\"observations\"> Observaciones\n					</label>\n				</div>\n				<div class=\"checkbox\">\n					<label class=\"col-sm-12\">\n						<input type=\"checkbox\" checked data-name=\"defect\"> Defecto\n					</label>\n				</div>\n			</div>\n		</div>\n	</div>\n	<hr>\n	<table class=\"table table-striped table-bordered table-hover table-office\" style=\"width: 100%\">\n		<thead>\n			<tr>\n				<th style=\"width: 5%\">#</th>\n				<th style=\"width: 15%\">Serie</th>\n				<th style=\"width: 20%\">Accesorios</th>\n				<th style=\"width: 30%\">Observaciones</th>\n				<th style=\"width: 30%\">Defecto</th>\n			</tr>\n		</thead>\n		<tbody></tbody>\n	</table>\n	<hr style=\"margin-bottom: 10px\">\n	<button name=\"save-details\" class=\"btn btn-primary pull-right\">Aceptar</button>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -293,15 +290,15 @@ function program8(depth0,data) {
   return buffer;
   }
 
-  buffer += "<td>";
+  buffer += "<td class=\"center-vh\" style=\"text-align: left;\">";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td style=\"white-space: normal\">";
+    + "</td>\n<td class=\"center-vh\" style=\"white-space: normal; text-align: left;\">";
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td>\n	<dt>";
+    + "</td>\n<td class=\"center-vh\" style=\"text-align: left;\">\n	<dt>";
   if (stack1 = helpers.brand) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.brand); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -312,15 +309,18 @@ function program8(depth0,data) {
     + "</dd>\n	";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.serial), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</td>\n<td class=\"text-center\">\n	";
+  buffer += "\n</td>\n<td class=\"center-vh\">\n	";
   options = {hash:{},inverse:self.program(6, program6, data),fn:self.program(3, program3, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, (depth0 && depth0.repairement_type), "Presupuesto", options) : helperMissing.call(depth0, "is", (depth0 && depth0.repairement_type), "Presupuesto", options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n</td>\n<td class=\"text-center\">";
+  buffer += "\n</td>\n<td class=\"center-vh\">\n	<h4 style=\"margin: 0px;\"><span class=\"label label-default ";
+  options = {hash:{},data:data};
+  buffer += escapeExpression(((stack1 = helpers.statusClass || (depth0 && depth0.statusClass)),stack1 ? stack1.call(depth0, (depth0 && depth0.status), options) : helperMissing.call(depth0, "statusClass", (depth0 && depth0.status), options)))
+    + "\">";
   if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</td>\n<td style=\"white-space: normal\">";
+    + "</span></h4>\n</td>\n<td style=\"white-space: normal\">";
   if (stack2 = helpers.technician_name) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.technician_name); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)

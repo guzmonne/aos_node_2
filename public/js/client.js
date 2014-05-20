@@ -1730,7 +1730,6 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
-			console.log(object.client_id);
 			if (!object.client_name && object.client_id){
 				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
 			}
@@ -1975,8 +1974,12 @@ App.Views.ApplianceMultipleFormDetailsModalView = App.Views.BaseView.extend({
 		var checkbox, column, $el, tabindex;
 		checkbox = this.$(e.target).closest('input');
 		column   = checkbox.data('name');
-		$el       = (column === 'accessories') ? 
-			this.$(".bootstrap-tagsinput input") : this.$("[name="+column+"]");
+		if (column === 'accessories'){
+			$el = this.$(".bootstrap-tagsinput input"); 
+			$el.parent().toggleClass('disabled');
+		} else {
+			$el = this.$("[name="+column+"]");
+		}
 		$el.attr("disabled", !checkbox.prop('checked'));
 	},
 
@@ -2104,8 +2107,9 @@ App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
 			if(!options.model_id || options.model_id === ''){return;}
 			for(var i = 0; i < quantity; i++){
 				if (self.details[rowId] && self.details[rowId][i+1]){
-					_.extend(options, self.details[rowId][i+1], {client_id: self.collection.client_id});
+					_.extend(options, self.details[rowId][i+1]);
 				}
+				options.client_id = self.collection.client_id;
 				var model = new App.Models.Appliance(options);
 				self.collection.add(model);
 				model.trigger('change');
@@ -3475,6 +3479,7 @@ App.Views.ServiceRequestShowView = App.Views.TabView.extend({
 		if (index === -1) { return; }
 		this.$('#service_request-tabs li:eq(1) a').tab('show');
 		this.appliancesCarousel.slideTo(index + 1);
+		App.scrollTo(this.$('.tab-content'), 30);
 	},
 
 	getApplianceIndex: function(id){

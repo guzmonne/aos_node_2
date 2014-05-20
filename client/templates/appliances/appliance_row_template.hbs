@@ -1,13 +1,13 @@
-<td>{{id}}</td>
-<td style="white-space: normal">{{client_name}}</td>
-<td>
+<td class="center-vh" style="text-align: left;">{{id}}</td>
+<td class="center-vh" style="white-space: normal; text-align: left;">{{client_name}}</td>
+<td class="center-vh" style="text-align: left;">
 	<dt>{{brand}}</dt>
 	<dd>{{model}}</dd>
 	{{#if serial}}
 		<dd><i class="fa fa-barcode"></i> {{serial}}</dd>
 	{{/if}}
 </td>
-<td class="text-center">
+<td class="center-vh">
 	{{#is repairement_type "Presupuesto"}}
 		<dt>{{repairement_type}}</dt>
 		{{#is cost "not" 0}}
@@ -17,7 +17,9 @@
 		{{repairement_type}}
 	{{/is}}
 </td>
-<td class="text-center">{{status}}</td>
+<td class="center-vh">
+	<h4 style="margin: 0px;"><span class="label label-default {{statusClass status}}">{{status}}</span></h4>
+</td>
 <td style="white-space: normal">{{technician_name}}</td>
 <td>
 	<dt>Creado</dt>
