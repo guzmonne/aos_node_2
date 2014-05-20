@@ -14,7 +14,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'status'            : 'Pendiente',
+			'status'            : 'Recibido',
 			'createdBy'         : 'Guzman Monne',
 			'updatedBy'         : 'Guzman Monne',
 		};

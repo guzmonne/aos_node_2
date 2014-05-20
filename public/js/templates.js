@@ -151,7 +151,7 @@ function program1(depth0,data) {
   return buffer;
   }
 
-  buffer += "<tr data-row=";
+  buffer += "<tr class=\"animated flipInX\" data-row=";
   if (stack1 = helpers.row) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.row); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -215,11 +215,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<tr data-row=";
+  buffer += "<tr class=\"animated fadeInUp\" data-row=";
   if (stack1 = helpers.row) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.row); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + ">\n	<td>\n		<div class=\"col-xs-8\">\n			<dt name=\"brand\"></dt>\n			<dd name=\"model\"></dd>\n			<dd name=\"model_id\" style=\"display: none\"></dd>\n		</div>\n		<div class=\"col-xs-4\" name=\"model-edit\"></div>\n		<button class=\"btn btn-success btn-block\" name=\"select-model\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar Equipo\">\n			<i class=\"fa fa-desktop fa-fw\"></i> Seleccionar Modelo\n		</button>\n	</td>\n	<td>\n			<input type=\"number\" name=\"quantity\" min=\"0\" max=\"9999\" value=\"1\" style=\"width: 100%\">\n	</td>\n	<td>\n		<select name=\"repairement_type\" style=\"width: 100%\">\n			<option value=\"Garantía\">Garantía</option>\n			<option value=\"Presupuesto\">Presupuesto</option>\n		</select>\n	</td>\n	<td class=\"text-center\">\n		<button class=\"btn btn-success btn-block\" name=\"more-details\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detalles\">\n			<i class=\"fa fa-asterisk fa-fw\"></i>\n		</button>\n	</td>\n	<td>\n		<button class=\"btn btn-danger btn-controls hide\" name=\"remove-row\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eliminar Equipos\">\n			<i class=\"fa fa-minus fa-fw\"></i>\n		</button>\n		<button class=\"btn btn-success btn-controls\" name=\"add-row\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Agregar Equipos\">\n			<i class=\"fa fa-plus fa-fw\"></i>\n		</button>\n	</td>\n</tr>";
+    + ">\n	<td>\n		<div class=\"col-xs-8\">\n			<dt name=\"brand\"></dt>\n			<dd name=\"model\"></dd>\n			<dd name=\"model_id\" style=\"display: none\"></dd>\n		</div>\n		<div class=\"col-xs-4\" name=\"model-edit\"></div>\n		<button class=\"btn btn-success btn-block\" name=\"select-model\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar Equipo\">\n			<i class=\"fa fa-desktop fa-fw\"></i> Seleccionar Modelo\n		</button>\n	</td>\n	<td>\n			<input type=\"number\" name=\"quantity\" min=\"0\" max=\"9999\" value=\"1\" style=\"width: 100%\">\n	</td>\n	<td>\n		<select name=\"repairement_type\" style=\"width: 100%\">\n			<option value=\"Garantía\">Garantía</option>\n			<option value=\"Presupuesto\">Presupuesto</option>\n		</select>\n	</td>\n	<td class=\"text-center\">\n		<button class=\"btn btn-success\" name=\"more-details\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detalles\">\n			<i class=\"fa fa-asterisk fa-fw\"></i>\n		</button>\n	</td>\n	<td>\n		<button class=\"btn btn-danger btn-controls hide\" name=\"remove-row\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eliminar Equipos\">\n			<i class=\"fa fa-minus fa-fw\"></i>\n		</button>\n		<button class=\"btn btn-success btn-controls\" name=\"add-row\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Agregar Equipos\">\n			<i class=\"fa fa-plus fa-fw\"></i>\n		</button>\n	</td>\n</tr>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

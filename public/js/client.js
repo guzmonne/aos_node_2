@@ -548,7 +548,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 
 	defaults: function(){
 		return {
-			'status'            : 'Pendiente',
+			'status'            : 'Recibido',
 			'createdBy'         : 'Guzman Monne',
 			'updatedBy'         : 'Guzman Monne',
 		};
@@ -2065,6 +2065,30 @@ App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
 		this.details[id] = details;
 		this.$tr.find('button[name=more-details]').removeClass('btn-success').addClass('btn-warning');
 	},
+
+	saveModel: function(){
+		console.log(this.details);
+		var self = this;
+		this.$('tbody tr').each(function(index, tr){
+			var $tr,rowId, quantity, options;
+			$tr = self.$(tr).closest('tr');
+			rowId    = $tr.data('row');
+			quantity = parseInt($tr.find('input[name=quantity]').val());
+			options   = {
+				model_id        : $tr.find('dd[name=model_id]').text(),
+				repairement_type: $tr.find('[name=repairement_type]').val(),
+			};
+			if(!options.model_id || options.model_id === ''){return;}
+			for(var i = 0; i < quantity; i++){
+				if (self.details[rowId] && self.details[rowId][i+1]){
+					_.extend(options, self.details[rowId][i+1]);
+				}
+				var model = new App.Models.Appliance(options);
+				self.collection.add(model);
+				model.trigger('change');
+			}
+		});
+	},
 });
 App.Views.ApplianceShowView = App.Views.ShowView.extend({
 	template : HBS.appliance_show_template,
@@ -3284,30 +3308,29 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	createServiceRequest: function(e){
 		e.preventDefault();
 		var self = this;
-		if (this.model.appliances.length === 0){
-			return this.invoke('showMessage', this.zeroAppliancesFlash);
-		}
 		this.saveModel();
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		console.log(this.model.toJSON());
-		//this.model.save(null, {
-		//	success: function(model, response, options){
-		//		var route = 'service_request/show/' + model.id;
-		//		Backbone.history.navigate(route);
-		//		self.stopListening(model.appliances);
-		//		app.Renderer.show({
-		//			viewName         : 'ServiceRequestShowView',
-		//			viewType         : 'show',
-		//			model            : model,
-		//			fetch            : false,
-		//			portletFrameClass: 'green',
-		//			flash            : self.serviceRequestSuccessFlash()
-		//		});
-		//		self.invoke('closePortletView');
-		//	},
-		//});
+		if (this.model.appliances.length === 0){
+			return this.invoke('showMessage', this.zeroAppliancesFlash);
+		}
+		this.model.save(null, {
+			success: function(model, response, options){
+				var route = 'service_request/show/' + model.id;
+				Backbone.history.navigate(route);
+				self.stopListening(model.appliances);
+				app.Renderer.show({
+					viewName         : 'ServiceRequestShowView',
+					viewType         : 'show',
+					model            : model,
+					fetch            : false,
+					portletFrameClass: 'green',
+					flash            : self.serviceRequestSuccessFlash,
+				});
+				self.invoke('closePortletView');
+			},
+		});
 	},
 
 	saveModel: function(){

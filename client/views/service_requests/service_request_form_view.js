@@ -129,30 +129,29 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	createServiceRequest: function(e){
 		e.preventDefault();
 		var self = this;
-		if (this.model.appliances.length === 0){
-			return this.invoke('showMessage', this.zeroAppliancesFlash);
-		}
 		this.saveModel();
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		console.log(this.model.toJSON());
-		//this.model.save(null, {
-		//	success: function(model, response, options){
-		//		var route = 'service_request/show/' + model.id;
-		//		Backbone.history.navigate(route);
-		//		self.stopListening(model.appliances);
-		//		app.Renderer.show({
-		//			viewName         : 'ServiceRequestShowView',
-		//			viewType         : 'show',
-		//			model            : model,
-		//			fetch            : false,
-		//			portletFrameClass: 'green',
-		//			flash            : self.serviceRequestSuccessFlash()
-		//		});
-		//		self.invoke('closePortletView');
-		//	},
-		//});
+		if (this.model.appliances.length === 0){
+			return this.invoke('showMessage', this.zeroAppliancesFlash);
+		}
+		this.model.save(null, {
+			success: function(model, response, options){
+				var route = 'service_request/show/' + model.id;
+				Backbone.history.navigate(route);
+				self.stopListening(model.appliances);
+				app.Renderer.show({
+					viewName         : 'ServiceRequestShowView',
+					viewType         : 'show',
+					model            : model,
+					fetch            : false,
+					portletFrameClass: 'green',
+					flash            : self.serviceRequestSuccessFlash,
+				});
+				self.invoke('closePortletView');
+			},
+		});
 	},
 
 	saveModel: function(){
