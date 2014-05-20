@@ -1,3 +1,8 @@
+// =========
+// NEW RELIC
+// =========
+require('newrelic');
+
 // ===================
 // MODULE DEPENDENCIES
 // ===================
