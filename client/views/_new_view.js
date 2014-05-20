@@ -11,6 +11,5 @@ App.Views.NewView = App.Views.BaseView.extend({
 			model: this.model,
 		});
 		this.formView.attachTo(this.$el, {method: 'html'});
-		this.model = undefined;
 	},
 });

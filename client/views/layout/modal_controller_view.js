@@ -30,11 +30,11 @@ App.Views.ModalController = App.Views.BaseView.extend({
 		this.callerMethod = null;
 	},
 
-	runCallerMethod: function(data){
+	runCallerMethod: function(){
 		if(!App.defined(this.callerView) || !App.defined(this.callerMethod)){return;}
 		var method = this.callerView[this.callerMethod];
 		if(!_.isFunction(method)){return;}
-		method.call(this.callerView, data);
+		method.apply(this.callerView, arguments);
 		this.closeModal();
 	},
 });

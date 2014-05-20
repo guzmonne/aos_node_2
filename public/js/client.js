@@ -1277,7 +1277,6 @@ App.Views.NewView = App.Views.BaseView.extend({
 			model: this.model,
 		});
 		this.formView.attachTo(this.$el, {method: 'html'});
-		this.model = undefined;
 	},
 });
 App.Views.RowView = App.Views.BaseView.extend({
@@ -1700,10 +1699,6 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 	template: HBS.appliance_row_template,
 	modelName: 'appliance',
 
-	awake: function(){
-		this.listenTo(this.model.model_id, 'change' , this.render);
-	},
-
 	serialize: function(){
 		var object = {};
 		if (App.defined(this.model)){
@@ -1907,6 +1902,170 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	tableCollection: 'Appliances',
 	modelView      : App.Views.ApplianceRowView,
 });
+App.Views.ApplianceMultipleFormDetailsModalView = App.Views.BaseView.extend({
+	template: HBS.appliance_multiple_form_details_modal_template,
+	row     : HBS.appliance_multiple_form_details_modal_row_template,
+	name      : "ApplianceMultipleFormDetailsModalView",
+	
+	className: "row",
+
+	modalOptions: {
+		title     : "Detalles",
+		footer    : false,
+		modalClass: "modal-lg",
+	},
+
+	events: {
+		'click button[name=save-details]'   : 'saveDetails',
+		'change input[type=checkbox]'       : 'applyFilters',
+		'change input[name=serial]'         : function(e){this.updateDetails(e, "serial");},
+		'change select[name=accessories]'   : function(e){this.updateDetails(e, "accessories");},
+		'change textarea[name=observations]': function(e){this.updateDetails(e, "observations");},
+		'change textarea[name=defect]'      : function(e){this.updateDetails(e, "defect");},
+	},
+
+	initialize: function(){
+		this.details = (this.details) ? this.details : {};
+	},
+
+	afterRender: function(){
+		var options;
+		for(var i = 0; i < this.quantity; i++){
+			options = _.extend(
+				{id: i+1}, 
+				this.details[i+1]
+			);
+			this.$('tbody').append(this.row(options));
+		}
+		this.$('[name=accessories]').tagsinput();
+	},
+
+	serialize: function(){
+		var model = app.storage.collection("models").get(this.model_id);
+		if (model && model.attributes){
+			return model.attributes;
+		}
+		return;
+	},
+
+	applyFilters: function(e){
+		var checkbox, column, $el, tabindex;
+		checkbox = this.$(e.target).closest('input');
+		column   = checkbox.data('name');
+		$el       = (column === 'accessories') ? 
+			this.$(".bootstrap-tagsinput input") : this.$("[name="+column+"]");
+		$el.attr("disabled", !checkbox.prop('checked'));
+	},
+
+	updateDetails: function(e, field){
+		var $tr                 = this.$(e.target).closest('tr');
+		var id                  = $tr.find('td[name=id]').text();
+		this.details[id]        = (this.details[id]) ? this.details[id] : {};
+		this.details[id][field] = $tr.find('[name='+field+']').val();
+	},
+
+	saveDetails: function(){
+		app.modalController.runCallerMethod(this.rowId, this.details);
+	},
+});
+App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
+	className: "col-lg-12",
+	template: HBS.appliance_multiple_form_template,
+	row     : HBS.appliance_multiple_form_row_template,
+
+	events: {
+		'click button[name=select-model]'      : 'renderSelectModel',
+		'click button[name=remove-row]'        : 'removeRow',
+		'click button[name=add-row]'           : 'addRow',
+		'click button[name=more-details]'      : 'moreDetails',
+		'focus .bootstrap-tagsinput input'     : 'activateTags',
+		'focusout .bootstrap-tagsinput input'  : 'deactivateTags',
+	},
+
+	initialize: function(){
+		this.$tr     = undefined;
+		this.details = {};
+	},
+
+	afterRender: function(){
+		this.newRow();
+		this.$el.tooltip();
+	},
+
+	selectModel: function(e){
+		if(e){e.preventDefault();}
+		if (	
+			!App.defined(this.modelSelectModalView)								|| 
+			!App.defined(this.modelSelectModalView.app))
+		{
+			this.modelSelectModalView = new App.Views.ModelSelectModalView();
+		}
+		app.modalController.displayModal(this.modelSelectModalView, this, 'modelSelected');
+	},
+
+	activeRow: function(row){
+		this.$tr = this.$('tr[data-row='+row+']');
+	},
+
+	newRow: function(row){
+		row = row ? row : _.uniqueId();
+		this.$('tbody').prepend(this.row({row: row}));
+	},
+
+	renderSelectModel: function(e){
+		e.preventDefault();
+		this.activeRow(this.$(e.target).closest('tr').data("row"));
+		this.selectModel();
+	},
+
+	modelSelected: function(model){
+		this.$tr.find('dt[name=brand]'   ).text(model.get('brand'));
+		this.$tr.find('dd[name=model]'   ).text(model.get('model'));
+		this.$tr.find('dd[name=model_id]').text(model.id);
+		this.$tr.find('button[name=select-model]').remove();
+		this.$tr.find('div[name=model-edit]').append(
+			'<button class="btn btn-warning pull-right" name="select-model">' +
+				'<i class="fa fa-desktop fa-fw"></i>'                           +
+			'</button>'
+		);
+	},
+
+	addRow: function(e){
+		e.preventDefault();
+		this.activeRow(this.$(e.target).closest('tr').data("row"));
+		if (this.$tr.find('dd[name=model_id]').text() === ''){return;}
+		this.$tr.find('button.btn-controls').toggleClass('hide');
+		this.newRow();
+	},
+
+	removeRow: function(e){
+		e.preventDefault(e);
+		this.activeRow(this.$(e.target).closest('tr').data("row"));
+		if(confirm('Esta seguro que desea elminar esta fila?')){
+			this.$tr.remove();
+		}
+	},
+
+	moreDetails: function(e){
+		e.preventDefault(e);
+		var options, rowId = this.$(e.target).closest('tr').data("row");
+		this.activeRow(rowId);
+		options = {
+			rowId   : rowId,
+			quantity: parseInt(this.$tr.find('input[name=quantity]').val()),
+			details : this.details[rowId],
+			model_id: this.$tr.find('dd[name=model_id]').text()
+		};
+		view = new App.Views.ApplianceMultipleFormDetailsModalView(options);
+		app.modalController.displayModal(view, this, 'detailsUpdated');
+	},
+
+	detailsUpdated: function(id, details){
+		this.details[id] = (this.details[id]) ? this.details[id] : {}; 
+		this.details[id] = details;
+		this.$tr.find('button[name=more-details]').removeClass('btn-success').addClass('btn-warning');
+	},
+});
 App.Views.ApplianceShowView = App.Views.ShowView.extend({
 	template : HBS.appliance_show_template,
 	className: 'row',
@@ -1958,9 +2117,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	firstRender: true,
 
 	events: {
-		'submit form'                        : function(e){e.preventDefault();},
-		//'focus .bootstrap-tagsinput input'   : 'activateTags',
-		//'focusout .bootstrap-tagsinput input': 'deactivateTags',
+		'submit form': function(e){e.preventDefault();},
 	},
 
 	initialize: function(){
@@ -2480,11 +2637,11 @@ App.Views.ModalController = App.Views.BaseView.extend({
 		this.callerMethod = null;
 	},
 
-	runCallerMethod: function(data){
+	runCallerMethod: function(){
 		if(!App.defined(this.callerView) || !App.defined(this.callerMethod)){return;}
 		var method = this.callerView[this.callerMethod];
 		if(!_.isFunction(method)){return;}
-		method.call(this.callerView, data);
+		method.apply(this.callerView, arguments);
 		this.closeModal();
 	},
 });
@@ -3003,10 +3160,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	className: 'col-lg-12',
 
 	events: {
-		'click button#single-appliance': 'singleApplianceForm',
-		'click button.appliance-delete': 'deleteAppliance',
-		'click button[type=submit]'    : 'createServiceRequest',
-		'click button#select-client'   : 'selectClient',
+		'click button#single-appliance'   : 'newSingleApplianceForm',
+		'click button#multiple-appliances': 'newMultipleAppliancesForm',
+		'click button.appliance-delete'   : 'deleteAppliance',
+		'click button[type=submit]'       : 'createServiceRequest',
+		'click button#select-client'      : 'selectClient',
 	},
 
 	initialize: function(){
@@ -3032,20 +3190,16 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		}
 	},
 
-	serviceRequestSuccessFlash: function(){
-		return {
-			title   : 'Orden de Servicio Creada',
-			message : 'La Orden de Servicio se ha creado con exito!.',
-			class   : 'success',
-			method  : 'html',
-		};
+	serviceRequestSuccessFlash: {
+		title   : 'Orden de Servicio Creada',
+		message : 'La Orden de Servicio se ha creado con exito!.',
+		class   : 'success',
 	},
 
 	zeroAppliancesFlash: {
 		title  : 'Atención',
 		message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
 		class  : 'warning',
-		method : 'html' 
 	},
 
 	selectClient: function(){
@@ -3056,13 +3210,30 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	clientSelected: function(model){
-		this.model.set('client_id', model.get('_id'));
+		this.model.set('client_id'  , model.get('_id'));
 		this.model.set('client_name', model.get('name'));
 		this.$('.btn-success').attr('disabled', false);
 	},
 
-	singleApplianceForm: function(e){
+	newMultipleAppliancesForm: function(e){
 		e.preventDefault();
+		this.$('#multiple-appliances').hide();
+		this.$('#single-appliance').hide();
+		this.$('button[type=submit]').attr('disabled', false);
+		this.appendMultipleAppliancesForm();
+	},
+
+	appendMultipleAppliancesForm: function(){
+		this.multipleAppliancesForm = new App.Views.ApplianceMultipleFormView({
+			collection: this.model.appliances,
+		});
+		this.multipleAppliancesForm.attachTo(this.$('#appliance-views'), {method: 'html'});
+		App.scrollTo(this.multipleAppliancesForm.$el);
+	},
+
+	newSingleApplianceForm: function(e){
+		e.preventDefault();
+		this.$('#multiple-appliances').hide();
 		var model = app.storage.newModel("appliances");
 		model.set({
 			client_name: this.model.get('client_name'),
@@ -3089,9 +3260,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			style: style
 		}));
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
-		if(index === (appliances.length - 1)){
-			App.scrollTo(view.$el, 50);
-		}
+		if(index === (appliances.length - 1)){ App.scrollTo(view.$el, 50); }
 	},
 
 	deleteAppliance: function(e){
@@ -3105,7 +3274,9 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			self.appendApplianceForm(null, view);
 			view.tagsinput();
 		});
-		if(this.model.appliances.length === 0){//
+		if(this.model.appliances.length === 0){
+			App.scrollTo(this.$el);
+			this.$('#multiple-appliances').show();
 			this.$('button[type=submit]').attr('disabled', true);
 		}
 	},
@@ -3120,22 +3291,23 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		this.model.save(null, {
-			success: function(model, response, options){
-				var route = 'service_request/show/' + model.id;
-				Backbone.history.navigate(route);
-				self.stopListening(model.appliances);
-				app.Renderer.show({
-					viewName         : 'ServiceRequestShowView',
-					viewType         : 'show',
-					model            : model,
-					fetch            : false,
-					portletFrameClass: 'green',
-				flash            : self.serviceRequestSuccessFlash()
-				});
-				self.invoke('closePortletView');
-			},
-		});
+		console.log(this.model.toJSON());
+		//this.model.save(null, {
+		//	success: function(model, response, options){
+		//		var route = 'service_request/show/' + model.id;
+		//		Backbone.history.navigate(route);
+		//		self.stopListening(model.appliances);
+		//		app.Renderer.show({
+		//			viewName         : 'ServiceRequestShowView',
+		//			viewType         : 'show',
+		//			model            : model,
+		//			fetch            : false,
+		//			portletFrameClass: 'green',
+		//			flash            : self.serviceRequestSuccessFlash()
+		//		});
+		//		self.invoke('closePortletView');
+		//	},
+		//});
 	},
 
 	saveModel: function(){
@@ -3197,18 +3369,14 @@ App.Views.ServiceRequestNewView = App.Views.NewView.extend({
 	formViewName: "ServiceRequestFormView",
 
 	initialize: function(){
-		this.listenTo(this.model, 'change:client_name', function(){
-			this.invoke('setHeader');
-		});
+		this.listenTo(this.model, 'change:client_name', function(){ this.invoke('setHeader'); });
 	},
 	
 	name: function(){
-		var clientName, clientID;
-		var result = "Nueva Orden de Servicio";
-		if (!App.defined(this.model)){return result;}
+		var clientName, result = "Nueva Orden de Servicio";
+		if (!this.model){return result;}
 		clientName = this.model.get('client_name');
-		clientID   = this.model.get('client_id');
-		if(App.defined(clientName) && App.defined(clientID)){
+		if(App.defined(clientName)){
 			return "Nueva Orden de Servicio para " + clientName;
 		} else {
 			return result;

@@ -137,6 +137,99 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     + "\" class=\"table table-striped table-bordered table-hover table-office dataTable\" aria-describedby=\"appliances-table-info\">\n		<thead>\n			<tr>\n				<th>ID</th>\n				<th>Cliente</th>	\n				<th>Equipo</th>\n				<th>Tipo</th>\n				<th>Estado</th>\n				<th>Tecnico</th>\n				<th>Detalles</th>\n				<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n			</tr>\n		</thead>\n		<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"appliances\">\n		</tbody>\n	</table>\n</div>\n";
   return buffer;
   });
+this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_details_modal_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
+
+function program1(depth0,data) {
+  
+  var buffer = "";
+  buffer += " <option value=\""
+    + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
+    + "\"></option> ";
+  return buffer;
+  }
+
+  buffer += "<tr data-row=";
+  if (stack1 = helpers.row) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.row); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ">\n	<td name=\"id\">";
+  if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</td>\n	<td>\n		<input type=\"text\" class=\"form-control\" name=\"serial\" value=\"";
+  if (stack1 = helpers.serial) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.serial); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\" style=\"width: 100%\">\n	</td>\n	<td>\n		<select type=\"text\" class=\"form-control\" name=\"accessories\" multiple style=\"width: 100%\">\n		";
+  stack1 = helpers.each.call(depth0, (depth0 && depth0.accessories), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n	</td>\n	<td>\n		<textarea class=\"form-control\" name=\"observations\" rows=\"1\" style=\"width: 100%;height: 34px;padding: 6px 12px;\">";
+  if (stack1 = helpers.observations) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.observations); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</textarea>\n	</td>\n	<td>\n		<textarea class=\"form-control\" name=\"defect\" rows=\"1\" style=\"width: 100%;height: 34px;padding: 6px 12px;\">";
+  if (stack1 = helpers.defect) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.defect); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "</textarea>\n	</td>\n</tr>";
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_details_modal_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
+
+
+  buffer += "<div class=\"col-lg-12\">\n	<div class=\"row\">\n		<div class=\"col-xs-8\">\n			<h1>\n			  Modelo: ";
+  if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + "\n			  <span class=\"pull-right label ";
+  options = {hash:{},data:data};
+  buffer += escapeExpression(((stack1 = helpers.statusClass || (depth0 && depth0.statusClass)),stack1 ? stack1.call(depth0, (depth0 && depth0.status), options) : helperMissing.call(depth0, "statusClass", (depth0 && depth0.status), options)))
+    + "\">";
+  if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</span>\n			</h1>\n			<div class=\"row\">\n				<div class=\"col-xs-2\">\n					<ul class=\"list-unstyled\">\n						<li><strong>Marca</strong></li>\n						<li><strong>Categoría</strong></li>\n						<li><strong>Subcategoría</strong></li>\n					</ul>\n				</div>\n				<div class=\"col-xs-4\">\n					<ul class=\"list-unstyled\">\n			  		<li>";
+  if (stack2 = helpers.brand) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.brand); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</li>\n			  		<li>";
+  if (stack2 = helpers.category) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.category); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</li>\n			  		<li>";
+  if (stack2 = helpers.subcategory) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
+  else { stack2 = (depth0 && depth0.subcategory); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
+  buffer += escapeExpression(stack2)
+    + "</li>\n					</ul>\n				</div>\n			</div>\n		</div>\n		<div class=\"col-xs-4\">\n			<h2>Filtros</h2>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"serial\"> Serie\n				</label>\n			</div>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"accessories\"> Accessorios\n				</label>\n			</div>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"observations\"> Observaciones\n				</label>\n			</div>\n			<div class=\"checkbox\">\n				<label class=\"col-sm-12\">\n					<input type=\"checkbox\" checked data-name=\"defect\"> Defecto\n				</label>\n			</div>\n		</div>\n	</div>\n	<hr>\n	<table class=\"table table-striped table-bordered table-hover table-office\" style=\"width: 100%\">\n		<thead>\n			<tr>\n				<th style=\"width: 5%\">#</th>\n				<th style=\"width: 15%\">Serie</th>\n				<th style=\"width: 20%\">Accesorios</th>\n				<th style=\"width: 30%\">Observaciones</th>\n				<th style=\"width: 30%\">Defecto</th>\n			</tr>\n		</thead>\n		<tbody></tbody>\n	</table>\n	<hr style=\"margin-bottom: 10px\">\n	<button name=\"save-details\" class=\"btn btn-primary pull-right\">Aceptar</button>\n</div>";
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<tr data-row=";
+  if (stack1 = helpers.row) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
+  else { stack1 = (depth0 && depth0.row); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
+  buffer += escapeExpression(stack1)
+    + ">\n	<td>\n		<div class=\"col-xs-8\">\n			<dt name=\"brand\"></dt>\n			<dd name=\"model\"></dd>\n			<dd name=\"model_id\" style=\"display: none\"></dd>\n		</div>\n		<div class=\"col-xs-4\" name=\"model-edit\"></div>\n		<button class=\"btn btn-success btn-block\" name=\"select-model\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Seleccionar Equipo\">\n			<i class=\"fa fa-desktop fa-fw\"></i> Seleccionar Modelo\n		</button>\n	</td>\n	<td>\n			<input type=\"number\" name=\"quantity\" min=\"0\" max=\"9999\" value=\"1\" style=\"width: 100%\">\n	</td>\n	<td>\n		<select name=\"repairement_type\" style=\"width: 100%\">\n			<option value=\"Garantía\">Garantía</option>\n			<option value=\"Presupuesto\">Presupuesto</option>\n		</select>\n	</td>\n	<td class=\"text-center\">\n		<button class=\"btn btn-success btn-block\" name=\"more-details\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Detalles\">\n			<i class=\"fa fa-asterisk fa-fw\"></i>\n		</button>\n	</td>\n	<td>\n		<button class=\"btn btn-danger btn-controls hide\" name=\"remove-row\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Eliminar Equipos\">\n			<i class=\"fa fa-minus fa-fw\"></i>\n		</button>\n		<button class=\"btn btn-success btn-controls\" name=\"add-row\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Agregar Equipos\">\n			<i class=\"fa fa-plus fa-fw\"></i>\n		</button>\n	</td>\n</tr>";
+  return buffer;
+  });
+this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  
+
+
+  return "<table class=\"table table-striped table-bordered table-hover table-office\" style=\"width: 100%\">\n	<thead>\n		<tr>\n			<th>Modelo</th>\n			<th style=\"width: 90px\">Cantidad</th>\n			<th style=\"width: 150px\">Tipo de Rep.</th>\n			<th style=\"width: 70px\">Detalles</th>\n			<th class=\"text-center\" style=\"width: 50px\">\n				<i class=\"fa fa-wrench\"></i>\n			</th>\n		</tr>\n	</thead>\n	<tbody></tbody>\n</table>";
+  });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
@@ -1264,7 +1357,7 @@ function program1(depth0,data) {
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" readonly>\n				</div>\n				<div class=\"col-xs-2\">\n					<button class=\"btn btn-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Buscar Cliente\" id=\"select-client\">\n						<i class=\"fa fa-search\"></i>\n					</button>\n				</div>\n			</div>\n		</div>\n		<div class=\"col-lg-3 col-md-4 col-xs-4\">\n			<div class=\"form-group\">\n				<label for=\"invoiceNumber\" class=\"col-xs-4 control-label\">Remito</label>\n				<div class=\"col-xs-8\">\n					<input type=\"text\" class=\"form-control\" name=\"invoiceNumber\" placeholder=\"e.j: A142985\" value=\"";
+    + "\" readonly>\n				</div>\n				<div class=\"col-xs-2\">\n					<button class=\"btn btn-info\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Buscar Cliente\" id=\"select-client\">\n						<i class=\"fa fa-search\"></i>\n					</button>\n				</div>\n			</div>\n		</div>\n		<div class=\"col-lg-4 col-md-4 col-xs-4\">\n			<div class=\"form-group\">\n				<label for=\"invoiceNumber\" class=\"col-xs-4 control-label\">Remito</label>\n				<div class=\"col-xs-8\">\n					<input type=\"text\" class=\"form-control\" name=\"invoiceNumber\" placeholder=\"e.j: A142985\" value=\"";
   if (stack1 = helpers.invoiceNumber) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.invoiceNumber); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -1278,7 +1371,7 @@ function program1(depth0,data) {
     + "\" ";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.client_id), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += ">\n				</div>\n			</div>\n		</div>\n	</div>\n	<hr style=\"margin-top: 0\">\n	<div class=\"row\">\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<div class=\"row\" id=\"appliance-views\"></div>\n		</div>\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<button disabled class=\"btn btn-success\" id=\"single-appliance\">\n				<i class=\"fa fa-plus\"></i> Nuevo Equipo\n			</button>\n			<button disabled class=\"btn btn-success\" id=\"multiple-appliance\">\n				<i class=\"fa fa-table\"></i> Carga Masiva\n			</button>\n			<hr style=\"margin-bottom: 0;\">\n		</div>\n	</div>\n	<div class=\"form-group\" style=\"margin-top: 10px;\">\n		<div class=\"col-xs-offset-10 col-xs-2\">\n			<button type=\"submit\" class=\"btn btn-dark-blue pull-right\" disabled>Crear</button>\n		</div>\n		<div class=\"col-xs-offset-10 col-xs-2\">\n			<button id=\"update-form\" class=\"btn btn-warning pull-right hide\">Actualizar</button>\n		</div>\n	</div>\n</div>";
+  buffer += ">\n				</div>\n			</div>\n		</div>\n	</div>\n	<div class=\"row\">\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<div class=\"row\" id=\"appliance-views\"></div>\n		</div>\n		<div class=\"col-lg-offset-1 col-lg-10 col-md-12\">\n			<button disabled class=\"btn btn-success\" id=\"single-appliance\">\n				<i class=\"fa fa-plus\"></i> Nuevo Equipo\n			</button>\n			<button disabled class=\"btn btn-success\" id=\"multiple-appliances\">\n				<i class=\"fa fa-table\"></i> Carga Masiva\n			</button>\n			<hr style=\"margin-bottom: 0;\">\n		</div>\n	</div>\n	<div style=\"margin-top: 10px;\">\n		<div class=\"col-xs-offset-10 col-xs-2\">\n			<button type=\"submit\" class=\"btn btn-dark-blue pull-right\" disabled>Crear</button>\n		</div>\n		<div class=\"col-xs-offset-10 col-xs-2\">\n			<button id=\"update-form\" class=\"btn btn-warning pull-right hide\">Actualizar</button>\n		</div>\n	</div>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_index_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

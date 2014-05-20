@@ -1,0 +1,35 @@
+<tr data-row={{row}}>
+	<td>
+		<div class="col-xs-8">
+			<dt name="brand"></dt>
+			<dd name="model"></dd>
+			<dd name="model_id" style="display: none"></dd>
+		</div>
+		<div class="col-xs-4" name="model-edit"></div>
+		<button class="btn btn-success btn-block" name="select-model" data-toggle="tooltip" data-placement="top" title="Seleccionar Equipo">
+			<i class="fa fa-desktop fa-fw"></i> Seleccionar Modelo
+		</button>
+	</td>
+	<td>
+			<input type="number" name="quantity" min="0" max="9999" value="1" style="width: 100%">
+	</td>
+	<td>
+		<select name="repairement_type" style="width: 100%">
+			<option value="Garantía">Garantía</option>
+			<option value="Presupuesto">Presupuesto</option>
+		</select>
+	</td>
+	<td class="text-center">
+		<button class="btn btn-success btn-block" name="more-details" data-toggle="tooltip" data-placement="top" title="Detalles">
+			<i class="fa fa-asterisk fa-fw"></i>
+		</button>
+	</td>
+	<td>
+		<button class="btn btn-danger btn-controls hide" name="remove-row" data-toggle="tooltip" data-placement="top" title="Eliminar Equipos">
+			<i class="fa fa-minus fa-fw"></i>
+		</button>
+		<button class="btn btn-success btn-controls" name="add-row" data-toggle="tooltip" data-placement="top" title="Agregar Equipos">
+			<i class="fa fa-plus fa-fw"></i>
+		</button>
+	</td>
+</tr>

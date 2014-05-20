@@ -5,10 +5,11 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	className: 'col-lg-12',
 
 	events: {
-		'click button#single-appliance': 'singleApplianceForm',
-		'click button.appliance-delete': 'deleteAppliance',
-		'click button[type=submit]'    : 'createServiceRequest',
-		'click button#select-client'   : 'selectClient',
+		'click button#single-appliance'   : 'newSingleApplianceForm',
+		'click button#multiple-appliances': 'newMultipleAppliancesForm',
+		'click button.appliance-delete'   : 'deleteAppliance',
+		'click button[type=submit]'       : 'createServiceRequest',
+		'click button#select-client'      : 'selectClient',
 	},
 
 	initialize: function(){
@@ -34,20 +35,16 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		}
 	},
 
-	serviceRequestSuccessFlash: function(){
-		return {
-			title   : 'Orden de Servicio Creada',
-			message : 'La Orden de Servicio se ha creado con exito!.',
-			class   : 'success',
-			method  : 'html',
-		};
+	serviceRequestSuccessFlash: {
+		title   : 'Orden de Servicio Creada',
+		message : 'La Orden de Servicio se ha creado con exito!.',
+		class   : 'success',
 	},
 
 	zeroAppliancesFlash: {
 		title  : 'Atención',
 		message: 'Debe agregar por lo menos un equipo a la Orden de Servicio.',
 		class  : 'warning',
-		method : 'html' 
 	},
 
 	selectClient: function(){
@@ -58,13 +55,30 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 
 	clientSelected: function(model){
-		this.model.set('client_id', model.get('_id'));
+		this.model.set('client_id'  , model.get('_id'));
 		this.model.set('client_name', model.get('name'));
 		this.$('.btn-success').attr('disabled', false);
 	},
 
-	singleApplianceForm: function(e){
+	newMultipleAppliancesForm: function(e){
 		e.preventDefault();
+		this.$('#multiple-appliances').hide();
+		this.$('#single-appliance').hide();
+		this.$('button[type=submit]').attr('disabled', false);
+		this.appendMultipleAppliancesForm();
+	},
+
+	appendMultipleAppliancesForm: function(){
+		this.multipleAppliancesForm = new App.Views.ApplianceMultipleFormView({
+			collection: this.model.appliances,
+		});
+		this.multipleAppliancesForm.attachTo(this.$('#appliance-views'), {method: 'html'});
+		App.scrollTo(this.multipleAppliancesForm.$el);
+	},
+
+	newSingleApplianceForm: function(e){
+		e.preventDefault();
+		this.$('#multiple-appliances').hide();
 		var model = app.storage.newModel("appliances");
 		model.set({
 			client_name: this.model.get('client_name'),
@@ -91,9 +105,7 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			style: style
 		}));
 		view.attachTo(this.$('#appliance-container-'+index), {method: 'append'});
-		if(index === (appliances.length - 1)){
-			App.scrollTo(view.$el, 50);
-		}
+		if(index === (appliances.length - 1)){ App.scrollTo(view.$el, 50); }
 	},
 
 	deleteAppliance: function(e){
@@ -107,7 +119,9 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 			self.appendApplianceForm(null, view);
 			view.tagsinput();
 		});
-		if(this.model.appliances.length === 0){//
+		if(this.model.appliances.length === 0){
+			App.scrollTo(this.$el);
+			this.$('#multiple-appliances').show();
 			this.$('button[type=submit]').attr('disabled', true);
 		}
 	},
@@ -122,22 +136,23 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 		_.each(this.children, function(child){
 			child.saveModel();
 		});
-		this.model.save(null, {
-			success: function(model, response, options){
-				var route = 'service_request/show/' + model.id;
-				Backbone.history.navigate(route);
-				self.stopListening(model.appliances);
-				app.Renderer.show({
-					viewName         : 'ServiceRequestShowView',
-					viewType         : 'show',
-					model            : model,
-					fetch            : false,
-					portletFrameClass: 'green',
-				flash            : self.serviceRequestSuccessFlash()
-				});
-				self.invoke('closePortletView');
-			},
-		});
+		console.log(this.model.toJSON());
+		//this.model.save(null, {
+		//	success: function(model, response, options){
+		//		var route = 'service_request/show/' + model.id;
+		//		Backbone.history.navigate(route);
+		//		self.stopListening(model.appliances);
+		//		app.Renderer.show({
+		//			viewName         : 'ServiceRequestShowView',
+		//			viewType         : 'show',
+		//			model            : model,
+		//			fetch            : false,
+		//			portletFrameClass: 'green',
+		//			flash            : self.serviceRequestSuccessFlash()
+		//		});
+		//		self.invoke('closePortletView');
+		//	},
+		//});
 	},
 
 	saveModel: function(){

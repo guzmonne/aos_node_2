@@ -6,9 +6,7 @@ App.Views.ApplianceSingleFormView = App.Views.BaseView.extend({
 	firstRender: true,
 
 	events: {
-		'submit form'                        : function(e){e.preventDefault();},
-		//'focus .bootstrap-tagsinput input'   : 'activateTags',
-		//'focusout .bootstrap-tagsinput input': 'deactivateTags',
+		'submit form': function(e){e.preventDefault();},
 	},
 
 	initialize: function(){
