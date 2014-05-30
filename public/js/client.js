@@ -379,10 +379,11 @@ App.Mixins.SelectModel = {
 	},
 
 	setModelDetails: function(){
-		this.$('[name=brand]').val(this.model.model_id.get('brand'));
-		this.$('[name=model]').val(this.model.model_id.get('model'));
-		this.$('[name=category]').val(this.model.model_id.get('category'));
-		this.$('[name=subcategory]').val(this.model.model_id.get('subcategory'));
+		var model = app.storage.getModel('models', this.model.get('model_id'));
+		this.$('[name=brand]'      ).val(model.get('brand'));
+		this.$('[name=model]'      ).val(model.get('model'));
+		this.$('[name=category]'   ).val(model.get('category'));
+		this.$('[name=subcategory]').val(model.get('subcategory'));
 	},
 
 	setAccessories: function(){
@@ -496,15 +497,15 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 	urlRoot: '/api/appliances',
 	name   : 'appliance',
 
-	constructor: function(){
-		this.listenTo(this, 'change:model_id', function(){
-			this.model_id = app.storage.getModel("models", this.get('model_id'), {fetch: false});
-		});
-		this.listenTo(this, 'change:technician_id', function(){
-			this.technician = app.storage.getModel("techs", this.get('technician_id'), {fetch: false});
-		});
-		Giraffe.Model.apply(this, arguments);
-	},
+	//constructor: function(){
+	//	this.listenTo(this, 'change:model_id', function(){
+	//		this.model_id = app.storage.getModel("models", this.get('model_id'), {fetch: false});
+	//	});
+	//	this.listenTo(this, 'change:technician_id', function(){
+	//		this.technician = ap//p.storage.getModel("techs", this.get('technician_id'), {fetch: false});
+	//	});
+	//	Giraffe.Model.apply(this, arguments);
+	//},
 
 	defaults: function(){
 		return {
@@ -1644,7 +1645,10 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			var createdAt = this.model.get('createdAt');
 			var updatedAt = this.model.get('updatedAt');
 			var closedAt  = this.model.get('closedAt');
-			if (this.model.model_id)  { _.extend(object, this.model.model_id.pick('brand', 'category', 'subcategory', 'model')); }
+			_.extend(	object, 
+								app.storage.getModel('models', this.model.get('model_id'))
+														.pick('brand', 'category', 'subcategory', 'model')
+			);
 			if (this.model.technician){ object.technician_name = this.model.technician.get('name'); }
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
@@ -1691,14 +1695,14 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
 		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
 		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
-		this.listenTo(this.model, 'change:repairement_type', function(){
-			this.updateViewField.apply(this, ['repairement_type']);
-			this.setRepairementType();	
-		});
 		this.listenTo(this.model, 'change:technician_id'   , this.setTechnician);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
 		this.listenTo(this.model, 'change:status'          , this.changeStatus);
+		this.listenTo(this.model, 'change:repairement_type', function(){
+			this.updateViewField.apply(this, ['repairement_type']);
+			this.setRepairementType();	
+		});
 		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
 		this.listenTo(app.storage.collection("techs"), 'remove', this.fillTechnicianField);
 	},
@@ -1713,10 +1717,12 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		}
 		this.setRepairementType();
 		this.changeStatus();
+		this.setModelDetails();
 	},
 
 	toggleButtons: function(){
 		this.$('#controls > button').toggleClass('hide');
+		this.$('#select-model').toggleClass('hide');
 		this.$('button#status-dropdown').attr('disabled', !this.$('button#status-dropdown').attr('disabled'));
 	},
 
@@ -1800,7 +1806,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
-		var model_id  = this.model.changedAttributes().model_id;
 		if (this.model.prevModelId){ this.model.set('model_id', this.model.prevModelId); }
 		this.render();
 	},
@@ -2881,6 +2886,7 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		if (!model){return this.changeView();} 
 		index = collection.indexOf(model);
 		view.slideTo(index + 1);
+		App.scrollTo(this.$el, -165);
 	},
 
 	changeView: function(e){
@@ -3641,6 +3647,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 		if (!model){return this.changeView();} 
 		index = collection.indexOf(model);
 		view.slideTo(index + 1);
+		App.scrollTo(this.$el, -70);
 	},
 
 

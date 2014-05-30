@@ -33,6 +33,7 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		if (!model){return this.changeView();} 
 		index = collection.indexOf(model);
 		view.slideTo(index + 1);
+		App.scrollTo(this.$el, -165);
 	},
 
 	changeView: function(e){

@@ -109,6 +109,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 		if (!model){return this.changeView();} 
 		index = collection.indexOf(model);
 		view.slideTo(index + 1);
+		App.scrollTo(this.$el, -70);
 	},
 
 

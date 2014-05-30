@@ -57,10 +57,11 @@ App.Mixins.SelectModel = {
 	},
 
 	setModelDetails: function(){
-		this.$('[name=brand]').val(this.model.model_id.get('brand'));
-		this.$('[name=model]').val(this.model.model_id.get('model'));
-		this.$('[name=category]').val(this.model.model_id.get('category'));
-		this.$('[name=subcategory]').val(this.model.model_id.get('subcategory'));
+		var model = app.storage.getModel('models', this.model.get('model_id'));
+		this.$('[name=brand]'      ).val(model.get('brand'));
+		this.$('[name=model]'      ).val(model.get('model'));
+		this.$('[name=category]'   ).val(model.get('category'));
+		this.$('[name=subcategory]').val(model.get('subcategory'));
 	},
 
 	setAccessories: function(){

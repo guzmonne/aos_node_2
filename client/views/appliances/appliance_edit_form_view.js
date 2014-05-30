@@ -27,14 +27,14 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		this.listenTo(this.model, 'change:diagnose'        , function(){this.updateViewField.apply(this, ['diagnose']);});
 		this.listenTo(this.model, 'change:replacements'    , function(){this.updateViewField.apply(this, ['replacements']);});
 		this.listenTo(this.model, 'change:solution'        , function(){this.updateViewField.apply(this, ['solution']);});
-		this.listenTo(this.model, 'change:repairement_type', function(){
-			this.updateViewField.apply(this, ['repairement_type']);
-			this.setRepairementType();	
-		});
 		this.listenTo(this.model, 'change:technician_id'   , this.setTechnician);
 		this.listenTo(this.model, 'change:accessories'     , this.setAccessories);
 		this.listenTo(this.model, 'change:model_id'        , this.setModelDetails);
 		this.listenTo(this.model, 'change:status'          , this.changeStatus);
+		this.listenTo(this.model, 'change:repairement_type', function(){
+			this.updateViewField.apply(this, ['repairement_type']);
+			this.setRepairementType();	
+		});
 		this.listenTo(app.storage.collection("techs"), 'add'   , this.fillTechnicianField);
 		this.listenTo(app.storage.collection("techs"), 'remove', this.fillTechnicianField);
 	},
@@ -49,10 +49,12 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 		}
 		this.setRepairementType();
 		this.changeStatus();
+		this.setModelDetails();
 	},
 
 	toggleButtons: function(){
 		this.$('#controls > button').toggleClass('hide');
+		this.$('#select-model').toggleClass('hide');
 		this.$('button#status-dropdown').attr('disabled', !this.$('button#status-dropdown').attr('disabled'));
 	},
 
@@ -136,7 +138,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	reRender: function(e){
 		e.preventDefault();
 		this.editMode = false;
-		var model_id  = this.model.changedAttributes().model_id;
 		if (this.model.prevModelId){ this.model.set('model_id', this.model.prevModelId); }
 		this.render();
 	},
