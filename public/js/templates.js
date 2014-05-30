@@ -320,7 +320,7 @@ function program8(depth0,data) {
   if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</span></h4>\n</td>\n<td style=\"white-space: normal\">";
+    + "</span></h4>\n</td>\n<td class=\"center-vh\" style=\"white-space: normal\">";
   if (stack2 = helpers.technician_name) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.technician_name); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)

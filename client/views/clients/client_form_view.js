@@ -100,34 +100,34 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	renderPhones: function(){
 		this.$('#phone-numbers').html(this.phoneFieldTemplate({
-			phones : this.model.phones.toJSON()
+			phones : this.model.get('phones'),
 		}));
 		this.$('[name=phone]').focus();
 	},
 
 	addPhone: function(){
-		var number = this.$('[name=phone]').val();
+		var phones, number = this.$('[name=phone]').val();
 		if(number === ""){return;}
-		this.model.phones.add({number: number});
+		this.model.push('phones', {number: number});
 	},
 
 	delPhone:function(e){
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
-		this.model.phones.remove(this.model.phones.at(index));
+		this.model.pop('phones', index);
 	},
 
 	editPhone: function(e){
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
-		var phone = this.model.phones.at(index);
+		var phone = this.model.getAt('phones', index);
 		this.delPhone(index);
-		this.$('[name=phone]').val(phone.get('number'));
+		this.$('[name=phone]').val(phone.number);
 	},
 
 	renderAddresses: function(){
 		this.$('#addresses').html(this.addressFieldTemplate({
-			addresses : this.model.addresses.toJSON()
+			addresses : this.model.get('addresses'),
 		}));
 		this.$('[name=street]').focus();
 		this.$('.form-control-under label[for=address]').hide();
@@ -136,23 +136,23 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	addAddress: function(){
 		var attrs = _.pick(this.$('form').formParams(), 'street', 'city', 'department');
 		if(attrs.street === ""){return;}
-		this.model.addresses.add(attrs);
+		this.model.push('addresses', attrs);
 	},
 
 	delAddress: function(e){//
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
-		this.model.addresses.remove(this.model.addresses.at(index));
+		this.model.pop('addresses', index);
 	},
 
 	editAddress: function(e){
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
-		var address = this.model.addresses.at(index);
+		var address = this.model.getAt('addresses', index);
 		this.delAddress(index);
-		this.$('[name=street]').val(address.get('street'));
-		this.$('[name=city]').val(address.get('city'));
-		this.$('[name=department]').val(address.get('department'));
+		this.$('[name=street]'    ).val(address.street);
+		this.$('[name=city]'      ).val(address.city);
+		this.$('[name=department]').val(address.department);
 	},
 
 	setModel: function(){

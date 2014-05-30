@@ -433,75 +433,35 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
-	constructor: function(attributes, options){
-		this.children = [];
-		if (this.childs){this.createChilds.apply(this, arguments);}
-		Giraffe.Model.apply(this, arguments);
+	awake: function(){},
+
+	push: function(attribute, value){
+		var array = this.get(attribute);
+		if (!_.isArray(array)){return;}
+		array.push(value);
+		this.set(attribute, array);
+		this.trigger('change:' + attribute);
+		return this;
 	},
 
-	awake: function(){},
+	pop: function(attribute, index){
+		var array = this.get(attribute);
+		if (!_.isArray(array)){return;}
+		array.splice(index, 1);
+		this.set(attribute, []).set(attribute, array);
+		this.trigger('change:' + attribute);
+		return this;
+	},
+
+	getAt: function(attribute, index){
+		var array = this.get(attribute);
+		if (!_.isArray(array)){return;}
+		return array[index];
+	},
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-	},
-
-	createChilds: function(){
-		var self = this;
-		if(	!_.isArray(this.childs) || !App.isObjectsArray(this.childs)){
-			throw new Error("'childs' attribute must be an objects's array");
-		}
-		var childs = this.childs;
-		var attrs = (arguments.length > 0) ? arguments[0] : {};
-		_.each(childs, function(child){
-			var attribute, type, storage;
-			if (!child.attribute || !child.type){
-				throw new Error("Every 'child' should have an 'attribute' and 'type' key value");
-			}
-			if (child.type === 'model'){
-				type = "Models";
-			} else if (child.type === 'collection'){
-				type = "Collections";
-			} else {
-				throw new Error("'child' type must be 'model' or 'collection'");
-			}
-			if (child.name && child.filter){
-				throw new Error("A 'child' can't have both a 'name' an a 'filter' options");
-			} else if (child.name && !child.filter) {
-				self[child.attribute] = new App[type][child.name]();
-				if (attrs[child.attribute]){
-					self[child.attribute].set(attrs[child.attribute]);
-				}
-			} else if  (!child.name && child.filter) {
-					var collection, options, objects;
-					if (child.type === "model"){
-						collection = (child.collection) ? child.collection : child.attribute + 's';
-						options    = {};
-						if (attrs[child.attribute]) { options.attributes = attrs[child.attribute]; }
-						self[child.attribute] = app.storage.setModel(collection, options);
-					} else {
-						collection            = (child.collection) ? child.collection : child.attribute;
-						options               = {};
-						objects               = (attrs[child.attribute]) ? attrs[child.attribute] : {};
-						options.filter        = child.filter;
-						self[child.attribute] = app.storage.setSubCollection(collection, objects, options, self);
-					}
-			} else {
-				throw new Error('A "child" must have either a "name" or a "filter" value');
-			}
-			self[child.attribute].parent = self; 
-			self.children.push(self[child.attribute]);
-			var triggerChange = function(){
-				self.set(child.attribute, self[child.attribute].toJSON());
-			};
-			if(child.type === "model"){
-				self.listenTo(self[child.attribute], 'change', triggerChange);
-			} else if (child.type === "collection"){
-				self.listenTo(self[child.attribute], 'add', triggerChange);
-				self.listenTo(self[child.attribute], 'remove', triggerChange);
-				self.listenTo(self[child.attribute], 'change', triggerChange);
-			}
-			self[child.attribute].listenTo(self, 'disposing', self[child.attribute].dispose);
-		});
+		Giraffe.Model.prototype.initialize.apply(this, arguments);
 	},
 
 	parse: function(response){
@@ -564,39 +524,6 @@ App.Models.Client = App.Models.BaseModel.extend({
 			'updatedBy' : 'Guzmán Monné'
 		};
 	},
-
-	childs: [
-		{
-			attribute: 'phones',
-			type: 'collection',
-			name: 'Phones'
-		},
-		{
-			attribute: 'addresses',
-			type: 'collection',
-			name: 'Addresses',
-		}
-	],
-});
-
-App.Models.Phone = App.Models.BaseModel.extend({
-	name: 'phone',
-	defaults: function(){
-		return {
-			number: '',
-		};
-	},
-});
-
-App.Models.Address = App.Models.BaseModel.extend({
-	name: 'address',
-	defaults: function(){
-		return {
-			street    : '',
-			city      : '',
-			department: '',
-		};
-	},
 });
 App.Models.Model = App.Models.BaseModel.extend({
 	
@@ -652,14 +579,6 @@ App.Collections.Appliances = App.Collections.BaseCollection.extend({
 App.Collections.Clients = Giraffe.Collection.extend({
 	url  : '/api/clients',
 	model: App.Models.Client,
-});
-
-App.Collections.Phones = Giraffe.Collection.extend({
-	model: App.Models.Phone,
-});
-
-App.Collections.Addresses = Giraffe.Collection.extend({
-	model: App.Models.Address,
 });
 App.Collections.Models = Giraffe.Collection.extend({
 	url  : '/api/models',
@@ -2357,34 +2276,34 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 
 	renderPhones: function(){
 		this.$('#phone-numbers').html(this.phoneFieldTemplate({
-			phones : this.model.phones.toJSON()
+			phones : this.model.get('phones'),
 		}));
 		this.$('[name=phone]').focus();
 	},
 
 	addPhone: function(){
-		var number = this.$('[name=phone]').val();
+		var phones, number = this.$('[name=phone]').val();
 		if(number === ""){return;}
-		this.model.phones.add({number: number});
+		this.model.push('phones', {number: number});
 	},
 
 	delPhone:function(e){
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
-		this.model.phones.remove(this.model.phones.at(index));
+		this.model.pop('phones', index);
 	},
 
 	editPhone: function(e){
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('phoneIndex')) : e;
-		var phone = this.model.phones.at(index);
+		var phone = this.model.getAt('phones', index);
 		this.delPhone(index);
-		this.$('[name=phone]').val(phone.get('number'));
+		this.$('[name=phone]').val(phone.number);
 	},
 
 	renderAddresses: function(){
 		this.$('#addresses').html(this.addressFieldTemplate({
-			addresses : this.model.addresses.toJSON()
+			addresses : this.model.get('addresses'),
 		}));
 		this.$('[name=street]').focus();
 		this.$('.form-control-under label[for=address]').hide();
@@ -2393,23 +2312,23 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 	addAddress: function(){
 		var attrs = _.pick(this.$('form').formParams(), 'street', 'city', 'department');
 		if(attrs.street === ""){return;}
-		this.model.addresses.add(attrs);
+		this.model.push('addresses', attrs);
 	},
 
 	delAddress: function(e){//
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
-		this.model.addresses.remove(this.model.addresses.at(index));
+		this.model.pop('addresses', index);
 	},
 
 	editAddress: function(e){
 		var index = (_.isObject(e)) ? 
 			parseInt(this.$(e.currentTarget).closest('button').data('sourceIndex')) : e;
-		var address = this.model.addresses.at(index);
+		var address = this.model.getAt('addresses', index);
 		this.delAddress(index);
-		this.$('[name=street]').val(address.get('street'));
-		this.$('[name=city]').val(address.get('city'));
-		this.$('[name=department]').val(address.get('department'));
+		this.$('[name=street]'    ).val(address.street);
+		this.$('[name=city]'      ).val(address.city);
+		this.$('[name=department]').val(address.department);
 	},
 
 	setModel: function(){

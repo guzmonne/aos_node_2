@@ -12,22 +12,18 @@ var _             = require('underscore');
 // =======
 var Schema   = mongoose.Schema;
 
-var Address = new Schema({
-	street    : String,
-	city      : String,
-	department: String,
-});
-
-var Phone = new Schema({
-	number: String,
-});
-
 var Client = new Schema({
 	'name'      : String,
 	'doc-type'  : String,
 	'doc-number': String,
-	'phones'    : [Phone],
-	'addresses' : [Address],
+	'phones'    : [{
+		'number': String 
+	}],
+	'addresses' : [{
+		'street'    : String,
+		'city'      : String,
+		'department': String,
+	}],
 	'email'     : {
 		'type'    : String,
 		'lowecase': true,
