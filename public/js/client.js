@@ -443,10 +443,13 @@ App.Models.BaseModel = Giraffe.Model.extend({
 
 	push: function(attribute, value){
 		var array = this.get(attribute);
-		if (!_.isArray(array)){return;}
+		if (!_.isArray(array)){
+			this.set(attribute, []);
+		}
 		array.push(value);
 		this.set(attribute, array);
-		this.trigger('change:' + attribute);
+		this.trigger('change', this);
+		this.trigger('change:' + attribute, this);
 		return this;
 	},
 
@@ -455,7 +458,8 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		if (!_.isArray(array)){return;}
 		array.splice(index, 1);
 		this.set(attribute, []).set(attribute, array);
-		this.trigger('change:' + attribute);
+		this.trigger('change', this);
+		this.trigger('change:' + attribute, this);
 		return this;
 	},
 
