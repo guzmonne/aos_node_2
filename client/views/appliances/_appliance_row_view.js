@@ -9,17 +9,18 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			var createdAt = this.model.get('createdAt');
 			var updatedAt = this.model.get('updatedAt');
 			var closedAt  = this.model.get('closedAt');
-			_.extend(	object, 
-								app.storage.getModel('models', this.model.get('model_id'))
-														.pick('brand', 'category', 'subcategory', 'model')
-			);
-			if (this.model.technician){ object.technician_name = this.model.technician.get('name'); }
+			if (object.client_id){
+				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
+			}
+			if (object.technician_id){
+				object.technician_name = app.storage.collection("techs").get(object.technician_id).get('name');
+			}
+			if(object.model_id){
+				_.extend(object, app.storage.collection("models").get(object.model_id).pick('brand', 'category', 'subcategory', 'model'));
+			}
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
-			if (!object.client_name && object.client_id){
-				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
-			}
 		}
 		return object;
 	},

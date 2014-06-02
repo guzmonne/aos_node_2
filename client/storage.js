@@ -47,7 +47,7 @@ App.Storage = (function(){
 		var getModel = function(collection, id, options, context){
 			if (!collection)            { throw new Error('No "collection" was passed'); }
 			if (!colls[collection])     { throw new Error('Collection "'+collection+'" is not defined'); }
-			if (!id && !_.isString(id)) { throw new Error('An "id must be passed"'); }
+			if (!id && !_.isString(id)) { throw new Error('An "id" must be passed'); }
 			var model, fetch;
 			collection = colls[collection];
 			options    = (options) ? options : {};

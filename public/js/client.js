@@ -141,7 +141,7 @@ App.Storage = (function(){
 		var getModel = function(collection, id, options, context){
 			if (!collection)            { throw new Error('No "collection" was passed'); }
 			if (!colls[collection])     { throw new Error('Collection "'+collection+'" is not defined'); }
-			if (!id && !_.isString(id)) { throw new Error('An "id must be passed"'); }
+			if (!id && !_.isString(id)) { throw new Error('An "id" must be passed'); }
 			var model, fetch;
 			collection = colls[collection];
 			options    = (options) ? options : {};
@@ -379,11 +379,16 @@ App.Mixins.SelectModel = {
 	},
 
 	setModelDetails: function(){
-		var model = app.storage.getModel('models', this.model.get('model_id'));
-		this.$('[name=brand]'      ).val(model.get('brand'));
-		this.$('[name=model]'      ).val(model.get('model'));
-		this.$('[name=category]'   ).val(model.get('category'));
-		this.$('[name=subcategory]').val(model.get('subcategory'));
+		try {
+			var model = app.storage.getModel('models', this.model.get('model_id'), {fetch: false});
+			this.$('[name=brand]'      ).val(model.get('brand'));
+			this.$('[name=model]'      ).val(model.get('model'));
+			this.$('[name=category]'   ).val(model.get('category'));
+			this.$('[name=subcategory]').val(model.get('subcategory'));
+		} catch (err) {
+			if (err.message !== 'An "id" must be passed'){console.log(err.stack);}
+			return;
+		}
 	},
 
 	setAccessories: function(){
@@ -1400,10 +1405,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	rowViewOptions: {},
 	fetchOptions	: {},
 
-	events: {
-		'click ul.pagination li': 'scrollToTable',
-	},
-
 	constructor: function(options){
 		this.rendered = false;
 		this.synced   = (options.synced) ? options.synced : false;
@@ -1436,17 +1437,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rendered = true;
 	},
 
-	scrollToTable: function(){
-		console.log('scrollToTable');
-		App.scrollTo(this.$('table'));
-	},
-
-	setScrollEvent: function(){
-		var self = this;
-		this.$('click ul.pagination li a').off('click');
-		this.$('click ul.pagination li a').on('click', function(){self.scrollToTable();});
-	},
-
 	appendCollection: function(collection){
 		var self   = this;
 		this.$('tbody').remove();
@@ -1458,11 +1448,14 @@ App.Views.TableView = App.Views.BaseView.extend({
 			self.tbody.append(view.render().el);
 		});
 		this.$('table').append(this.tbody);
-		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
+		this.oTable = this.$(this.tableEl + "-" + this.timestamp).DataTable({
+			"scrollY"       : 500,
+			"scrollX"       : true,
+			"scrollCollapse": true,
+		});
+		//this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
 		this.stopListening(this.collection, 'add', this.append);
-		this.listenTo(this.collection, 'add', this.append);
-		this.setScrollEvent();
+		this.listenTo     (this.collection, 'add', this.append);
 	},
 
 	tableFetched: function(){
@@ -1475,7 +1468,8 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rowViewOptions.model = model;
 		var view = new this.modelView(this.rowViewOptions);
 		this.addChild(view);
-		this.oTable.fnAddTr(view.render().el);
+		//this.oTable.fnAddTr(view.render().el);
+		this.oTable.draw();
 		this.setScrollEvent();
 	},
 
@@ -1645,17 +1639,18 @@ App.Views.ApplianceRowView = App.Views.RowView.extend({
 			var createdAt = this.model.get('createdAt');
 			var updatedAt = this.model.get('updatedAt');
 			var closedAt  = this.model.get('closedAt');
-			_.extend(	object, 
-								app.storage.getModel('models', this.model.get('model_id'))
-														.pick('brand', 'category', 'subcategory', 'model')
-			);
-			if (this.model.technician){ object.technician_name = this.model.technician.get('name'); }
+			if (object.client_id){
+				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
+			}
+			if (object.technician_id){
+				object.technician_name = app.storage.collection("techs").get(object.technician_id).get('name');
+			}
+			if(object.model_id){
+				_.extend(object, app.storage.collection("models").get(object.model_id).pick('brand', 'category', 'subcategory', 'model'));
+			}
 			object.createdAt =	(App.defined(createdAt))	?	this.model.dateDDMMYYYY(createdAt)	:	null;
 			object.updatedAt =	(App.defined(updatedAt))	? this.model.dateDDMMYYYY(updatedAt)	: null;
 			object.closedAt  =	(App.defined(closedAt))		? this.model.dateDDMMYYYY(closedAt)		: null;
-			if (!object.client_name && object.client_id){
-				object.client_name = app.storage.collection("clients").get(object.client_id).get('name');
-			}
 		}
 		return object;
 	},

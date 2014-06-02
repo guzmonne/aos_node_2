@@ -2,10 +2,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	rowViewOptions: {},
 	fetchOptions	: {},
 
-	events: {
-		'click ul.pagination li': 'scrollToTable',
-	},
-
 	constructor: function(options){
 		this.rendered = false;
 		this.synced   = (options.synced) ? options.synced : false;
@@ -38,17 +34,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rendered = true;
 	},
 
-	scrollToTable: function(){
-		console.log('scrollToTable');
-		App.scrollTo(this.$('table'));
-	},
-
-	setScrollEvent: function(){
-		var self = this;
-		this.$('click ul.pagination li a').off('click');
-		this.$('click ul.pagination li a').on('click', function(){self.scrollToTable();});
-	},
-
 	appendCollection: function(collection){
 		var self   = this;
 		this.$('tbody').remove();
@@ -60,11 +45,14 @@ App.Views.TableView = App.Views.BaseView.extend({
 			self.tbody.append(view.render().el);
 		});
 		this.$('table').append(this.tbody);
-		this.oTable = this.$(this.tableEl + "-" + this.timestamp).dataTable();
-		this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
+		this.oTable = this.$(this.tableEl + "-" + this.timestamp).DataTable({
+			"scrollY"       : 500,
+			"scrollX"       : true,
+			"scrollCollapse": true,
+		});
+		//this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
 		this.stopListening(this.collection, 'add', this.append);
-		this.listenTo(this.collection, 'add', this.append);
-		this.setScrollEvent();
+		this.listenTo     (this.collection, 'add', this.append);
 	},
 
 	tableFetched: function(){
@@ -77,7 +65,8 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rowViewOptions.model = model;
 		var view = new this.modelView(this.rowViewOptions);
 		this.addChild(view);
-		this.oTable.fnAddTr(view.render().el);
+		//this.oTable.fnAddTr(view.render().el);
+		this.oTable.draw();
 		this.setScrollEvent();
 	},
 

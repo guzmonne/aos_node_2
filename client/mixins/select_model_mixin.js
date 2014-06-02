@@ -57,11 +57,16 @@ App.Mixins.SelectModel = {
 	},
 
 	setModelDetails: function(){
-		var model = app.storage.getModel('models', this.model.get('model_id'));
-		this.$('[name=brand]'      ).val(model.get('brand'));
-		this.$('[name=model]'      ).val(model.get('model'));
-		this.$('[name=category]'   ).val(model.get('category'));
-		this.$('[name=subcategory]').val(model.get('subcategory'));
+		try {
+			var model = app.storage.getModel('models', this.model.get('model_id'), {fetch: false});
+			this.$('[name=brand]'      ).val(model.get('brand'));
+			this.$('[name=model]'      ).val(model.get('model'));
+			this.$('[name=category]'   ).val(model.get('category'));
+			this.$('[name=subcategory]').val(model.get('subcategory'));
+		} catch (err) {
+			if (err.message !== 'An "id" must be passed'){console.log(err.stack);}
+			return;
+		}
 	},
 
 	setAccessories: function(){
