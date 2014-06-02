@@ -1,8 +1,8 @@
 App.Views.TableView = App.Views.BaseView.extend({
-	rowViewOptions: {},
-	fetchOptions	: {},
-
 	constructor: function(options){
+		this.rowViewOptions   = {};
+		this.fetchOptions     = {};
+		this.dataTableOptions = {};
 		this.rendered = false;
 		this.synced   = (options.synced) ? options.synced : false;
 		Giraffe.View.apply(this, arguments);
@@ -14,6 +14,9 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.listenTo(this.collection, 'sync', this.tableFetched);
 		this.listenTo(this, 'disposing', function(){
 			this.$('click ul.pagination li').off('click');
+		});
+		this.listenTo(app, 'nav:toggleMenu:end', function(){
+			this.oTable.columns.adjust().draw();
 		});
 		_.bind(this.append, this);
 		this.timestamp = _.uniqueId();
@@ -35,7 +38,14 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	appendCollection: function(collection){
-		var self   = this;
+		var self    = this;
+		var options = _.extend({
+			"scrollY"       : 500,
+			"scrollX"       : true,
+			"scrollCollapse": true,
+			"deferRender"   : true,
+			"stateSave": true,
+		}, this.dataTableOptions);
 		this.$('tbody').remove();
 		this.tbody = $('<tbody />');
 		_.each(this.collection.models, function(model){
@@ -45,11 +55,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 			self.tbody.append(view.render().el);
 		});
 		this.$('table').append(this.tbody);
-		this.oTable = this.$(this.tableEl + "-" + this.timestamp).DataTable({
-			"scrollY"       : 500,
-			"scrollX"       : true,
-			"scrollCollapse": true,
-		});
+		this.oTable = this.$(this.tableEl + "-" + this.timestamp).DataTable(options);
 		//this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
 		this.stopListening(this.collection, 'add', this.append);
 		this.listenTo     (this.collection, 'add', this.append);
@@ -66,8 +72,8 @@ App.Views.TableView = App.Views.BaseView.extend({
 		var view = new this.modelView(this.rowViewOptions);
 		this.addChild(view);
 		//this.oTable.fnAddTr(view.render().el);
+		this.$(this.tableEl + "-" + this.timestamp + ' tbody').append(view.render().el);
 		this.oTable.draw();
-		this.setScrollEvent();
 	},
 
 	onSync: function(){

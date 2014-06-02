@@ -290,15 +290,15 @@ function program8(depth0,data) {
   return buffer;
   }
 
-  buffer += "<td class=\"center-vh\" style=\"text-align: left;\">";
+  buffer += "<td style=\"text-align: left;\">";
   if (stack1 = helpers.id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td class=\"center-vh\" style=\"white-space: normal; text-align: left;\">";
+    + "</td>\n<td style=\"white-space: normal; text-align: left;\">";
   if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</td>\n<td class=\"center-vh\" style=\"text-align: left;\">\n	<dt>";
+    + "</td>\n<td style=\"text-align: left;\">\n	<dt>";
   if (stack1 = helpers.brand) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.brand); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
@@ -309,18 +309,18 @@ function program8(depth0,data) {
     + "</dd>\n	";
   stack1 = helpers['if'].call(depth0, (depth0 && depth0.serial), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n</td>\n<td class=\"center-vh\">\n	";
+  buffer += "\n</td>\n<td>\n	";
   options = {hash:{},inverse:self.program(6, program6, data),fn:self.program(3, program3, data),data:data};
   stack2 = ((stack1 = helpers.is || (depth0 && depth0.is)),stack1 ? stack1.call(depth0, (depth0 && depth0.repairement_type), "Presupuesto", options) : helperMissing.call(depth0, "is", (depth0 && depth0.repairement_type), "Presupuesto", options));
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n</td>\n<td class=\"center-vh\">\n	<h4 style=\"margin: 0px;\"><span class=\"label label-default ";
+  buffer += "\n</td>\n<td>\n	<h4 style=\"margin: 0px;\"><span class=\"label label-default ";
   options = {hash:{},data:data};
   buffer += escapeExpression(((stack1 = helpers.statusClass || (depth0 && depth0.statusClass)),stack1 ? stack1.call(depth0, (depth0 && depth0.status), options) : helperMissing.call(depth0, "statusClass", (depth0 && depth0.status), options)))
     + "\">";
   if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
-    + "</span></h4>\n</td>\n<td class=\"center-vh\" style=\"white-space: normal\">";
+    + "</span></h4>\n</td>\n<td style=\"white-space: normal\">";
   if (stack2 = helpers.technician_name) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0.technician_name); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)
@@ -335,7 +335,7 @@ function program8(depth0,data) {
     + "</dd>\n	";
   stack2 = helpers['if'].call(depth0, (depth0 && depth0.closedAt), {hash:{},inverse:self.noop,fn:self.program(8, program8, data),data:data});
   if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n</td>\n<td class=\"center-vh\">\n	<a href=\"#render/appliance/show/";
+  buffer += "\n</td>\n<td>\n	<a href=\"#render/appliance/show/";
   if (stack2 = helpers._id) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
   else { stack2 = (depth0 && depth0._id); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
   buffer += escapeExpression(stack2)

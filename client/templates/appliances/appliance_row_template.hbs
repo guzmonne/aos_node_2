@@ -1,13 +1,13 @@
-<td class="center-vh" style="text-align: left;">{{id}}</td>
-<td class="center-vh" style="white-space: normal; text-align: left;">{{client_name}}</td>
-<td class="center-vh" style="text-align: left;">
+<td style="text-align: left;">{{id}}</td>
+<td style="white-space: normal; text-align: left;">{{client_name}}</td>
+<td style="text-align: left;">
 	<dt>{{brand}}</dt>
 	<dd>{{model}}</dd>
 	{{#if serial}}
 		<dd><i class="fa fa-barcode"></i> {{serial}}</dd>
 	{{/if}}
 </td>
-<td class="center-vh">
+<td>
 	{{#is repairement_type "Presupuesto"}}
 		<dt>{{repairement_type}}</dt>
 		{{#is cost "not" 0}}
@@ -17,10 +17,10 @@
 		{{repairement_type}}
 	{{/is}}
 </td>
-<td class="center-vh">
+<td>
 	<h4 style="margin: 0px;"><span class="label label-default {{statusClass status}}">{{status}}</span></h4>
 </td>
-<td class="center-vh" style="white-space: normal">{{technician_name}}</td>
+<td style="white-space: normal">{{technician_name}}</td>
 <td>
 	<dt>Creado</dt>
 	<dd>{{createdAt}}</dd>
@@ -31,7 +31,7 @@
 		<dd>{{closedAt}}</dd>
 	{{/if}}
 </td>
-<td class="center-vh">
+<td>
 	<a href="#render/appliance/show/{{_id}}" class="btn btn-green" data-id={{_id}} id="appliance-details" data-toggle="tooltip" data-placement="top" title="Mas Información" style="margin-bottom: 3px;">
 		<i class="fa fa-ellipsis-h fa-fw"></i>
 	</a>

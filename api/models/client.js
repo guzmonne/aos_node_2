@@ -81,11 +81,15 @@ ClientModel.prototype.create = function(params, callback){
 		'doc-type'  : params['doc-type'],
 		'doc-number': params['doc-number'],
 	});
-	for (var i = 0; i < params['phones'].length; i++){
-		client.phones.push(params['phones'][i]);
+	if(_.isArray(params['phones'])){
+		for (var i = 0; i < params['phones'].length; i++){
+			client.phones.push(params['phones'][i]);
+		}
 	}
-	for (var i = 0; i < params['addresses'].length; i++){
-		client.addresses.push(params['addresses'][i]);
+	if(_.isArray(params['addresses'])){
+		for (var i = 0; i < params['addresses'].length; i++){
+			client.addresses.push(params['addresses'][i]);
+		}
 	}
 	client.save(function(err, client){
 		if (err){return callback(err);}

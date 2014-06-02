@@ -12,7 +12,7 @@ App.Views.SideNavView = App.Views.BaseView.extend({
 	},
 
 	appEvents: {
-		'nav:toggleMenu': 'toggleMenu',
+		'nav:toggleMenu:start': 'toggleMenu',
 	},
 
 	events: {
