@@ -91,4 +91,50 @@ window.App = {
 			}
 		}, true);
 	},
+
+	statusClass: function(status){
+    var className;
+    switch (status){
+    case "Recibido":
+        className = "btn-status-1";
+        break;
+    case "En Reparación":
+        className = "btn-status-2";
+        break;
+    case "En Espera":
+        className = "btn-status-3";
+        break;
+    case "Atrasado":
+        className = "btn-status-4";
+        break;
+    case "Reparado":
+        className = "btn-status-5";
+        break;
+    case "Entregado":
+        className = "btn-status-7";
+        break;
+    case "Enviado":
+        className = "btn-status-6";
+        break;
+    }
+    return className;
+  },
+
+  dateDDMMYYYY: function(date){
+		var parsedDate;
+		if (date instanceof Date){
+			parsedDate = date;
+		} else {
+			parsedDate = new Date(date);
+		}
+		return  parsedDate.getDate() +
+			"/" + parsedDate.getMonth() + 
+			"/" + parsedDate.getFullYear();
+	},
+
+	tryCatch: function(callback, context){
+		context = (context) ? context : this;
+		try {callback.apply(context);}
+		catch (err){console.log(err.stack);}
+	},
 };

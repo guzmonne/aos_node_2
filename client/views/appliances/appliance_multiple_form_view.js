@@ -97,7 +97,6 @@ App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		console.log(this.details);
 		var self = this;
 		this.$('tbody tr').each(function(index, tr){
 			var $tr,rowId, quantity, options;

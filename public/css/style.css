@@ -995,11 +995,16 @@ td {
   border-right  : 1px solid #C1C3D1;
 }
 
+
 td.center-vh{
   text-align    : center;
 }
 
 .table>tbody>tr>td.center-vh{  
+  vertical-align: middle;
+}
+
+.table>tbody>tr>td.center-v {
   vertical-align: middle;
 }
 

@@ -10,12 +10,16 @@ App.Views.ModalController = App.Views.BaseView.extend({
 		'click .close-modal': 'closeModal',
 	},
 
-	displayModal: function(view, callerView, callerMethod){
+	afterRender: function(){
+		this.$modalContainer = this.$('#modalContainer');
+	},
+
+	displayModal: function(view, callerView, callerMethod, eventHandlerFn){
 		if (callerView)   {this.callerView   = callerView;}
 		if (callerMethod) {this.callerMethod = callerMethod;}
 		if(!App.defined(this.currentModal) || this.currentModal.bodyView.cid !== view.cid){
 			this.setCurrentModal(view);
-		}	
+		}
 		this.$('#modalContainer').modal('show');
 	},
 

@@ -11,8 +11,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 		this.awake.apply(this, arguments);
 		this.listenTo(this.model, 'change' , this.render);
 		this.listenTo(this.model, 'remove', this.invokeRemoveRow);
-		this.listenTo(app, 'model:show:active',   this.activate);
-		this.listenTo(app, 'model:show:inactive', this.deactivate);
 	},
 
 	afterRender: function(){
@@ -37,21 +35,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 			return this.model.serialize();
 		} else {
 			return this.model.toJSON();
-		}
-	},
-
-	activate: function(id){
-		if(this.model && this.model.id !== id){return;}
-		this.activated = true;
-		this.$el.addClass('selected');
-	},
-
-	deactivate: function(id){
-		if(this.model && this.model.id !== id){return;}
-		if(this.$el.hasClass('selected')){
-			this.activated = false;
-			this.$el.removeClass('selected');
-			this.className = '';
 		}
 	},
 });

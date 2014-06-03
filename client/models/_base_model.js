@@ -2,6 +2,11 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
+	initialize: function(){
+		this.awake.apply(this, arguments);
+		Giraffe.Model.prototype.initialize.apply(this, arguments);
+	},
+
 	awake: function(){},
 
 	push: function(attribute, value){
@@ -32,26 +37,6 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		return array[index];
 	},
 
-	initialize: function(){
-		this.awake.apply(this, arguments);
-		Giraffe.Model.prototype.initialize.apply(this, arguments);
-	},
-
-	parse: function(response){
-		if (this.childs){
-			var self = this;
-			var attributes = _.map(this.childs, function(child){
-				return child.attribute;
-			});
-			_.each(attributes, function(attribute){
-				if (response[attribute]){
-					self[attribute].set(response[attribute]);
-				}
-			});
-		}
-		return response;
-	},
-	
 	// Just a basic function to parse a 'Date()' type.
 	dateDDMMYYYY: function(date){
 		var parsedDate;

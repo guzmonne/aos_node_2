@@ -3,9 +3,79 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	className: "row",
 	name     : "Ordenes de Servicio",
 	
-	tableEl        : '#service_requests-table',
-	tableCollection: 'ServiceRequests',
-	modelView      : App.Views.ServiceRequestRowView,
+	tableEl  : '#service_requests-table',
+
+	awake: function(){
+		this.dataTableOptions = {
+			"columnDefs": [
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": -1 },
+			],
+			"columns": [
+				{"data": "id"},
+				{"data": function (source, type, val) {
+						if (source.client_id){
+							try {
+								if (!source.client_id){return "";}
+								return app.storage.collection('clients').get(source.client_id).get('name');
+							} catch (err) {
+								console.log(err.stack);
+								return "";
+							}
+						}
+						return "";
+					}
+				},
+				{"data": function(source, type, val){
+						var appliances = source.appliances;
+						if(type === "sort"){
+							if (_.isArray(appliances)){return appliances.length;}
+							return 0;
+						}
+						if(type === "display"){
+							var length = (_.isArray(appliances)) ? appliances.length : 0;
+							var html   = '<ul class="list-unstyled"><li><strong>Equipos:</strong> '+length+'</li>';
+							if (source.invoiceNumber && source.invoiceNumber !== ''){
+								html = html + '<li><strong>Remito:</strong> '+source.invoiceNumber+'</li>';
+							}
+							return html + '</ul>';
+						}
+					} 
+				},
+				{"data": "status"},
+				{"data": function(source, type, val){
+						var dates = [];
+						dates.push(App.dateDDMMYYYY(source.createdAt));
+						dates.push(App.dateDDMMYYYY(source.updatedAt));
+						if (source.closedAt) { dates.push(App.dateDDMMYYYY(source.closedAt));}
+						if (type === 'display'){
+							var html =
+								'<dt>Creado</dt>' + 
+								'<dd>'+ dates[0] +'</dd>' +
+								'<dt>Actualizado</dt>' +
+								'<dd>'+ dates[1] +'</dd>';
+							if (dates.length === 3) {
+								html = html + 
+								'<dt>Cerrado</dt>' +
+								'<dd>'+ dates[2] +'</dd>';
+							}
+							return html;
+						}
+						return dates.join(' ');
+					},
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							return '<a href="#render/service_request/show/'+ source._id +'" class="btn btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+							'</a>';
+						}
+						return source._id;
+					}
+				}
+			]
+		};
+	},
 
 	events:{
 		'click button#new-service-request': 'newServiceRequest',

@@ -91,6 +91,52 @@ window.App = {
 			}
 		}, true);
 	},
+
+	statusClass: function(status){
+    var className;
+    switch (status){
+    case "Recibido":
+        className = "btn-status-1";
+        break;
+    case "En Reparación":
+        className = "btn-status-2";
+        break;
+    case "En Espera":
+        className = "btn-status-3";
+        break;
+    case "Atrasado":
+        className = "btn-status-4";
+        break;
+    case "Reparado":
+        className = "btn-status-5";
+        break;
+    case "Entregado":
+        className = "btn-status-7";
+        break;
+    case "Enviado":
+        className = "btn-status-6";
+        break;
+    }
+    return className;
+  },
+
+  dateDDMMYYYY: function(date){
+		var parsedDate;
+		if (date instanceof Date){
+			parsedDate = date;
+		} else {
+			parsedDate = new Date(date);
+		}
+		return  parsedDate.getDate() +
+			"/" + parsedDate.getMonth() + 
+			"/" + parsedDate.getFullYear();
+	},
+
+	tryCatch: function(callback, context){
+		context = (context) ? context : this;
+		try {callback.apply(context);}
+		catch (err){console.log(err.stack);}
+	},
 };
 App.Storage = (function(){
 	var storage;
@@ -439,6 +485,11 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
 
+	initialize: function(){
+		this.awake.apply(this, arguments);
+		Giraffe.Model.prototype.initialize.apply(this, arguments);
+	},
+
 	awake: function(){},
 
 	push: function(attribute, value){
@@ -469,26 +520,6 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		return array[index];
 	},
 
-	initialize: function(){
-		this.awake.apply(this, arguments);
-		Giraffe.Model.prototype.initialize.apply(this, arguments);
-	},
-
-	parse: function(response){
-		if (this.childs){
-			var self = this;
-			var attributes = _.map(this.childs, function(child){
-				return child.attribute;
-			});
-			_.each(attributes, function(attribute){
-				if (response[attribute]){
-					self[attribute].set(response[attribute]);
-				}
-			});
-		}
-		return response;
-	},
-	
 	// Just a basic function to parse a 'Date()' type.
 	dateDDMMYYYY: function(date){
 		var parsedDate;
@@ -1221,8 +1252,6 @@ App.Views.RowView = App.Views.BaseView.extend({
 		this.awake.apply(this, arguments);
 		this.listenTo(this.model, 'change' , this.render);
 		this.listenTo(this.model, 'remove', this.invokeRemoveRow);
-		this.listenTo(app, 'model:show:active',   this.activate);
-		this.listenTo(app, 'model:show:inactive', this.deactivate);
 	},
 
 	afterRender: function(){
@@ -1249,76 +1278,11 @@ App.Views.RowView = App.Views.BaseView.extend({
 			return this.model.toJSON();
 		}
 	},
-
-	activate: function(id){
-		if(this.model && this.model.id !== id){return;}
-		this.activated = true;
-		this.$el.addClass('selected');
-	},
-
-	deactivate: function(id){
-		if(this.model && this.model.id !== id){return;}
-		if(this.$el.hasClass('selected')){
-			this.activated = false;
-			this.$el.removeClass('selected');
-			this.className = '';
-		}
-	},
 });
 App.Views.ShowView = App.Views.BaseView.extend({
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		this.listenTo(app , 'row:rendered', this.checkEventCaller);
-		this.listenTo(this, 'disposing'   , this.modelShowInactive);
-		this.modelShowActive();
-	},
-
-	// !!!
-	// Type: Void
-	// -----
-	// Description:
-	// ------------
-	// Function called to announce that a show view is active. It triggers an event
-	// that is ussualy caught by the row views to mark the row as active
-	// ------------ 
-	// !!!
-	modelShowActive: function(){
-		if(!this.model){return;}
-		app.trigger('model:show:active', this.model.id);
-	},
-
-	// !!!
-	// Type: Void
-	// -----
-	// Description:
-	// ------------
-	// Function called to announce that a show view is active. It triggers an event
-	// that is ussualy caught by the row views to mark the row as active
-	// ------------ 
-	// !!!
-	modelShowInactive: function(){
-		if(!this.model){return;}
-		app.trigger('model:show:inactive', this.model.id);
-	},
-
-	// !!!
-	// Type: Void
-	// -----
-	// Description:
-	// ------------
-	// Checks if the event emitter has the same model as we do
-	// ------------ 
-	// Arguments:
-	// ----------
-	// id [String]: id of the model handled by the event emmiter. If it is the same
-	// as ours then we emit the show active event.
-	// ----------
-	// !!!
-	checkEventCaller: function(id){
-		if (id === this.model.id){
-			this.modelShowActive();
-		}
 	},
 });
 App.Views.TabView = App.Views.BaseView.extend({
@@ -1393,18 +1357,6 @@ App.Views.TabView = App.Views.BaseView.extend({
 		return this.tabDetails;
 	},
 });
-
-//{{#each tab}}
-//<li {{#if active}}class="active"{{/if}}>
-//	<a href="#{{href}}" data-toggle="tab" id="{{id}}">
-//		{{title}}
-//	</a>
-//</li>
-//{{/each}}
-
-//{{#each tab}}
-//  <div class="tab-pane fade in {{#if active}}active{{/if}} {{#if class}}{{class}}{{/if}}" id="{{href}}"></div>
-//{{/each}}
 App.Views.TableView = App.Views.BaseView.extend({
 	constructor: function(options){
 		this.rowViewOptions   = {};
@@ -1415,18 +1367,23 @@ App.Views.TableView = App.Views.BaseView.extend({
 		Giraffe.View.apply(this, arguments);
 	},
 
+	events: {
+		'click a[name=select]': 'selected',
+	},
+
 	initialize: function(){
 		var self = this;
 		this.awake.apply(this, arguments);
-		this.listenTo(this.collection, 'sync', this.tableFetched);
-		this.listenTo(this, 'disposing', function(){
-			this.$('click ul.pagination li').off('click');
-		});
-		this.listenTo(app, 'nav:toggleMenu:end', function(){
-			this.oTable.columns.adjust().draw();
-		});
-		_.bind(this.append, this);
+		this.listenTo(this.collection, 'sync'              , this.tableFetched);
+		this.listenTo(app            , 'nav:toggleMenu:end', this.adjustColumns);
+		this.$el.on  (      'resize'   , function(){self.adjustColumns.apply(self);});
+		this.listenTo(this, 'disposing', function(){this.$el.off('resize');});
 		this.timestamp = _.uniqueId();
+	},
+
+	bindEvents: function(){
+		this.listenTo(this.collection, 'change', this.updateTable);
+		this.listenTo(this.collection, 'add'   , this.addRow);
 	},
 
 	serialize: function(){
@@ -1447,25 +1404,24 @@ App.Views.TableView = App.Views.BaseView.extend({
 	appendCollection: function(collection){
 		var self    = this;
 		var options = _.extend({
-			"scrollY"       : 500,
-			"scrollX"       : true,
+			"scrollY"       : 600,
 			"scrollCollapse": true,
 			"deferRender"   : true,
-			"stateSave": true,
+			"stateSave"     : true,
+			"stateDuration" : -1,
+			"data"          : this.collection.toJSON(),
+			"scrollX"       : true,
+			"sScrollXInner" : "100%",
+			//"sScrollX"      : "98%",
 		}, this.dataTableOptions);
-		this.$('tbody').remove();
-		this.tbody = $('<tbody />');
-		_.each(this.collection.models, function(model){
-			self.rowViewOptions.model = model;
-			var view = new self.modelView(self.rowViewOptions);
-			self.addChild(view);
-			self.tbody.append(view.render().el);
-		});
-		this.$('table').append(this.tbody);
-		this.oTable = this.$(this.tableEl + "-" + this.timestamp).DataTable(options);
-		//this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
-		this.stopListening(this.collection, 'add', this.append);
-		this.listenTo     (this.collection, 'add', this.append);
+		// Table jQuery Object
+		this.$table  = this.$(this.tableEl + "-" + this.timestamp);
+		// Table Datatable Object
+		this.$oTable = this.$table.dataTable(options);
+		// Table Datatable API Object
+		this.oTable  = this.$oTable.api();
+		this.$('.dataTables_scrollHead').css('margin-bottom', '-20px');
+		this.bindEvents();
 	},
 
 	tableFetched: function(){
@@ -1478,13 +1434,42 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rowViewOptions.model = model;
 		var view = new this.modelView(this.rowViewOptions);
 		this.addChild(view);
-		//this.oTable.fnAddTr(view.render().el);
-		this.$(this.tableEl + "-" + this.timestamp + ' tbody').append(view.render().el);
-		this.oTable.draw();
+		this.oTable.row.add(view.model.toJSON());
 	},
 
 	onSync: function(){
 		this.sync("collection", this.fetchOptions);
+	},
+
+	adjustColumns: function(){
+		this.$oTable.fnAdjustColumnSizing();
+	},
+
+	getModelIndex: function(model){
+		if(!this.$oTable){return;}
+		if(_.isString(model)){model = this.collection.get(model);}
+		return this.collection.indexOf(model);
+	},
+
+	updateTable: function(model){
+		var index = this.getModelIndex(model);
+		if(!index){return;}
+		this.$oTable.fnUpdate(model.attributes, index);
+	},
+
+	addRow: function(model){
+		var rowNode = this.oTable.row.add(model.attributes).draw().node();
+		App.animate(this.$(rowNode), 'fadeIn');
+		this.adjustColumns();
+	},
+
+	selected: function(e){
+		if (e) {e.preventDefault();}
+		var id = this.$(e.target).closest('a').data('id');
+		var model = this.collection.get(id);
+		if (model){
+			app.modalController.runCallerMethod(model);
+		}
 	},
 });
 App.Views.Renderer = App.Views.BaseView.extend({
@@ -1850,15 +1835,121 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	name     : "Equipos",
 	
 	tableEl        : '#appliances-table',
-	tableCollection: 'Appliances',
-	modelView      : App.Views.ApplianceRowView,
 
 	awake: function(){
 		this.dataTableOptions = {
 			"columnDefs": [
-				{ "searchable": false, "targets": 7 },
-				{ "className": "center-vh", "targets": [ 0, 1, 2, 3, 4, 5, 7] }
-			]
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": [0, 3, 4, 5, 7] },
+				{ "className": "center-v" , "targets": [1, 2, 6, 7] },
+			],
+			"columns": [
+				{"data": "id"},
+				{"data": function (source, type, val) {
+						if (source.client_id){
+							try {
+								if (!source.client_id){return "";}
+								return app.storage.collection('clients').get(source.client_id).get('name');
+							} catch (err) {
+								console.log(err.stack);
+								return "";
+							}
+						}
+						return "";
+					}
+				},
+				{"data": function (source, type, val) {
+						if (source.model_id){
+							try {
+								if (!source.model_id){return "";}
+								var object = app.storage.collection('models').get(source.model_id).attributes; 
+								if (source.serial){object.serial = source.serial;}
+								if (type === 'display') {
+									var html =	
+										'<dt>' + object.brand + '</dt>' + 
+										'<dd>' + object.model + '</dd>';
+									if (object.serial){html = html + '<dd><i class="fa fa-barcode">  ' + object.serial + '</dd>';}
+									return html;
+								} else {
+									return object.brand + ' ' + object.model + ' ' + object.serial;
+								}
+							} catch (err) {
+								console.log(err.stack);
+								return "";
+							}
+						}
+						return "";
+					},
+				},
+				{"data": function(source, type, val){
+						var rep = source.repairement_type;
+						if(type === 'display' && rep === "Presupuesto"){
+							var cost = (source.cost) ? source.cost : 0;
+							return	'<dt>Presupuesto</dt>' +
+											'<dd>$'+cost+',00</dd>';
+						}
+						if (parseInt(source.cost) > 0){rep = rep + ' ' + source.cost;}
+						return rep;
+					}
+				},
+				{"data": function(source, type, val){
+						if(type === 'display'){
+							return	'<h4 style="margin: 0px;"><span class="label label-default ' + App.statusClass(source.status) + '">' + 
+												source.status +
+											'</span></h4>';
+						}
+						return source.status;
+					}
+				},
+				{"data": function (source, type, val) {
+						if (source.technician_id){
+							try {
+								if (!source.technician_id){return "";}
+								return app.storage.collection('techs').get(source.technician_id).get('name');
+							} catch (err) {
+								console.log(err.stack);
+								return "";
+							}
+						}
+						return "";
+					}
+				},
+				{"data": function(source, type, val){
+						var dates = [];
+						dates.push(App.dateDDMMYYYY(source.createdAt));
+						dates.push(App.dateDDMMYYYY(source.updatedAt));
+						if (source.closedAt) { dates.push(App.dateDDMMYYYY(source.closedAt));}
+						if (type === 'display'){
+							var html =
+								'<dt>Creado</dt>' + 
+								'<dd>'+ dates[0] +'</dd>' +
+								'<dt>Actualizado</dt>' +
+								'<dd>'+ dates[1] +'</dd>';
+							if (dates.length === 3) {
+								html = html + 
+								'<dt>Cerrado</dt>' +
+								'<dd>'+ dates[2] +'</dd>';
+							}
+							return html;
+						}
+						return dates.join(' ');
+					},
+				},
+				{"data": function(source, type, val){
+						var ids = [source._id, source.service_request_id];
+						if(type === "display"){
+							return '<a href="#render/appliance/show/'+ ids[0] +'" class="btn btn-green"  id="appliance-details" data-id="'+ids[0]+'" data-toggle="tooltip" data-placement="top" title="Mas Información" style="margin-bottom: 3px;">' +
+									'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+								'</a>' +
+								'<br>' +
+								'<a href="#render/service_request/show/'+ ids[1] +'" class="btn btn-green" id="appliance-service-request" data-toggle="tooltip" data-placement="top" title="Orden de Servicio" style="margin-top: 3px">' +
+									'<i class="fa fa-clipboard fa-fw"></i>' +
+								'</a>';
+						}
+						return ids.join(' ');
+					},
+				}
+			],
 		};
 	},
 });
@@ -2031,7 +2122,6 @@ App.Views.ApplianceMultipleFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		console.log(this.details);
 		var self = this;
 		this.$('tbody tr').each(function(index, tr){
 			var $tr,rowId, quantity, options;
@@ -2406,13 +2496,77 @@ App.Views.ClientIndexView = App.Views.TableView.extend({
 	name     : "Clientes",
 	
 	tableEl        : '#clients-table',
-	tableCollection: 'Clients',
-	modelView      : App.Views.ClientRowView,
-	
-	fetchOptions		: {
-		data: {
-			fields: '-service_requests'
-		}
+
+	awake: function(){
+		var self = this;
+		fetchOptions = {
+			data: {
+				fields: '-service_requests'
+			}
+		};
+		this.dataTableOptions = {
+			"columnDefs": [
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": -1 },
+			],
+			"columns": [
+				{"data": function(source, type, val){
+						if(type === "display"){
+							return	'<ul class="list-unstyled">' +
+												'<li><strong style="font-size: 16px">'+source.name+'</strong></li>' +
+												'<li><strong>'+source["doc-type"]+'</strong> <i class="fa fa-barcode fa-fw"></i>'+source["doc-number"]+'</li>' +
+												'<li><i class="fa fa-envelope fa-fw"></i>'+source.email+'</li>' +
+											'</ul>';
+						}
+						return [source.name, source["doc-type"], source["doc-number"], source.email].join(" ");
+					}
+				},
+				{"data": function(source, type, val){
+						var phones = source.phones;
+						if (!_.isArray(phones)){return phones;}
+						if (type === "display"){
+							var html = '<ul class="list-unstyled">';
+							for (var i = 0; i < phones.length; i++){
+								html = html + '<li><i class="fa fa-phone fa-muted fa-fw"></i>'+phones[i].number+'</li>';
+							}
+							html = html + '</ul>';
+							return html;
+						}
+						return phones.join(' ');
+					} 
+				},
+				{"data": function(source, type, val){
+						var addresses = source.addresses;
+						if (!_.isArray(addresses)){return addresses;}
+						if (type === "display"){
+							var html = '';
+							for (var i = 0; i < addresses.length; i++){
+								html = html + '<address><strong>'+addresses[i].street+'</strong>,<br>'+addresses[i].city+','+addresses[i].department+'</address>';
+							}
+							return html;
+						}
+						return addresses.join(' ');
+					} 
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							var html;
+							if (self.selection === true){
+								html =	'<a data-id="'+source._id+'" class="btn btn-warning" name="select" data-toggle="tooltip" data-placement="top" title="Seleccionar">' +
+													'<i class="fa fa-external-link fa-lg"></i>'+
+												'</a>';
+							} else {
+								html =	'<a href="#render/client/show/'+ source._id +'" class="btn btn-green"  id="client-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+													'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+												'</a>';
+							}
+							return html;
+						}
+						return source._id;
+					}
+				}
+			]
+		};
 	},
 });
 App.Views.ClientNewView = App.Views.NewView.extend({	
@@ -2431,11 +2585,18 @@ App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
+		var self = this;
+		app.modalController.$('#modalContainer').on('shown.bs.modal', function (e) {
+			self.clientIndex.adjustColumns();
+		});
+		this.listenTo(this, 'disposing', function(){
+			app.modalController.$('#modalContainer').off();
+		});
 		this.clientIndex = new App.Views.ClientIndexView({
 			collection: app.storage.getCollection("clients"),
-			synced: true,
+			synced    : true,
+			selection : true,
 		});
-		this.clientIndex.selection = true;
 		this.clientIndex.attachTo('#client-index');
 	},
 });
@@ -2448,6 +2609,17 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 		}
 	},
 	
+	afterRender: function(){
+		var self = this;
+		this.$('a#client-service_requests[data-toggle=tab]').on('shown.bs.tab', function (e) {
+			self.serviceRequests.adjustColumns();
+		});
+		this.listenTo(this, 'disposing', function(){
+			this.$('a#client-service_requests[data-toggle=tab]').off();
+		});
+		App.Views.TabView.prototype.afterRender.apply(this, arguments);
+	},
+
 	name: function(){
 		return 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
@@ -2491,7 +2663,7 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 				}),
 				synced: true,
 			});
-		}
+		} else {}
 	},
 });
 App.Views.BreadCrumbsView = Giraffe.View.extend({
@@ -2606,12 +2778,16 @@ App.Views.ModalController = App.Views.BaseView.extend({
 		'click .close-modal': 'closeModal',
 	},
 
-	displayModal: function(view, callerView, callerMethod){
+	afterRender: function(){
+		this.$modalContainer = this.$('#modalContainer');
+	},
+
+	displayModal: function(view, callerView, callerMethod, eventHandlerFn){
 		if (callerView)   {this.callerView   = callerView;}
 		if (callerMethod) {this.callerMethod = callerMethod;}
 		if(!App.defined(this.currentModal) || this.currentModal.bodyView.cid !== view.cid){
 			this.setCurrentModal(view);
-		}	
+		}
 		this.$('#modalContainer').modal('show');
 	},
 
@@ -2995,13 +3171,43 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 	name     : "Modelos",
 	
 	tableEl        : '#models-table',
-	tableCollection: 'Models',
-	modelView      : App.Views.ModelRowView,
 
-	fetchOptions		: {
-		data: {
-			fields: 'brand model category subcategory _id'
-		}
+	awake: function(){
+		var self = this;
+		this.fetchOptions = {
+			data: {
+				fields: 'brand model category subcategory _id'
+			}
+		};
+		this.dataTableOptions = {
+			"columnDefs": [
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": -1 },
+			],
+			"columns": [
+				{"data": "model"},
+				{"data": "brand"},
+				{"data": "category"},
+				{"data": "subcategory"},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							var html;
+							if (self.selection === true){
+								html =	'<a data-id="'+source._id+'" class="btn btn-warning" name="select" data-toggle="tooltip" data-placement="top" title="Seleccionar">' +
+													'<i class="fa fa-external-link fa-lg"></i>'+
+												'</a>';
+							} else {
+								html =	'<a href="#render/model/show/'+ source._id +'" class="btn btn-green"  id="client-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+													'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+												'</a>';
+							}
+							return html;
+						}
+						return source._id;
+					}
+				}
+			]
+		};
 	},
 });
 App.Views.ModelNewView = App.Views.NewView.extend({
@@ -3021,11 +3227,18 @@ App.Views.ModelSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
+		var self = this;
+		app.modalController.$('#modalContainer').on('shown.bs.modal', function (e) {
+			self.modelIndex.adjustColumns();
+		});
+		this.listenTo(this, 'disposing', function(){
+			app.modalController.$('#modalContainer').off();
+		});
 		this.modelIndex = new App.Views.ModelIndexView({
 			collection: app.storage.getCollection("models"),
 			synced    : true,
+			selection : true,
 		});
-		this.modelIndex.selection  = true;
 		this.modelIndex.parentView = this.parentView;
 		this.modelIndex.attachTo('#model-index');
 	},
@@ -3316,9 +3529,79 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	className: "row",
 	name     : "Ordenes de Servicio",
 	
-	tableEl        : '#service_requests-table',
-	tableCollection: 'ServiceRequests',
-	modelView      : App.Views.ServiceRequestRowView,
+	tableEl  : '#service_requests-table',
+
+	awake: function(){
+		this.dataTableOptions = {
+			"columnDefs": [
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": -1 },
+			],
+			"columns": [
+				{"data": "id"},
+				{"data": function (source, type, val) {
+						if (source.client_id){
+							try {
+								if (!source.client_id){return "";}
+								return app.storage.collection('clients').get(source.client_id).get('name');
+							} catch (err) {
+								console.log(err.stack);
+								return "";
+							}
+						}
+						return "";
+					}
+				},
+				{"data": function(source, type, val){
+						var appliances = source.appliances;
+						if(type === "sort"){
+							if (_.isArray(appliances)){return appliances.length;}
+							return 0;
+						}
+						if(type === "display"){
+							var length = (_.isArray(appliances)) ? appliances.length : 0;
+							var html   = '<ul class="list-unstyled"><li><strong>Equipos:</strong> '+length+'</li>';
+							if (source.invoiceNumber && source.invoiceNumber !== ''){
+								html = html + '<li><strong>Remito:</strong> '+source.invoiceNumber+'</li>';
+							}
+							return html + '</ul>';
+						}
+					} 
+				},
+				{"data": "status"},
+				{"data": function(source, type, val){
+						var dates = [];
+						dates.push(App.dateDDMMYYYY(source.createdAt));
+						dates.push(App.dateDDMMYYYY(source.updatedAt));
+						if (source.closedAt) { dates.push(App.dateDDMMYYYY(source.closedAt));}
+						if (type === 'display'){
+							var html =
+								'<dt>Creado</dt>' + 
+								'<dd>'+ dates[0] +'</dd>' +
+								'<dt>Actualizado</dt>' +
+								'<dd>'+ dates[1] +'</dd>';
+							if (dates.length === 3) {
+								html = html + 
+								'<dt>Cerrado</dt>' +
+								'<dd>'+ dates[2] +'</dd>';
+							}
+							return html;
+						}
+						return dates.join(' ');
+					},
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							return '<a href="#render/service_request/show/'+ source._id +'" class="btn btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+							'</a>';
+						}
+						return source._id;
+					}
+				}
+			]
+		};
+	},
 
 	events:{
 		'click button#new-service-request': 'newServiceRequest',
@@ -3476,11 +3759,53 @@ App.Views.TechIndexView = App.Views.TableView.extend({
 	tableEl        : '#techs-table',
 	modelView      : App.Views.UserRowView,
 
-	fetchOptions: {
-		data: {
-			techs: true,
-		}
-	}
+	awake: function(){
+		this.fetchOptions = {
+			data: {
+				techs: true,
+			}
+		};		
+		this.dataTableOptions = {
+			"columnDefs": [
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": -1 },
+			],
+			"columns": [
+				{"data": function(source, type, val){
+						if(type === "sort"){return source.name;}
+						if(type === "display"){
+							var html = '<dd><i class="fa fa-user fa-fw"></i>'+source.name+'</dd>';
+							if (source.email){html = html + '<dd><i class="fa fa-envelope fa-fw"></i>'+source.email+'</dd>';}
+							return html;
+						}
+						return [source.name, source.email].join(' ');
+					} 
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							var html = '<dt>Roles</dt>';
+							if (source.permissions.roles.isAdmin === true){html = html + '<dd>Administrador</dd>';}
+							if (source.permissions.roles.isTech  === true){html = html + '<dd>Tecnico</dd>';}
+							return html;
+						}
+						var result = [];
+						if (source.permissions.roles.isAdmin === true){result.push('Administrador');}
+						if (source.permissions.roles.isTech  === true){result.push('Tecnico');}
+						return result.join(' ');
+					} 
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							return '<a href="#render/user/show/'+ source._id +'" class="btn btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+							'</a>';
+						}
+						return source._id;
+					}
+				}
+			]
+		};
+	},
 });
 App.Views.UserDetailsView = App.Views.ShowView.extend({
 	template: HBS.user_details_template,
@@ -3546,7 +3871,49 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 	name     : "Usuarios",
 	
 	tableEl        : '#users-table',
-	modelView      : App.Views.UserRowView,
+	
+	awake: function(){
+		this.dataTableOptions = {
+			"columnDefs": [
+				{ "searchable": false, "targets": -1 },
+				{ "className": "center-vh", "targets": -1 },
+			],
+			"columns": [
+				{"data": function(source, type, val){
+						if(type === "sort"){return source.name;}
+						if(type === "display"){
+							var html = '<dd><i class="fa fa-user fa-fw"></i>'+source.name+'</dd>';
+							if (source.email){html = html + '<dd><i class="fa fa-envelope fa-fw"></i>'+source.email+'</dd>';}
+							return html;
+						}
+						return [source.name, source.email].join(' ');
+					} 
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							var html = '<dt>Roles</dt>';
+							if (source.permissions.roles.isAdmin === true){html = html + '<dd>Administrador</dd>';}
+							if (source.permissions.roles.isTech  === true){html = html + '<dd>Tecnico</dd>';}
+							return html;
+						}
+						var result = [];
+						if (source.permissions.roles.isAdmin === true){result.push('Administrador');}
+						if (source.permissions.roles.isTech  === true){result.push('Tecnico');}
+						return result.join(' ');
+					} 
+				},
+				{"data": function(source, type, val){
+						if(type === "display"){
+							return '<a href="#render/user/show/'+ source._id +'" class="btn btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+							'</a>';
+						}
+						return source._id;
+					}
+				}
+			]
+		};
+	},
 });
 App.Views.UserNewView = App.Views.NewView.extend({
 	name        : "Nuevo Usuario",
@@ -3582,6 +3949,17 @@ App.Views.UserShowView = App.Views.TabView.extend({
 
 	awake: function(){
 		this.listenTo(this.model, "roles:change", this.techTab);
+	},
+
+	afterRender: function(){
+		var self = this;
+		this.$('a#user-appliances[data-toggle=tab]').on('shown.bs.tab', function (e) {
+			self.appliancesIndex.adjustColumns();
+		});
+		this.listenTo(this, 'disposing', function(){
+			this.$('a#client-service_requests[data-toggle=tab]').off();
+		});
+		App.Views.TabView.prototype.afterRender.apply(this, arguments);
 	},
 
 	tabs: function(){
@@ -3769,10 +4147,10 @@ app.addInitializer(function(options){
 app.addInitializer(function(options){
 	$.notify.defaults({
 		globalPosition: 'top right',
-		showAnimation: 'fadeIn',
-		hideAnimation: 'fadeOut',
-		autoHideDelay: 1500,
-		showDuration: 200,
+		showAnimation : 'fadeIn',
+		hideAnimation : 'fadeOut',
+		autoHideDelay : 1500,
+		showDuration  : 200,
 	});
 	$.notify.addStyle('bs-callout', {
 	html: 

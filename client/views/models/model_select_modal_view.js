@@ -10,11 +10,18 @@ App.Views.ModelSelectModalView = App.Views.BaseView.extend({
 	},
 
 	afterRender: function(){
+		var self = this;
+		app.modalController.$('#modalContainer').on('shown.bs.modal', function (e) {
+			self.modelIndex.adjustColumns();
+		});
+		this.listenTo(this, 'disposing', function(){
+			app.modalController.$('#modalContainer').off();
+		});
 		this.modelIndex = new App.Views.ModelIndexView({
 			collection: app.storage.getCollection("models"),
 			synced    : true,
+			selection : true,
 		});
-		this.modelIndex.selection  = true;
 		this.modelIndex.parentView = this.parentView;
 		this.modelIndex.attachTo('#model-index');
 	},

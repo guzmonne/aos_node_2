@@ -70,15 +70,3 @@ App.Views.TabView = App.Views.BaseView.extend({
 		return this.tabDetails;
 	},
 });
-
-//{{#each tab}}
-//<li {{#if active}}class="active"{{/if}}>
-//	<a href="#{{href}}" data-toggle="tab" id="{{id}}">
-//		{{title}}
-//	</a>
-//</li>
-//{{/each}}
-
-//{{#each tab}}
-//  <div class="tab-pane fade in {{#if active}}active{{/if}} {{#if class}}{{class}}{{/if}}" id="{{href}}"></div>
-//{{/each}}

@@ -45,10 +45,10 @@ app.addInitializer(function(options){
 app.addInitializer(function(options){
 	$.notify.defaults({
 		globalPosition: 'top right',
-		showAnimation: 'fadeIn',
-		hideAnimation: 'fadeOut',
-		autoHideDelay: 1500,
-		showDuration: 200,
+		showAnimation : 'fadeIn',
+		hideAnimation : 'fadeOut',
+		autoHideDelay : 1500,
+		showDuration  : 200,
 	});
 	$.notify.addStyle('bs-callout', {
 	html: 

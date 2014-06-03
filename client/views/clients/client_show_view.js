@@ -7,6 +7,17 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 		}
 	},
 	
+	afterRender: function(){
+		var self = this;
+		this.$('a#client-service_requests[data-toggle=tab]').on('shown.bs.tab', function (e) {
+			self.serviceRequests.adjustColumns();
+		});
+		this.listenTo(this, 'disposing', function(){
+			this.$('a#client-service_requests[data-toggle=tab]').off();
+		});
+		App.Views.TabView.prototype.afterRender.apply(this, arguments);
+	},
+
 	name: function(){
 		return 'Cliente: ' + this.model.get('name') + ' #' + this.model.get('id');
 	},
@@ -50,6 +61,6 @@ App.Views.ClientShowView = App.Views.TabView.extend({
 				}),
 				synced: true,
 			});
-		}
+		} else {}
 	},
 });

@@ -8,18 +8,23 @@ App.Views.TableView = App.Views.BaseView.extend({
 		Giraffe.View.apply(this, arguments);
 	},
 
+	events: {
+		'click a[name=select]': 'selected',
+	},
+
 	initialize: function(){
 		var self = this;
 		this.awake.apply(this, arguments);
-		this.listenTo(this.collection, 'sync', this.tableFetched);
-		this.listenTo(this, 'disposing', function(){
-			this.$('click ul.pagination li').off('click');
-		});
-		this.listenTo(app, 'nav:toggleMenu:end', function(){
-			this.oTable.columns.adjust().draw();
-		});
-		_.bind(this.append, this);
+		this.listenTo(this.collection, 'sync'              , this.tableFetched);
+		this.listenTo(app            , 'nav:toggleMenu:end', this.adjustColumns);
+		this.$el.on  (      'resize'   , function(){self.adjustColumns.apply(self);});
+		this.listenTo(this, 'disposing', function(){this.$el.off('resize');});
 		this.timestamp = _.uniqueId();
+	},
+
+	bindEvents: function(){
+		this.listenTo(this.collection, 'change', this.updateTable);
+		this.listenTo(this.collection, 'add'   , this.addRow);
 	},
 
 	serialize: function(){
@@ -40,25 +45,24 @@ App.Views.TableView = App.Views.BaseView.extend({
 	appendCollection: function(collection){
 		var self    = this;
 		var options = _.extend({
-			"scrollY"       : 500,
-			"scrollX"       : true,
+			"scrollY"       : 600,
 			"scrollCollapse": true,
 			"deferRender"   : true,
-			"stateSave": true,
+			"stateSave"     : true,
+			"stateDuration" : -1,
+			"data"          : this.collection.toJSON(),
+			"scrollX"       : true,
+			"sScrollXInner" : "100%",
+			//"sScrollX"      : "98%",
 		}, this.dataTableOptions);
-		this.$('tbody').remove();
-		this.tbody = $('<tbody />');
-		_.each(this.collection.models, function(model){
-			self.rowViewOptions.model = model;
-			var view = new self.modelView(self.rowViewOptions);
-			self.addChild(view);
-			self.tbody.append(view.render().el);
-		});
-		this.$('table').append(this.tbody);
-		this.oTable = this.$(this.tableEl + "-" + this.timestamp).DataTable(options);
-		//this.$('table').wrap('<div class="table-wrap table-responsive-width"></div>');
-		this.stopListening(this.collection, 'add', this.append);
-		this.listenTo     (this.collection, 'add', this.append);
+		// Table jQuery Object
+		this.$table  = this.$(this.tableEl + "-" + this.timestamp);
+		// Table Datatable Object
+		this.$oTable = this.$table.dataTable(options);
+		// Table Datatable API Object
+		this.oTable  = this.$oTable.api();
+		this.$('.dataTables_scrollHead').css('margin-bottom', '-20px');
+		this.bindEvents();
 	},
 
 	tableFetched: function(){
@@ -71,12 +75,41 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.rowViewOptions.model = model;
 		var view = new this.modelView(this.rowViewOptions);
 		this.addChild(view);
-		//this.oTable.fnAddTr(view.render().el);
-		this.$(this.tableEl + "-" + this.timestamp + ' tbody').append(view.render().el);
-		this.oTable.draw();
+		this.oTable.row.add(view.model.toJSON());
 	},
 
 	onSync: function(){
 		this.sync("collection", this.fetchOptions);
+	},
+
+	adjustColumns: function(){
+		this.$oTable.fnAdjustColumnSizing();
+	},
+
+	getModelIndex: function(model){
+		if(!this.$oTable){return;}
+		if(_.isString(model)){model = this.collection.get(model);}
+		return this.collection.indexOf(model);
+	},
+
+	updateTable: function(model){
+		var index = this.getModelIndex(model);
+		if(!index){return;}
+		this.$oTable.fnUpdate(model.attributes, index);
+	},
+
+	addRow: function(model){
+		var rowNode = this.oTable.row.add(model.attributes).draw().node();
+		App.animate(this.$(rowNode), 'fadeIn');
+		this.adjustColumns();
+	},
+
+	selected: function(e){
+		if (e) {e.preventDefault();}
+		var id = this.$(e.target).closest('a').data('id');
+		var model = this.collection.get(id);
+		if (model){
+			app.modalController.runCallerMethod(model);
+		}
 	},
 });
