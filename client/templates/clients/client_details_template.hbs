@@ -1,38 +1,24 @@
 <div class="col-md-12 col-lg-offset-1 col-lg-10">
-  <span class="pull-right" style="margin-top: 5px">
+  <span class="pull-right" style="margin-top: 20px">
     <a href="#render/client/index" class="pull-right text-muted">
       <i class="fa fa-list fa-3x"></i>
     </a>
   </span>
   <h1>
-     {{name}}
+     <span name="name"></span>
      <small class="text-right">
-      {{doc-type}} <i class="fa fa-barcode"></i> {{doc-number}}
+      <span name="doc-type"></span><i class="fa fa-barcode"></i><span name="doc-number"></span>
     </small>
   </h1>
   </h1>
   <hr>
   <div class="row">
     <div class="col-xs-4">
-      <ul class="list-unstyled">
-        {{#phones}}
-          <li><i class="fa fa-phone fa-muted fa-fw"></i>{{number}}</li>
-        {{/phones}}
-      </ul>
-      <ul class="list-unstyled"> 
-        {{#addresses}}
-          <li>
-            <i class="fa fa-building-o fa-muted fa-fw"></i> 
-            {{street}}.<br>
-            {{city}}, {{department}}
-          </li>
-        {{/addresses}}
-      </ul>
+      <ul class="list-unstyled" name="phones"></ul>
+      <ul class="list-unstyled" name="addresses"> </ul>
       <p>
         <i class="fa fa-envelope-o fa-muted fa-fw"></i>  
-        <a href="#">
-          {{email}}
-        </a>
+        <a href="#" name="email"></a>
       </p>
     </div>
     <div class="col-xs-8">
@@ -70,12 +56,12 @@
   <div class="row">
     <div class="col-sm-6">
       <small>
-        Creado el {{createdAt}} por {{createdBy}}
+        Creado el <span name="createdAt"></span> por <span name="createdBy"></span>
       </small>
     </div>
     <div class="col-sm-6 text-right">
       <small>
-        Modificado el {{updatedAt}} por {{updatedBy}}
+        Modificado el <span name="updatedAt"></span> por <span name="updatedBy"></span>
       </small>
     </div>
   </div>

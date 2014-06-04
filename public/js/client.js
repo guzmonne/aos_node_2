@@ -930,25 +930,29 @@ App.Views.BaseView = Giraffe.View.extend({
     }
   },
 
-	sync: function(type, options){
-		if (!type){return;}
-		var success, self = this;
-		options        = (options) ? options : {};
-		success        = options.success;
-		options.remove = (options.remove)    ? options.remove    : true;
-		options.add    = (options.add)       ? options.add       : true;
-		options.merge  = (options.merge)     ? options.merge     : true;
-		options.success = function(){
-			if (success) {success.apply(this, arguments);}
-			self.afterSync();
-		};
-		if (type === "model" && this.model){
-			this.model.fetch(options);
-		}
-		if (type === "collection" && this.collection){
-			this.collection.fetch(options);
-		}
-  },
+	// sync: function(type, options){
+	//	if (!type){return;}
+	//	var success, self = this;
+	//	options        = (options) ? options : {};
+	//	success        = options.success;
+	//	options.remove = (options.remove)    ? options.remove    : true;
+	//	options.add    = (options.add)       ? options.add       : true;
+	//	options.merge  = (options.merge)     ? options.merge     : true;
+	//	options.success = function(){
+	//		if (success) {success.apply(this, arguments);}
+	//		self.afterSync();
+	//	};
+	//	if (type === "model" && this.model){
+	//		this.model.fetch(options);
+	//	}
+	//	if (type === "collection" && this.collection){
+	//		this.collection.fetch(options);
+	//	}
+ //  },
+
+  invokeSetHeader: function(){
+		this.invoke('setHeader');
+	},
 });
 App.Views.CarouselView = App.Views.BaseView.extend({
 	template: HBS.carousel_template,
@@ -2266,22 +2270,71 @@ App.Views.ClientDetailsView = App.Views.ShowView.extend({
 
 	className: 'row',
 
+	bindings: {
+		'[name=name]'      : 'name',
+		'[name=doc-type]'  : 'doc-type',
+		'[name=doc-number]': 'doc-number',
+		'[name=phones]'    : {
+			observe: 'phones',
+			onGet  : function(values){
+				if(!_.isArray(values)){return '<li>Vacío</li>';}
+				var html = '';
+				for(var i = 0;i < values.length;i++){
+					html = html + '<li><i class="fa fa-phone fa-muted fa-fw"></i>'+values[i].number+'</li>';
+				}
+				return html;
+			},
+			updateMethod: 'html',
+		},
+		'[name=addresses]': {
+			observe: 'addresses',
+			onGet  : function(values){
+				if(!_.isArray(values)){return '<li>Vacío</li>';}
+				var html = '';
+				for(var i = 0;i < values.length;i++){
+					html = html + '<li><i class="fa fa-building-o fa-muted fa-fw"></i>'+
+													values[i].street+'<br>'+
+													values[i].city+','+values[i].city+
+												'</li>';
+				}
+				return html;
+			},
+			updateMethod: 'html',
+		},
+		'[name=email]': "email",
+		'[name=createdAt]': {
+			observe: 'createdAt',
+			onGet: function(value){
+				return App.dateDDMMYYYY(value);
+			},
+		},
+		'[name=createdBy]': 'createdBy',
+		'[name=updatedAt]': {
+			observe: 'updatedAt',
+			onGet: function(value){
+				return App.dateDDMMYYYY(value);
+			},
+		},
+		'[name=updatedBy]': 'updatedBy',
+	},
+
 	awake: function(){
-		this.listenTo(this.model, 'sync', this.render);
+		this.listenTo(this.model, 'change:name', this.invokeSetHeader);
+		this.listenTo(this      , 'disposing'  , function(){this.unstickit();});
 	},
 
 	afterRender: function(){
-		this.invoke('setHeader');
+		this.stickit();
 	},
 
-	serialize: function(){
-		var result       = (App.defined(this.model)) ? this.model.toJSON() : {};
-		var createdAt    = this.model.get('createdAt');
-		var updatedAt    = this.model.get('updatedAt');
-		result.createdAt = this.model.dateDDMMYYYY(createdAt);
-		result.updatedAt = this.model.dateDDMMYYYY(updatedAt);
-		return result;
-	},
+	// serialize: function(){
+	//	var result       = (App.defined(this.model)) ? this.model.toJSON() : {};
+	//	var createdAt    = this.model.get('createdAt');
+	//	var updatedAt    = this.model.get('updatedAt');
+	//	result.createdAt = this.model.dateDDMMYYYY(createdAt);
+	//	result.updatedAt = this.model.dateDDMMYYYY(updatedAt);
+	//	return result;
+	// },
 });
 App.Views.ClientFormView = App.Views.BaseView.extend({
 	template            : HBS.client_form_template,
@@ -2478,6 +2531,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 					message: 'El cliente se ha actualizado correctamente',
 					class  : 'success',
 				});
+				model.set('updatedAt', new Date());
 			},
 		});
 		this.cloneModelCollections();
@@ -3313,30 +3367,56 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	template: HBS.service_request_details_template,
 	className: 'row',
 
+	bindings: {
+		'[name=client_id]': {
+			observe: 'client_id',
+			onGet: function(id){
+				try {
+					var name = app.storage.get('clients', id).get('name'); 
+					return '<a href="#render/client/show/'+id+'">'+name+'</a>';
+				} catch (err) {
+					return "";
+				}
+			},
+			updateMethod: 'html'
+		},
+		'[name=status]': 'status',
+		'[name=invoiceNumber]': {
+			observe: 'invoiceNumber',
+			onGet  : function(value){
+				if (!App.defined(value) || value === ''){return '';}
+				return '<h3 class="pull-right">Remito: <span class="text-primary">'+value+'</span></h3>';
+			},
+			updateMethod: 'html'
+		},
+		'[name=createdAt]': {
+			observe: 'createdAt',
+			onGet: function(value){
+				return App.dateDDMMYYYY(value);
+			},
+		},
+		'[name=createdBy]': 'createdBy',
+		'[name=updatedAt]': {
+			observe: 'updatedAt',
+			onGet: function(value){
+				return App.dateDDMMYYYY(value);
+			},
+		},
+		'[name=updatedBy]': 'updatedBy',
+	},
+
 	awake: function(){
-		_.once(this.renderApplianceIndex);
-		this.listenTo(this.model, 'change:client_name', function(){this.updateViewText.apply(this, ['client_name']);});
-		this.listenTo(this.model, 'change:status', function(){this.updateViewText.apply(this, ['status']);});
-		this.listenTo(this.model, 'change:invoiceNumber', function(){
-			this.updateViewText.apply(this, ['invoiceNumber']);
-			if (this.model.get('invoiceNumber') === ''){ 
-				this.$('[name=invoiceText]').addClass("hide"); 
-			} else {
-				this.$('[name=invoiceText]').removeClass("hide");
-			}
-		});
-		this.listenTo(this.model, 'change:client_id', function(){
-			this.$('[name=client_name]').attr('href', '#render/client/show/' + this.model.get('client_id'));
-		});
+		this.listenTo(this.model, 'change:name', this.invokeSetHeader);
+		this.listenTo(this      , 'disposing'  , function(){this.unstickit();});
 	},
 
 	afterRender: function(){
+		this.stickit();
 		this.renderApplianceIndex();
-		this.invoke('setHeader');
 	},
 
 	renderApplianceIndex: function(){
-		if (!App.defined(this.model)){return;}
+		if (!App.defined(this.model) || this.appliancesIndex){return;}
 		var self = this;
 		var el = this.$('#service-request-appliances');
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
@@ -3543,14 +3623,16 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 						if (source.client_id){
 							try {
 								if (!source.client_id){return "";}
-								return app.storage.collection('clients').get(source.client_id).get('name');
+								var name = app.storage.collection('clients').get(source.client_id).get('name'); 
+								return (name) ? name : "";
 							} catch (err) {
 								console.log(err.stack);
 								return "";
 							}
 						}
 						return "";
-					}
+					},
+					"defaultContent": ""
 				},
 				{"data": function(source, type, val){
 						var appliances = source.appliances;
@@ -3566,7 +3648,8 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 							}
 							return html + '</ul>';
 						}
-					} 
+					},
+					"defaultContent": "" 
 				},
 				{"data": "status"},
 				{"data": function(source, type, val){
@@ -3589,6 +3672,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 						}
 						return dates.join(' ');
 					},
+					"defaultContent": ""
 				},
 				{"data": function(source, type, val){
 						if(type === "display"){
@@ -3597,7 +3681,8 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 							'</a>';
 						}
 						return source._id;
-					}
+					},
+					"defaultContent": ""
 				}
 			]
 		};

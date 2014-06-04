@@ -193,6 +193,7 @@ App.Views.ClientFormView = App.Views.BaseView.extend({
 					message: 'El cliente se ha actualizado correctamente',
 					class  : 'success',
 				});
+				model.set('updatedAt', new Date());
 			},
 		});
 		this.cloneModelCollections();

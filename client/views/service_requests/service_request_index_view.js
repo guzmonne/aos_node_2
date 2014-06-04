@@ -17,14 +17,16 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 						if (source.client_id){
 							try {
 								if (!source.client_id){return "";}
-								return app.storage.collection('clients').get(source.client_id).get('name');
+								var name = app.storage.collection('clients').get(source.client_id).get('name'); 
+								return (name) ? name : "";
 							} catch (err) {
 								console.log(err.stack);
 								return "";
 							}
 						}
 						return "";
-					}
+					},
+					"defaultContent": ""
 				},
 				{"data": function(source, type, val){
 						var appliances = source.appliances;
@@ -40,7 +42,8 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 							}
 							return html + '</ul>';
 						}
-					} 
+					},
+					"defaultContent": "" 
 				},
 				{"data": "status"},
 				{"data": function(source, type, val){
@@ -63,6 +66,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 						}
 						return dates.join(' ');
 					},
+					"defaultContent": ""
 				},
 				{"data": function(source, type, val){
 						if(type === "display"){
@@ -71,7 +75,8 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 							'</a>';
 						}
 						return source._id;
-					}
+					},
+					"defaultContent": ""
 				}
 			]
 		};

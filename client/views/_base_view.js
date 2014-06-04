@@ -279,23 +279,27 @@ App.Views.BaseView = Giraffe.View.extend({
     }
   },
 
-	sync: function(type, options){
-		if (!type){return;}
-		var success, self = this;
-		options        = (options) ? options : {};
-		success        = options.success;
-		options.remove = (options.remove)    ? options.remove    : true;
-		options.add    = (options.add)       ? options.add       : true;
-		options.merge  = (options.merge)     ? options.merge     : true;
-		options.success = function(){
-			if (success) {success.apply(this, arguments);}
-			self.afterSync();
-		};
-		if (type === "model" && this.model){
-			this.model.fetch(options);
-		}
-		if (type === "collection" && this.collection){
-			this.collection.fetch(options);
-		}
-  },
+	// sync: function(type, options){
+	//	if (!type){return;}
+	//	var success, self = this;
+	//	options        = (options) ? options : {};
+	//	success        = options.success;
+	//	options.remove = (options.remove)    ? options.remove    : true;
+	//	options.add    = (options.add)       ? options.add       : true;
+	//	options.merge  = (options.merge)     ? options.merge     : true;
+	//	options.success = function(){
+	//		if (success) {success.apply(this, arguments);}
+	//		self.afterSync();
+	//	};
+	//	if (type === "model" && this.model){
+	//		this.model.fetch(options);
+	//	}
+	//	if (type === "collection" && this.collection){
+	//		this.collection.fetch(options);
+	//	}
+ //  },
+
+  invokeSetHeader: function(){
+		this.invoke('setHeader');
+	},
 });
