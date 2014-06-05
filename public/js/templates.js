@@ -131,7 +131,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"table table-striped table-bordered table-hover table-office dataTable\" aria-describedby=\"appliances-table-info\">\n		<thead>\n			<tr>\n				<th>ID</th>\n				<th>Cliente</th>	\n				<th>Equipo</th>\n				<th>Tipo</th>\n				<th>Estado</th>\n				<th>Tecnico</th>\n				<th>Detalles</th>\n				<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n			</tr>\n		</thead>\n		<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"appliances\">\n		</tbody>\n	</table>\n</div>\n";
+    + "\" class=\"table table-striped table-bordered table-hover table-office table-condensed\" aria-describedby=\"appliances-table-info\">\n		<thead>\n			<tr>\n				<th>ID</th>\n				<th>Cliente</th>	\n				<th>Equipo</th>\n				<th>Tipo</th>\n				<th>Estado</th>\n				<th>Tecnico</th>\n				<th>Detalles</th>\n				<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n			</tr>\n		</thead>\n		<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"appliances\">\n		</tbody>\n	</table>\n</div>\n";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_details_modal_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -356,23 +356,11 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
 
-  buffer += "<div class=\"col-md-12\">\n	<h3>\n		Cliente: <a href=\"#render/client/show/";
-  if (stack1 = helpers.client_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.client_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "\" name=\"client_name\">";
-  if (stack1 = helpers.client_name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.client_name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</a>\n		<a href=\"#render/service_request/show/";
-  if (stack1 = helpers.service_request_id) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.service_request_id); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "\" class=\"btn btn-green pull-right\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Orden de Servicio\" name=\"service_request_id\">\n			<i class=\"fa fa-clipboard fa-fw\"></i> Ir a Orden de Servicio\n		</a>\n	</h3>\n</div>\n<div class=\"col-md-12\">\n	<hr style=\"margin: 10px 0 10px 0;\" >\n</div>\n<div class=\"col-lg-offset-2 col-lg-8 col-md-12\" id=\"form-";
+  buffer += "<div class=\"col-md-12\">\n	<h3>\n		Cliente: <span name=\"client_id\"></span><span name=\"service_request_id\"></span>\n	</h3>\n</div>\n<div class=\"col-md-12\">\n	<hr style=\"margin: 10px 0 10px 0;\" >\n</div>\n<div class=\"col-lg-offset-2 col-lg-8 col-md-12\" id=\"form-";
   if (stack1 = helpers.cid) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.cid); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\"></div>";
+    + "\"></div>\n<div class=\"col-lg-12\">\n	<hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el <span name=\"createdAt\"></span> por <span name=\"createdBy\"></span>\n      </small>\n    </div>\n    <div class=\"col-sm-6 text-right\">\n      <small>\n        Modificado el <span name=\"updatedAt\"></span> por <span name=\"updatedBy\"></span>\n      </small>\n    </div>\n  </div>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_single_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -602,7 +590,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"table table-striped table-bordered table-hover table-office\" aria-describedby=\"clients-table-info\">\n				<thead>\n					<tr>\n						<th>Datos</th>\n						<th>Telefono/s</th>\n						<th>Dirección/es</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\"></tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
+    + "\" class=\"table table-striped table-bordered table-hover table-office table-condensed\" aria-describedby=\"clients-table-info\">\n				<thead>\n					<tr>\n						<th>Datos</th>\n						<th>Telefono/s</th>\n						<th>Dirección/es</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"clients\"></tbody>\n			</table>\n		</div>\n	</div>\n</div>\n			";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["client_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1096,50 +1084,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["HBS"] = this["HBS"] || {};this["HBS"]["model_details_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, functionType="function", escapeExpression=this.escapeExpression, helperMissing=helpers.helperMissing;
+  
 
 
-  buffer += "<div class=\"col-lg-12\">\n  <span class=\"pull-right\" style=\"margin-top: 20px\">\n    <a href=\"#render/model/index\" class=\"pull-right text-muted\">\n      <i class=\"fa fa-list fa-3x\"></i>\n    </a>\n  </span>\n  <h1>\n    Modelo: ";
-  if (stack1 = helpers.model) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.model); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "\n    <span class=\"pull-right label ";
-  options = {hash:{},data:data};
-  buffer += escapeExpression(((stack1 = helpers.statusClass || (depth0 && depth0.statusClass)),stack1 ? stack1.call(depth0, (depth0 && depth0.status), options) : helperMissing.call(depth0, "statusClass", (depth0 && depth0.status), options)))
-    + "\">";
-  if (stack2 = helpers.status) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.status); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + "</span>\n  </h1>\n  <div class=\"row\">\n  	<div class=\"col-xs-2\">\n  		<ul class=\"list-unstyled\">\n  			<li><strong>Marca</strong></li>\n  			<li><strong>Categoría</strong></li>\n  			<li><strong>Subcategoría</strong></li>\n  		</ul>\n  	</div>\n  	<div class=\"col-xs-4\">\n  		<ul class=\"list-unstyled\">\n	  		<li>";
-  if (stack2 = helpers.brand) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.brand); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + "</li>\n	  		<li>";
-  if (stack2 = helpers.category) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.category); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + "</li>\n	  		<li>";
-  if (stack2 = helpers.subcategory) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.subcategory); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + "</li>\n  		</ul>\n  	</div>\n  </div>\n  <hr style=\"margin: 0\">\n  <div class=\"row\">\n    <div class=\"col-sm-12\" style=\"margin-bottom: 10px\">\n        <h3>\n          Equipos \n          <div class=\"pull-right\">\n            <div class=\"btn-group btn-toggle\"> \n              <button id=\"form-view\" class=\"btn btn-info active\" data-view=\"control\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Vista Formulario\">\n                <i class=\"fa fa-table fa-fw\"></i>\n              </button>\n              <button id=\"table-view\" class=\"btn btn-default-shadow\" data-view=\"control\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Vista Tabla\">\n                <i class=\"fa fa-list fa-fw\"></i>\n              </button>\n            </div>\n          </div>\n        </h3>\n    </div>\n  </div>\n  <div id=\"model-appliances-table\" data-view=\"container\"></div>\n  <div id=\"model-appliances-carousel\" class=\"hide\" data-view=\"container\"></div>\n</div>\n<div class=\"col-lg-12\">\n<hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el ";
-  if (stack2 = helpers.createdAt) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.createdAt); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + " por ";
-  if (stack2 = helpers.createdBy) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.createdBy); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + "\n      </small>\n    </div>\n    <div class=\"col-sm-6 text-right\">\n      <small>\n        Modificado el ";
-  if (stack2 = helpers.updatedAt) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.updatedAt); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + " por ";
-  if (stack2 = helpers.updatedBy) { stack2 = stack2.call(depth0, {hash:{},data:data}); }
-  else { stack2 = (depth0 && depth0.updatedBy); stack2 = typeof stack2 === functionType ? stack2.call(depth0, {hash:{},data:data}) : stack2; }
-  buffer += escapeExpression(stack2)
-    + "\n      </small>\n    </div>\n  </div>\n</div>";
-  return buffer;
+  return "<div class=\"col-lg-12\">\n  <span class=\"pull-right\" style=\"margin-top: 20px\">\n    <a href=\"#render/model/index\" class=\"pull-right text-muted\">\n      <i class=\"fa fa-list fa-3x\"></i>\n    </a>\n  </span>\n  <h1>\n    Modelo: <span name=\"model\"></span>\n  </h1>\n  <div class=\"row\">\n  	<div class=\"col-xs-2\">\n  		<ul class=\"list-unstyled\">\n  			<li><strong>Marca</strong></li>\n  			<li><strong>Categoría</strong></li>\n  			<li><strong>Subcategoría</strong></li>\n  		</ul>\n  	</div>\n  	<div class=\"col-xs-4\">\n  		<ul class=\"list-unstyled\">\n	  		<li name=\"brand\"></li>\n	  		<li name=\"category\"></li>\n	  		<li name=\"subcategory\"></li>\n  		</ul>\n  	</div>\n  </div>\n  <hr style=\"margin: 0\">\n  <div class=\"row\">\n    <div class=\"col-sm-12\" style=\"margin-bottom: 10px\">\n        <h3>\n          Equipos \n          <div class=\"pull-right\">\n            <div class=\"btn-group btn-toggle\"> \n              <button id=\"form-view\" class=\"btn btn-info active\" data-view=\"control\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Vista Formulario\">\n                <i class=\"fa fa-table fa-fw\"></i>\n              </button>\n              <button id=\"table-view\" class=\"btn btn-default-shadow\" data-view=\"control\" data-toggle=\"tooltip\" data-placement=\"top\" title=\"Vista Tabla\">\n                <i class=\"fa fa-list fa-fw\"></i>\n              </button>\n            </div>\n          </div>\n        </h3>\n    </div>\n  </div>\n  <div id=\"model-appliances-table\" data-view=\"container\"></div>\n  <div id=\"model-appliances-carousel\" class=\"hide\" data-view=\"container\"></div>\n</div>\n<div class=\"col-lg-12\">\n  <hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el <span name=\"createdAt\"></span> por <span name=\"createdBy\"></span>\n      </small>\n    </div>\n    <div class=\"col-sm-6 text-right\">\n      <small>\n        Modificado el <span name=\"updatedAt\"></span> por <span name=\"updatedBy\"></span>\n      </small>\n    </div>\n  </div>\n</div>";
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["model_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
@@ -1361,35 +1309,14 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["HBS"] = this["HBS"] || {};this["HBS"]["user_details_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, functionType="function", escapeExpression=this.escapeExpression, self=this;
+  var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression;
 
-function program1(depth0,data) {
-  
-  
-  return "<li>Administrador</li>";
-  }
 
-function program3(depth0,data) {
-  
-  
-  return "<li>Tecnico</li>";
-  }
-
-  buffer += "<div class=\"col-lg-12\">\n  <span class=\"pull-right\">\n    <a href=\"#render/user/index\" class=\"pull-right text-muted\">\n      <i class=\"fa fa-list fa-3x\"></i>\n    </a>\n  </span>\n  <h1>\n    ";
-  if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
-  else { stack1 = (depth0 && depth0.name); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "\n    <small>";
+  buffer += "<div class=\"col-lg-12\">\n  <span class=\"pull-right\">\n    <a href=\"#render/user/index\" class=\"pull-right text-muted\" style=\"margin-top: 20px\">\n      <i class=\"fa fa-list fa-3x\"></i>\n    </a>\n  </span>\n  <h1>\n    <span name=\"name\"></span>\n    <small name=\"email\">";
   if (stack1 = helpers.email) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.email); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "</small>\n  </h1>\n  <hr>\n  <div class=\"row\">\n  	<div class=\"col-lg-12\">\n  		<h3>Permisos:</h3>\n  	</div>\n		<div class=\"col-sm-6\">\n			<h4>Roles</h4>\n			<ul>\n				";
-  stack2 = helpers['if'].call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.permissions)),stack1 == null || stack1 === false ? stack1 : stack1.roles)),stack1 == null || stack1 === false ? stack1 : stack1.isAdmin), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n				";
-  stack2 = helpers['if'].call(depth0, ((stack1 = ((stack1 = (depth0 && depth0.permissions)),stack1 == null || stack1 === false ? stack1 : stack1.roles)),stack1 == null || stack1 === false ? stack1 : stack1.isTech), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n			</ul>\n		</div>\n  </div>\n</div>";
+    + "</small>\n  </h1>\n  <hr>\n  <div class=\"row\">\n  	<div class=\"col-lg-12\">\n  		<h3>Permisos:</h3>\n  	</div>\n		<div class=\"col-sm-6\">\n			<h4>Roles</h4>\n			<ul name=\"permissions\"></ul>\n		</div>\n  </div>\n</div>\n<div class=\"col-lg-12\">\n<hr>\n  <div class=\"row\">\n    <div class=\"col-sm-6\">\n      <small>\n        Creado el <span name=\"createdAt\"></span> por <span name=\"createdBy\"></span>\n      </small>\n    </div>\n    <div class=\"col-sm-6 text-right\">\n      <small>\n        Modificado el <span name=\"updatedAt\"></span> por <span name=\"updatedBy\"></span>\n      </small>\n    </div>\n  </div>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["user_form_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

@@ -2,6 +2,27 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 	template: HBS.model_details_template,
 	className: 'row',
 
+	bindings: {
+		'[name=model]'      : 'model',
+		'[name=brand]'      : 'brand',
+		'[name=category]'   : 'category',
+		'[name=subcategory]': 'subcategory',
+		'[name=createdAt]': {
+			observe: 'createdAt',
+			onGet: function(value){
+				return App.dateDDMMYYYY(value);
+			},
+		},
+		'[name=createdBy]': 'createdBy',
+		'[name=updatedAt]': {
+			observe: 'updatedAt',
+			onGet: function(value){
+				return App.dateDDMMYYYY(value);
+			},
+		},
+		'[name=updatedBy]': 'updatedBy',
+	},
+
 	ui: {
 		$formView : "#form-view",
 		$tableView: "#table-view",
@@ -15,10 +36,15 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 		'click a'         : 'slideToAppliance',
 	},
 
+	awake: function(){
+		this.listenTo(this.model, 'change:id'  , this.invokeSetHeader);
+		this.listenTo(this      , 'disposing'  , function(){this.unstickit();});
+	},
+
 	afterRender: function(){
+		this.stickit();
 		this.$el.tooltip();
 		this.renderApplianceIndex();
-		this.invoke('setHeader');
 	},
 
 	slideToAppliance: function(e){
@@ -73,13 +99,5 @@ App.Views.ModelDetailsView = App.Views.ShowView.extend({
 			})
 		});
 		this.appliancesCarousel.attachTo(el, { method: 'html' });
-	},
-
-	serialize: function(){
-		var result = (App.defined(this.model)) ? this.model.toJSON() : {};
-		result.createdAt = (result.createdAt) ? this.model.dateDDMMYYYY(result.createdAt) : null; 
-		result.updatedAt = (result.updatedAt) ? this.model.dateDDMMYYYY(result.updatedAt) : null; 
-		result.timestamp = this.timestamp;
-		return result;
 	},
 });

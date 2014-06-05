@@ -5,8 +5,7 @@
     </a>
   </span>
   <h1>
-    Modelo: {{model}}
-    <span class="pull-right label {{statusClass status}}">{{status}}</span>
+    Modelo: <span name="model"></span>
   </h1>
   <div class="row">
   	<div class="col-xs-2">
@@ -18,9 +17,9 @@
   	</div>
   	<div class="col-xs-4">
   		<ul class="list-unstyled">
-	  		<li>{{brand}}</li>
-	  		<li>{{category}}</li>
-	  		<li>{{subcategory}}</li>
+	  		<li name="brand"></li>
+	  		<li name="category"></li>
+	  		<li name="subcategory"></li>
   		</ul>
   	</div>
   </div>
@@ -46,16 +45,16 @@
   <div id="model-appliances-carousel" class="hide" data-view="container"></div>
 </div>
 <div class="col-lg-12">
-<hr>
+  <hr>
   <div class="row">
     <div class="col-sm-6">
       <small>
-        Creado el {{createdAt}} por {{createdBy}}
+        Creado el <span name="createdAt"></span> por <span name="createdBy"></span>
       </small>
     </div>
     <div class="col-sm-6 text-right">
       <small>
-        Modificado el {{updatedAt}} por {{updatedBy}}
+        Modificado el <span name="updatedAt"></span> por <span name="updatedBy"></span>
       </small>
     </div>
   </div>

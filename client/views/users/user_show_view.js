@@ -26,7 +26,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 	modelName: 'user',
 
 	awake: function(){
-		this.listenTo(this.model, "roles:change", this.techTab);
+		this.listenTo(this.model, "change:permissions", this.techTab);
 	},
 
 	afterRender: function(){
@@ -35,7 +35,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 			self.appliancesIndex.adjustColumns();
 		});
 		this.listenTo(this, 'disposing', function(){
-			this.$('a#client-service_requests[data-toggle=tab]').off();
+			this.$('a#user-appliances[data-toggle=tab]').off();
 		});
 		App.Views.TabView.prototype.afterRender.apply(this, arguments);
 	},
@@ -126,31 +126,23 @@ App.Views.UserShowView = App.Views.TabView.extend({
 
 	renderAppliancesTable: function(){
 		if (!App.defined(this.model) || App.defined(this.appliancesIndex)){return;}
-		var self = this;
-		var el   = this.$('#user-appliances-'+ this.timestamp);
+		var el         = this.$('#user-appliances-'+ this.timestamp);
+		var collection = this.getAppliancesCollection();
 		this.appliancesIndex = new App.Views.ApplianceIndexView({
-			id: "appliances-table",
-			synced: true,
-			collection   : app.storage.getSubCollection("appliances", {
-				technician_id: this.model.id
-			}, {
-				success: function(){
-					self.appliancesIndex.attachTo(el, {method: 'html'});
-					el.prepend(self.appliancesToolbar());
-				}
-			}),
+			id        : "appliances-table",
+			collection: collection,
 		});
+		this.appliancesIndex.attachTo(el, {method: 'html'});
+		el.prepend(this.appliancesToolbar());
 	},
 
 	renderAppliancesCarousel: function(){
 		if (!this.model) {return;}
 		if (this.appliancesCarousel){return;}
-		var el   = this.$('#appliances-carousel');
+		var el         = this.$('#appliances-carousel');
+		var collection = this.getAppliancesCollection();
 		this.appliancesCarousel = new App.Views.ApplianceCarouselView({
-			synced    : true,
-			collection: app.storage.getSubCollection('appliances', {
-				technician_id: this.model.id
-			})
+			collection: collection
 		});
 		this.appliancesCarousel.attachTo(el, { method: 'html' });
 	},
@@ -165,8 +157,28 @@ App.Views.UserShowView = App.Views.TabView.extend({
 		this.editForm.attachTo(this.$('#user-edit-'+ this.timestamp), {method: 'html'});
 	},
 
-	bindEvents: function(){
-		// Interacts with Row View to activate it
-		this.listenTo(app, this.modelName + ':row:rendered', this.announceEntrance);
+	getAppliancesCollection: function(){
+		var self = this;
+		if (!this.appliancesCollection){
+			this.appliancesCollection = app.storage.getSubCollection(
+				"appliances",
+				{
+					technician_id: this.model.id
+				}, 
+				{
+					fetch: false,
+					matches : function(attributes){
+						try {if(attributes.technician_id === self.model.id){return true}else{return false;}}
+						catch (err){return false;}
+					}
+				}
+			);
+		}
+		app.storage.collection('appliances').fetch({
+			data: {
+				technician_id: this.model.id
+			}
+		});
+		return this.appliancesCollection;
 	},
 });

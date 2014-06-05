@@ -25,7 +25,8 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 							}
 						}
 						return "";
-					}
+					},
+					"defaultContent": "" 
 				},
 				{"data": function (source, type, val) {
 						if (source.model_id){
@@ -49,6 +50,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 						}
 						return "";
 					},
+					"defaultContent": "" 
 				},
 				{"data": function(source, type, val){
 						var rep = source.repairement_type;
@@ -77,11 +79,12 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 								return app.storage.collection('techs').get(source.technician_id).get('name');
 							} catch (err) {
 								console.log(err.stack);
-								return "";
+								return "S/A";
 							}
 						}
-						return "";
-					}
+						return "S/A";
+					},
+					"defaultContent": "S/A" 
 				},
 				{"data": function(source, type, val){
 						var dates = [];
@@ -103,6 +106,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 						}
 						return dates.join(' ');
 					},
+					"defaultContent": "" 
 				},
 				{"data": function(source, type, val){
 						var ids = [source._id, source.service_request_id];
@@ -117,6 +121,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 						}
 						return ids.join(' ');
 					},
+					"defaultContent": "" 
 				}
 			],
 		};

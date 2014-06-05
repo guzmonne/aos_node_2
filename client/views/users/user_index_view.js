@@ -20,7 +20,8 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 							return html;
 						}
 						return [source.name, source.email].join(' ');
-					} 
+					},
+					"defaultContent": ""
 				},
 				{"data": function(source, type, val){
 						if(type === "display"){
@@ -33,7 +34,8 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 						if (source.permissions.roles.isAdmin === true){result.push('Administrador');}
 						if (source.permissions.roles.isTech  === true){result.push('Tecnico');}
 						return result.join(' ');
-					} 
+					},
+					"defaultContent": ""
 				},
 				{"data": function(source, type, val){
 						if(type === "display"){
@@ -42,7 +44,8 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 							'</a>';
 						}
 						return source._id;
-					}
+					},
+					"defaultContent": ""
 				}
 			]
 		};

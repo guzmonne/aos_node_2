@@ -153,6 +153,9 @@ App.Storage = (function(){
 					subCollection.remove(model);
 				}
 			});
+			subCollection.listenTo(collection, "sync", function(){
+				subCollection.trigger('sync');
+			});
 			return subCollection;
 		};
 
@@ -193,16 +196,25 @@ App.Storage = (function(){
 		};
 
 		// Techs Collection Event Handlers
-		var isTech = function(attributes){
-			var permissions = attributes.permissions;
-			if (permissions && permissions.roles && permissions.roles.isTech === true){
-				return true;
-			}
-			return false;
+		isTech = function(attributes){
+			try{ if (attributes.permissions.roles.isTech === true){return true;}else{return false;} }
+			catch(err){return false;}
 		};
-		colls.techs = getSubCollection("users", {techs: true}, {
-			fetch  : false, 
-			matches: isTech
+		colls.techs = new App.Collections.Users();
+		colls.techs.listenTo(colls.users, 'add', function(model){
+			if (isTech(model.attributes)){colls.techs.add(model, {merge: true});}
+		});
+		colls.techs.listenTo(colls.users, 'remove', function(model){
+			if (isTech(model.attributes)){colls.techs.remove(model);}
+		});
+		colls.techs.listenTo(colls.users, 'change', function(model){
+			if (isTech(model.attributes)){colls.techs.add(model, {merge: true});}
+		});
+		colls.techs.listenTo(colls.techs, 'change', function(model){
+			if (!isTech(model.attributes)){colls.techs.remove(model);}
+		});
+		colls.techs.listenTo(colls.users, 'sync', function(){
+			colls.techs.trigger('sync');
 		});
 
 		return {

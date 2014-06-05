@@ -83,6 +83,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	},
 
 	adjustColumns: function(){
+		if(!this.$oTable){return;}
 		this.$oTable.fnAdjustColumnSizing();
 	},
 

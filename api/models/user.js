@@ -28,9 +28,9 @@ var User = new Schema({
 	'updatedBy'  : String,
 	'createdAt'  : Date,
 	'updatedAt'  : Date,
-	'service_requests'   : [{
+	'appliances'   : [{
 		type: Schema.Types.ObjectId,
-		ref: 'ServiceRequest',
+		ref: 'Appliance',
 	}],
 });
 
