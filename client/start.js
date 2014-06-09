@@ -81,6 +81,7 @@ app.addInitializer(function(){
 });
 
 $(document).ready(function(){
+	moment.lang('es');
 	app.attachTo('section#page-wrapper');
 	app.start();
 });

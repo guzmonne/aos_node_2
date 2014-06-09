@@ -10,76 +10,65 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 			"columnDefs": [
 				{ "searchable": false, "targets": -1 },
 				{ "className": "center-vh", "targets": -1 },
+				{ "className": "text-center", "targets": [0, 2, 3, 4, 5, 6]},
 			],
 			"columns": [
-				{"data": "id"},
-				{"data": function (source, type, val) {
-						if (source.client_id){
-							try {
-								if (!source.client_id){return "";}
-								var name = app.storage.collection('clients').get(source.client_id).get('name'); 
-								return (name) ? name : "";
-							} catch (err) {
-								console.log(err.stack);
-								return "";
-							}
-						}
-						return "";
-					},
-					"defaultContent": ""
-				},
+				{"data": "id", defaultContent: ""},
+				{"data": this.clientName, "defaultContent": ""},
 				{"data": function(source, type, val){
-						var appliances = source.appliances;
-						if(type === "sort"){
-							if (_.isArray(appliances)){return appliances.length;}
-							return 0;
-						}
-						if(type === "display"){
-							var length = (_.isArray(appliances)) ? appliances.length : 0;
-							var html   = '<ul class="list-unstyled"><li><strong>Equipos:</strong> '+length+'</li>';
-							if (source.invoiceNumber && source.invoiceNumber !== ''){
-								html = html + '<li><strong>Remito:</strong> '+source.invoiceNumber+'</li>';
-							}
-							return html + '</ul>';
-						}
-					},
-					"defaultContent": "" 
-				},
-				{"data": "status"},
+					if (!source.invoiceNumber || source.invoiceNumber === '')
+					{ return 'S/R'; } else { return source.invoiceNumber; }
+				}},
+				{"data": this.serviceRequestInfo, "defaultContent": ""},
+				{"data": "status", "defaultContent": ""},
 				{"data": function(source, type, val){
-						var dates = [];
-						dates.push(App.dateDDMMYYYY(source.createdAt));
-						dates.push(App.dateDDMMYYYY(source.updatedAt));
-						if (source.closedAt) { dates.push(App.dateDDMMYYYY(source.closedAt));}
-						if (type === 'display'){
-							var html =
-								'<dt>Creado</dt>' + 
-								'<dd>'+ dates[0] +'</dd>' +
-								'<dt>Actualizado</dt>' +
-								'<dd>'+ dates[1] +'</dd>';
-							if (dates.length === 3) {
-								html = html + 
-								'<dt>Cerrado</dt>' +
-								'<dd>'+ dates[2] +'</dd>';
-							}
-							return html;
-						}
-						return dates.join(' ');
-					},
-					"defaultContent": ""
-				},
+					return moment(source.createdAt).format('DD/MM/YYYY');
+				}, "defaultContent": ""},
 				{"data": function(source, type, val){
-						if(type === "display"){
-							return '<a href="#render/service_request/show/'+ source._id +'" class="btn btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-							'</a>';
-						}
-						return source._id;
-					},
-					"defaultContent": ""
-				}
+					if(source.closedAt){
+						return moment(source.closedAt).format('DD/MM/YYYY');
+					}else{
+						return "Abierto";
+					}
+				}, "defaultContent": "Abierto"},
+				{"data": this.serviceRequestButton, "defaultContent": ""}
 			]
 		};
+	},
+
+	clientName: function (source, type, val) {
+		if (source.client_id){
+			try {
+				if (!source.client_id){return "";}
+				var name = app.storage.collection('clients').get(source.client_id).get('name'); 
+				return (name) ? name : "";
+			} catch (err) {
+				console.log(err.stack);
+				return "";
+			}
+		}
+		return "";
+	},
+
+	serviceRequestInfo: function(source, type, val){
+		var appliances = source.appliances;
+		if(type === "sort"){
+			if (_.isArray(appliances)){return appliances.length;}
+			return 0;
+		}
+		if(type === "display"){
+			var length = (_.isArray(appliances)) ? appliances.length : 0;
+			return length;
+		}
+	},
+
+	serviceRequestButton: function(source, type, val){
+		if(type === "display"){
+			return '<a href="#render/service_request/show/'+ source._id +'" class="btn btn-xs btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+				'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+			'</a>';
+		}
+		return source._id;
 	},
 
 	events:{

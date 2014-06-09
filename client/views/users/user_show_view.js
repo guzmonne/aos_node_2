@@ -29,17 +29,6 @@ App.Views.UserShowView = App.Views.TabView.extend({
 		this.listenTo(this.model, "change:permissions", this.techTab);
 	},
 
-	afterRender: function(){
-		var self = this;
-		this.$('a#user-appliances[data-toggle=tab]').on('shown.bs.tab', function (e) {
-			self.appliancesIndex.adjustColumns();
-		});
-		this.listenTo(this, 'disposing', function(){
-			this.$('a#user-appliances[data-toggle=tab]').off();
-		});
-		App.Views.TabView.prototype.afterRender.apply(this, arguments);
-	},
-
 	tabs: function(){
 		var tabs = [
 			{
@@ -168,7 +157,7 @@ App.Views.UserShowView = App.Views.TabView.extend({
 				{
 					fetch: false,
 					matches : function(attributes){
-						try {if(attributes.technician_id === self.model.id){return true}else{return false;}}
+						try {if(attributes.technician_id === self.model.id){return true;}else{return false;}}
 						catch (err){return false;}
 					}
 				}

@@ -143,7 +143,6 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 
 	saveModel: function(){
-		this.setRepType();
 		this.model.set(_.pick(this.$('form').formParams(), 
 			'serial',
 			'observations',
@@ -153,18 +152,10 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 			'replacements',
 			'diagnose',
 			'solution',
-			'technician_id'
+			'technician_id',
+			'repairement_type',
+			'cost'
 		));
-	},
-
-	setRepType: function(){
-		var oldRepType = this.model.get('repairement_type');
-		var newRepType = this.$('[name=repairement_type]').val();
-		if((oldRepType !== newRepType) && (newRepType === "Garantía")){
-			this.model.set('cost', 0);
-		} else {
-			this.model.set('cost', this.$('[name=cost]').val());
-		}
 	},
 
 	selectModelOff: function(){

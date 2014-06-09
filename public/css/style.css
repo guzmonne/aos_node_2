@@ -882,6 +882,10 @@ input[type="checkbox"]:checked:hover:before {
   border-color: #50215A;
 }
 
+.btn-margin {
+  margin: 2px;
+}
+
 
 /* TABLES */
 .table>thead>tr>th {
@@ -1025,7 +1029,7 @@ td.center-vh{
 .table-responsive-width > .table > thead > tr > td,
 .table-responsive-width > .table > tbody > tr > td,
 .table-responsive-width > .table > tfoot > tr > td {
-  white-space: nowrap;
+  white-space: normal;
 }
 .table-responsive-width > .table-bordered {
   border: 0;
@@ -1054,7 +1058,7 @@ td.center-vh{
 }
 
 th, td { 
-  white-space: nowrap; 
+  white-space: normal; 
 }
 
 /* BS-CALLOUT */

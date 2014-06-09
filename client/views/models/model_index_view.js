@@ -26,11 +26,11 @@ App.Views.ModelIndexView = App.Views.TableView.extend({
 						if(type === "display"){
 							var html;
 							if (self.selection === true){
-								html =	'<a data-id="'+source._id+'" class="btn btn-warning" name="select" data-toggle="tooltip" data-placement="top" title="Seleccionar">' +
+								html =	'<a data-id="'+source._id+'" class="btn btn-warning btn-xs" name="select" data-toggle="tooltip" data-placement="top" title="Seleccionar">' +
 													'<i class="fa fa-external-link fa-lg"></i>'+
 												'</a>';
 							} else {
-								html =	'<a href="#render/model/show/'+ source._id +'" class="btn btn-green"  id="client-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+								html =	'<a href="#render/model/show/'+ source._id +'" class="btn btn-green btn-xs"  id="client-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
 													'<i class="fa fa-ellipsis-h fa-fw"></i>' +
 												'</a>';
 							}

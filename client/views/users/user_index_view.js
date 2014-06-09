@@ -39,7 +39,7 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 				},
 				{"data": function(source, type, val){
 						if(type === "display"){
-							return '<a href="#render/user/show/'+ source._id +'" class="btn btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+							return '<a href="#render/user/show/'+ source._id +'" class="btn btn-xs btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
 								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
 							'</a>';
 						}

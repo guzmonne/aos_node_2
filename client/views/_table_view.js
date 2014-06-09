@@ -15,10 +15,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 	initialize: function(){
 		var self = this;
 		this.awake.apply(this, arguments);
-		this.listenTo(this.collection, 'sync'              , this.tableFetched);
-		this.listenTo(app            , 'nav:toggleMenu:end', this.adjustColumns);
-		this.$el.on  (      'resize'   , function(){self.adjustColumns.apply(self);});
-		this.listenTo(this, 'disposing', function(){this.$el.off('resize');});
+		this.listenTo(this.collection, 'sync', this.tableFetched);
 		this.timestamp = _.uniqueId();
 	},
 
@@ -45,14 +42,14 @@ App.Views.TableView = App.Views.BaseView.extend({
 	appendCollection: function(collection){
 		var self    = this;
 		var options = _.extend({
-			"scrollY"       : 600,
-			"scrollCollapse": true,
+			//"scrollY"       : 600,
+			//"scrollCollapse": true,
 			"deferRender"   : true,
 			"stateSave"     : true,
 			"stateDuration" : -1,
 			"data"          : this.collection.toJSON(),
-			"scrollX"       : true,
-			"sScrollXInner" : "100%",
+			//"scrollX"       : true,
+			//"sScrollXInner" : "100%",
 			//"sScrollX"      : "98%",
 		}, this.dataTableOptions);
 		// Table jQuery Object
@@ -82,11 +79,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.sync("collection", this.fetchOptions);
 	},
 
-	adjustColumns: function(){
-		if(!this.$oTable){return;}
-		this.$oTable.fnAdjustColumnSizing();
-	},
-
 	getModelIndex: function(model){
 		if(!this.$oTable){return;}
 		if(_.isString(model)){model = this.collection.get(model);}
@@ -102,7 +94,6 @@ App.Views.TableView = App.Views.BaseView.extend({
 	addRow: function(model){
 		var rowNode = this.oTable.row.add(model.attributes).draw().node();
 		App.animate(this.$(rowNode), 'fadeIn');
-		this.adjustColumns();
 	},
 
 	selected: function(e){

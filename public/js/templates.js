@@ -131,7 +131,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"table table-striped table-bordered table-hover table-office table-condensed\" aria-describedby=\"appliances-table-info\">\n		<thead>\n			<tr>\n				<th>ID</th>\n				<th>Cliente</th>	\n				<th>Equipo</th>\n				<th>Tipo</th>\n				<th>Estado</th>\n				<th>Tecnico</th>\n				<th>Detalles</th>\n				<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n			</tr>\n		</thead>\n		<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"appliances\">\n		</tbody>\n	</table>\n</div>\n";
+    + "\" class=\"table table-striped table-bordered table-condensed table-hover table-office table-condensed\" aria-describedby=\"appliances-table-info\">\n		<thead>\n			<tr>\n				<th>ID</th>\n				<th>Cliente</th>	\n				<th>Modelo</th>\n				<th>Marca</th>\n				<th>Serie</th>\n				<th>Tipo</th>\n				<th>Estado</th>\n				<th>Tecnico</th>\n				<th>Creado</th>\n				<th>Cerrado</th>\n				<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n			</tr>\n		</thead>\n		<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"appliances\">\n		</tbody>\n	</table>\n</div>\n";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["appliance_multiple_form_details_modal_row_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
@@ -1222,7 +1222,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (stack1 = helpers.timestamp) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = (depth0 && depth0.timestamp); stack1 = typeof stack1 === functionType ? stack1.call(depth0, {hash:{},data:data}) : stack1; }
   buffer += escapeExpression(stack1)
-    + "\" class=\"table table-striped table-bordered table-hover table-office dataTable\" aria-describedby=\"service_requests-table-info\">\n				<thead>\n					<tr>\n						<th>ID</th>\n						<th>Cliente</th>\n						<th>Info</th>\n						<th>Estado</th>\n						<th>Detalle</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n				</tbody>\n			</table>\n		</div>\n	</div>\n</div>";
+    + "\" class=\"table table-striped table-condensed table-bordered table-hover table-office dataTable\" aria-describedby=\"service_requests-table-info\">\n				<thead>\n					<tr>\n						<th>ID</th>\n						<th>Cliente</th>\n						<th>Remito</th>\n						<th>Cant.</th>\n						<th>Estado</th>\n						<th>Creado</th>\n						<th>Cerrado</th>\n						<th class=\"text-center\"><i class=\"fa fa-wrench\"></i></th>\n					</tr>\n				</thead>\n				<tbody role=\"alert\" aria-live=\"polite\" aria-relevant=\"all\" id=\"service_requests\">\n				</tbody>\n			</table>\n		</div>\n	</div>\n</div>";
   return buffer;
   });
 this["HBS"] = this["HBS"] || {};this["HBS"]["service_request_new_template"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {

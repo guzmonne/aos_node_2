@@ -11,12 +11,6 @@ App.Views.ClientSelectModalView = App.Views.BaseView.extend({
 
 	afterRender: function(){
 		var self = this;
-		app.modalController.$('#modalContainer').on('shown.bs.modal', function (e) {
-			self.clientIndex.adjustColumns();
-		});
-		this.listenTo(this, 'disposing', function(){
-			app.modalController.$('#modalContainer').off();
-		});
 		this.clientIndex = new App.Views.ClientIndexView({
 			collection: app.storage.getCollection("clients"),
 			synced    : true,
