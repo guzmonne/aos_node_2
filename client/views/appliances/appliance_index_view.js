@@ -4,7 +4,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	name     : "Equipos",
 	
 	tableEl        : '#appliances-table',
-
+	
 	awake: function(){
 		this.dataTableOptions = {
 			"columnDefs": [
@@ -16,8 +16,8 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 			"columns": [
 				{"data": "id"},
 				{"data": this.clientName},
-				{"data": this.modelName},
 				{"data": this.brandName},
+				{"data": this.modelName},
 				{"data": this.serial},
 				{"data": this.repairementType},
 				{"data": this.status},
