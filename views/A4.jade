@@ -1,0 +1,69 @@
+doctype html
+html(lang="en")
+	head
+		meta(charset="utf-8")
+		meta(name="viewport" content="width=device-width, initial-scale=1.0")
+		meta(name="description" content="Service Request Administrator")
+		meta(name="author" content="Guzman Monne")
+		title AOS - Report
+
+		link(rel='stylesheet', href='/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/css/font-awesome/css/font-awesome.css')
+		link(rel='stylesheet', href='/css/print.css')
+
+	body
+		header
+			h1.title Orden de Servicio
+			.row
+				.col-xs-6
+					address
+						ul.list-unstyled
+							li Dirección de Punktal 
+							li
+								i.fa.fa-phone.fa-fw(style="margin-top: 3px") 
+								|  2600 2525
+							li
+								i.fa.fa-envelope.fa-fw
+								|  mail@punktal.com
+							li R.U.T. 41245886363
+				.col-xs-6
+					span.pull-right
+						img(alt='Punktal logo', src='/images/punktal_logo.png')
+		article.row
+			.col-xs-6
+				h1
+					| Cliente: 
+					span.text-primary(name='client_name') Nombre de Cliente
+			.col-xs-6
+				table.table.table-bordered.table-condensed.table-invoice
+					tr
+						th ID
+						td 
+							span(name='id')
+					tr
+						th Fecha
+						td
+							span(name='today')
+			.col-xs-12.inventory
+				table.table.table-bordered.table-inventory
+					thead
+						tr
+							th IDs
+							th Marca
+							th Modelo
+							th Cantidad
+							th Observaciones
+					tbody
+					tfoot
+						tr
+							td(colspan='3')
+							td
+								span(name='total_qty')
+		aside.row
+			.col-xs-12
+				h3 Firma de Cliente:
+				h5 Notas
+			.col-xs-6.justified
+				p(name='notes_1')
+			.col-xs-6.justified
+				p(name='notes_2')

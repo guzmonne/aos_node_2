@@ -23810,7 +23810,7 @@ ImageMeasure.prototype.measureImage = function(src) {
 	if (!this.pdfDoc._imageRegistry[src]) {
 		label = "I" + (++this.pdfDoc._imageCount);
 		image = pdfKit.PDFImage.open(realImageSrc(src), label);
-		image.embed(this.pdfDoc);
+    image.embed(this.pdfDoc);
 		this.pdfDoc._imageRegistry[src] = image;
 	} else {
 		image = this.pdfDoc._imageRegistry[src];

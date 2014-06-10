@@ -150,6 +150,13 @@ app.get('/', function(req, res){
 		});
 	});
 });
+// Report
+// ------
+app.get('/print/A4', function(req, res){
+	res.render('A4', {
+		csrf: req.csrfToken()
+	});
+});
 // Client
 // ------
 app.get( '/api/clients'    , client.index);

@@ -72,11 +72,22 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	},
 
 	buildReport: function(){
-		if (this.report){return this.report;}
+		//if (this.report){return this.report;}
 		var self = this;
 		var body = {}, tbody = [], clientName = '', content = [];
 		try {clientName = app.storage.get('clients', this.model.get('client_id')).get('name');}
 		catch(err){console.log(err.stack);}
+		var h1 = App.PDF.text([
+				{text: 'Numero de Orden: ', style: 'header'},
+				{text: this.model.get('id').toString(), style: 'greyHeader'},
+			]
+		);
+		var h2 = App.PDF.text(
+			[
+				{text: 'Cliente: ', style: 'subHeader'},
+				{text: clientName, style: 'greySubHeader'},
+			]
+		);
 		var tBodyHeader = [
 			App.PDF.text('IDS'          , 'tableHeader'), 
 			App.PDF.text('Marca'        , 'tableHeader'), 
@@ -84,12 +95,6 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 			App.PDF.text('Cantidad'     , 'tableHeader'), 
 			App.PDF.text('Observaciones', 'tableHeader')
 		];
-		var header = App.PDF.text(
-			[
-				{text: 'Cliente:', style: 'header'},
-				{text: clientName, style: 'greyHeader'},
-			]
-		);
 		tbody.push(tBodyHeader);
 		body = this.fillTableObject();
 		_.each(body, function(value, key, list){
@@ -108,24 +113,23 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 			array.push(obs);
 			tbody.push(array);
 		});
-		//content.push(App.PDF.punktalLogo);
 		content.push(App.PDF.columns(
 			[
-				header,
+				{stack: [h1, h2]},
 				App.PDF.text(moment(new Date()).format('DD/MM/YYYY'), {margin: [0, 5, 0, 10], alignment: 'right'})
 			]
 		));
 		content.push(App.PDF.table(tbody, {widths: [ 30, 60, 50, 50, '*' ]}, 'lightHorizontalLines'));
-		this.report = {
+		return {
 			pageSize: 'A4',
-			pageMargins: [ 40, 40, 40, 100 ],
+			pageMargins: [ 40, 100, 40, 100 ],
+			header: App.PDF.punktalLogoHeader(),
 			content: content,
 			footer: [
 				App.PDF.clientSign,
 				App.PDF.columnsLorem,
 			]
-		}; 
-		return this.report; 
+		};
 	},
 
 	downloadPDF: function(){
@@ -136,12 +140,12 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 
 	printPDF: function(){
 		var filename, report = this.buildReport();
-		pdfMake.createPdf(report).print();
+		fileName = 'OdeS_' + this.model.get('id') + '.pdf';
+		pdfMake.createPdf(report).print(filename);
 	},
 
 	fillTableObject: function(){
 		var body = {}, model_id, model, appliance, appliancesIds = this.model.get('appliances');
-		console.log(this.model);
 		for(var i = 0; i < appliancesIds.length; i++){
 			try {
 				if (_.isObject(appliancesIds[i])){
