@@ -5,6 +5,10 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	
 	tableEl  : '#service_requests-table',
 
+	events:{
+		'click button#new-service-request': 'newServiceRequest',
+	},
+
 	awake: function(){
 		this.dataTableOptions = {
 			"columnDefs": [
@@ -26,16 +30,9 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 	},
 
 	serviceRequestButton: function(source, type, val){
-		if(type === "display"){
-			return '<a href="#render/service_request/show/'+ source._id +'" class="btn btn-xs btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-				'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-			'</a>';
-		}
+		var model = app.storage.get('service_requests', source._id);
+		if(type === "display"){ return model.serviceRequestButton(); }
 		return source._id;
-	},
-
-	events:{
-		'click button#new-service-request': 'newServiceRequest',
 	},
 
 	comparator: function(portletView){

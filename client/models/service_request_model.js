@@ -41,4 +41,11 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		attributes.appliancesCount = this.get('appliances').length;
 		return attributes;
 	},
+
+	serviceRequestButton: function(){
+		var id = this.id;
+		return	'<a href="#render/service_request/show/'+id+'" class="btn btn-xs btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+							'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+						'</a>';
+	},
 });
