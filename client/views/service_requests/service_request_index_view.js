@@ -13,53 +13,16 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 				{ "className": "text-center", "targets": [0, 2, 3, 4, 5, 6]},
 			],
 			"columns": [
-				{"data": "id", defaultContent: ""},
-				{"data": this.clientName, "defaultContent": ""},
-				{"data": function(source, type, val){
-					if (!source.invoiceNumber || source.invoiceNumber === '')
-					{ return 'S/R'; } else { return source.invoiceNumber; }
-				}},
-				{"data": this.serviceRequestInfo, "defaultContent": ""},
-				{"data": "status", "defaultContent": ""},
-				{"data": function(source, type, val){
-					return moment(source.createdAt).format('DD/MM/YYYY');
-				}, "defaultContent": ""},
-				{"data": function(source, type, val){
-					if(source.closedAt){
-						return moment(source.closedAt).format('DD/MM/YYYY');
-					}else{
-						return "Abierto";
-					}
-				}, "defaultContent": "Abierto"},
+				{"data": "id"             , "defaultContent": ""},
+				{"data": "client_name"    , "defaultContent": ""},
+				{"data": "invoiceNumber"  , "defaultContent": "S/R"},
+				{"data": "appliancesCount", "defaultContent": "0"},
+				{"data": "status"         , "defaultContent": ""},
+				{"data": "createdAt_short", "defaultContent": ""},
+				{"data": "closedAt_short" , "defaultContent": "Abierto"},
 				{"data": this.serviceRequestButton, "defaultContent": ""}
 			]
 		};
-	},
-
-	clientName: function (source, type, val) {
-		if (source.client_id){
-			try {
-				if (!source.client_id){return "";}
-				var name = app.storage.collection('clients').get(source.client_id).get('name'); 
-				return (name) ? name : "";
-			} catch (err) {
-				console.log(err.stack);
-				return "";
-			}
-		}
-		return "";
-	},
-
-	serviceRequestInfo: function(source, type, val){
-		var appliances = source.appliances;
-		if(type === "sort"){
-			if (_.isArray(appliances)){return appliances.length;}
-			return 0;
-		}
-		if(type === "display"){
-			var length = (_.isArray(appliances)) ? appliances.length : 0;
-			return length;
-		}
 	},
 
 	serviceRequestButton: function(source, type, val){

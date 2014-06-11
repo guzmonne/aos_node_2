@@ -92,34 +92,6 @@ window.App = {
 		}, true);
 	},
 
-	statusClass: function(status){
-		var className;
-		switch (status){
-		case "Recibido":
-				className = "btn-status-1";
-				break;
-		case "En Reparación":
-				className = "btn-status-2";
-				break;
-		case "En Espera":
-				className = "btn-status-3";
-				break;
-		case "Atrasado":
-				className = "btn-status-4";
-				break;
-		case "Reparado":
-				className = "btn-status-5";
-				break;
-		case "Entregado":
-				className = "btn-status-7";
-				break;
-		case "Enviado":
-				className = "btn-status-6";
-				break;
-		}
-		return className;
-	},
-
 	dateDDMMYYYY: function(date){
 		var parsedDate;
 		if (date instanceof Date){
@@ -684,6 +656,48 @@ App.Mixins.ShowViewAnnouncer = {
 		this.model.trigger('model:show:inactive');
 	},
 };
+App.Mixins.UserIndex = (function(window, undefined){
+	var userShowButton = function(source, type, val){
+		var model = app.storage.get('users', source._id);
+		if(type === "display"){ return model.userShowButton(); }
+		return source._id;
+	};
+
+	var userRoles = function(source, type, val){
+		var model = app.storage.get('users', source._id);
+		if(type === "display"){ return model.userRoles(); }
+		var result = [];
+		if (source.permissions.roles.isAdmin === true){result.push('Administrador');}
+		if (source.permissions.roles.isTech  === true){result.push('Tecnico');}
+		return result.join(' ');
+	};
+
+	var userData = function(source, type, val){
+		var model = app.storage.get('users', source._id);
+		if(type === "sort")   {return source.name;}
+		if(type === "display"){ return model.userDetails(); }
+		return [source.name, source.email].join(' ');
+	};
+
+	var dataTableOptions = {
+		"columnDefs": [
+			{ "searchable": false, "targets": -1 },
+			{ "className": "center-vh", "targets": -1 },
+		],
+		"columns": [
+			{"data": userData      , "defaultContent": "" },
+			{"data": userRoles     , "defaultContent": ""	},
+			{"data": userShowButton, "defaultContent": "" }
+		]
+	};
+	
+	return {
+		dataTableOptions: dataTableOptions,
+		userShowButton  : userShowButton,
+		userRoles       : userRoles,
+		userData        : userData
+	};
+})();
 App.Models.BaseModel = Giraffe.Model.extend({
 	// So Backbone can use the '_id' value of our Mongo documents as the documents id
 	idAttribute: '_id',
@@ -691,6 +705,23 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	initialize: function(){
 		this.awake.apply(this, arguments);
 		Giraffe.Model.prototype.initialize.apply(this, arguments);
+	},
+
+	setRelatedField: function(collectionName, relatedFieldName, attributeName, name){
+		var relatedField, result;
+		if (!_.isString(collectionName))    {throw new Error('A collection name must be passes as a string');}
+		if (!_.isString(relatedFieldName))  {throw new Error('A related field value must be passes as a string');}
+		if (!_.isString(attributeName))     {throw new Error('An attribute name must be passes as a string');}
+		relatedField = this.get(relatedFieldName);
+		if(!relatedField){return;}
+		name = (name) ? name : attributeName;
+		try{
+			result = app.storage.get(collectionName, relatedField).get(attributeName);
+		} catch (err){
+			return console.log(err.stack);
+		}
+		this.set(name, result);
+		return result;
 	},
 
 	awake: function(){},
@@ -723,6 +754,28 @@ App.Models.BaseModel = Giraffe.Model.extend({
 		return array[index];
 	},
 
+	setDates: function(){
+		var date, dates = ['createdAt', 'updatedAt', 'closedAt'];
+		for (var i = 0; i < dates.length; i++){
+			date = this.get(dates[i]);
+			if (!_.isUndefined(date)){
+				try {
+					this.set(dates[i] + '_short', moment(date).format('DD/MM/YYYY'));
+				} catch (err) {
+					console.log(err.stack);
+				}
+			}
+		}
+	},
+
+	cleanField: function(attributeName){
+		if (!_.isString(attributeName)){throw new Error('The attributeName must be a string');}
+		var attribute = this.get(attributeName);
+		if (!attribute || attribute === ''){ 
+			this.set(attributeName, null);
+		}
+	},
+
 	// Just a basic function to parse a 'Date()' type.
 	dateDDMMYYYY: function(date){
 		var parsedDate;
@@ -740,8 +793,43 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 	urlRoot: '/api/appliances',
 	name   : 'appliance',
 
+	defaults: function(){
+		return {
+			'status'            : 'Recibido',
+			'createdBy'         : 'Guzman Monne',
+			'updatedBy'         : 'Guzman Monne',
+		};
+	},
+
 	awake: function(){
 		this.listenTo(this, 'change:repairement_type', this.checkCost);
+		this.listenTo(this, 'sync', this.setRelatedFields);
+		this.listenTo(this, 'add' , this.setRelatedFields);
+	},
+
+	setRelatedFields: function(){
+		this.setClientName();
+		this.setModelAndBrand();
+		this.setTechnicianName();
+		this.setDates();
+		this.setSerial();
+	},
+
+	setClientName: function(){
+		this.setRelatedField('clients', 'client_id', 'name', 'client_name');
+	},
+
+	setModelAndBrand: function(){
+		this.setRelatedField('models', 'model_id', 'brand');
+		this.setRelatedField('models', 'model_id', 'model');
+	},
+
+	setTechnicianName: function(){
+		this.setRelatedField('techs', 'technician_id', 'name', 'technician_name');
+	},
+
+	setSerial: function(){
+		this.cleanField('serial');
 	},
 
 	checkCost: function(){
@@ -754,12 +842,81 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 		}
 	},
 
-	defaults: function(){
-		return {
-			'status'            : 'Recibido',
-			'createdBy'         : 'Guzman Monne',
-			'updatedBy'         : 'Guzman Monne',
-		};
+	statusClass: function(status){
+		var className;
+		switch (status){
+		case "Recibido":
+				className = "btn-status-1";
+				break;
+		case "En Reparación":
+				className = "btn-status-2";
+				break;
+		case "En Espera":
+				className = "btn-status-3";
+				break;
+		case "Atrasado":
+				className = "btn-status-4";
+				break;
+		case "Reparado":
+				className = "btn-status-5";
+				break;
+		case "Entregado":
+				className = "btn-status-7";
+				break;
+		case "Enviado":
+				className = "btn-status-6";
+				break;
+		}
+		return className;
+	},
+
+	statusLabel: function(){
+		var status = this.get('status');
+		return	'<h4 style="margin: 0px;">' +
+							'<span class="label label-default ' + this.statusClass(status) + '">' + 
+								status +
+							'</span>'+
+						'</h4>';
+	},
+
+	budgetList: function(){
+		var cost = this.get('cost');
+		cost = (cost) ? cost : 0;
+		return	'<dt>Presupuesto</dt>' +
+						'<dd>$'+cost+',00</dd>';
+	},
+
+	datesList: function(){
+		var dates = [
+			this.get('createdAt_short'),
+			this.get('updatedAt_short'),
+			this.get('closedAt_short')
+		];
+		var html =
+			'<dt>Creado</dt>' + 
+			'<dd>'+ dates[0] +'</dd>' +
+			'<dt>Actualizado</dt>' +
+			'<dd>'+ dates[1] +'</dd>';
+		if (dates.length === 3) {
+			html = html + 
+			'<dt>Cerrado</dt>' +
+			'<dd>'+ dates[2] +'</dd>';
+		}
+		return html;
+	},
+
+	showApplianceButton: function(){
+		var id = this.id;
+		return	'<a href="#render/appliance/show/'+id+'" class="btn btn-xs btn-green btn-margin"  id="appliance-details" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+							'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+						'</a>';
+	},
+
+	showServiceRequestButton: function(){
+		var id = this.get('service_request_id');
+		return	'<a href="#render/service_request/show/'+id+'" class="btn btn-xs btn-green btn-margin" id="appliance-service-request" data-toggle="tooltip" data-placement="top" title="Orden de Servicio">' +
+							'<i class="fa fa-clipboard fa-fw"></i>' +
+						'</a>';
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
@@ -801,6 +958,33 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		};
 	},
 
+	awake: function(){
+		this.listenTo(this, 'change:repairement_type', this.checkCost);
+		this.listenTo(this, 'sync', this.setRelatedFields);
+		this.listenTo(this, 'add' , this.setRelatedFields);
+	},
+
+	setRelatedFields: function(){
+		this.setClientName();
+		this.setAppliancesCount();
+		this.setInvoiceNumber();
+		this.setDates();
+	},
+
+	setAppliancesCount: function(){
+		var appliances = this.get('appliances');
+		var length = (_.isArray(appliances)) ? appliances.length: 0;
+		this.set('appliancesCount', length);
+	},
+
+	setClientName: function(){
+		this.setRelatedField('clients', 'client_id', 'name', 'client_name');
+	},
+
+	setInvoiceNumber: function(){
+		this.cleanField('invoiceNumber');
+	},
+
 	serialize: function(){
 		var attributes = this.toJSON();
 		attributes.appliancesCount = this.get('appliances').length;
@@ -815,6 +999,29 @@ App.Models.User = App.Models.BaseModel.extend({
 			'createdBy'  : 'Guzmán Monné',
 			'updatedBy'  : 'Guzmán Monné',
 		};
+	},
+
+	userDetails: function(){
+		var name  = this.get('name');
+		var email = this.get('email');
+		var html  = '<dd><i class="fa fa-user fa-fw"></i>'+name+'</dd>';
+		if (email){html = html + '<dd><i class="fa fa-envelope fa-fw"></i>'+email+'</dd>';}
+		return html;
+	},
+
+	userRoles: function(){
+		var html = '<dt>Roles</dt>';
+		var permissions = this.get('permissions');
+		if (permissions.roles.isAdmin === true){html = html + '<dd>Administrador</dd>';}
+		if (permissions.roles.isTech  === true){html = html + '<dd>Tecnico</dd>';}
+		return html;
+	},
+
+	userShowButton: function(){
+		var id = this.id;
+		return	'<a href="#render/user/show/'+id+'" class="btn btn-xs btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+							'<i class="fa fa-ellipsis-h fa-fw"></i>' +
+						'</a>';
 	},
 });
 App.Collections.BaseCollection = Giraffe.Collection.extend({
@@ -2034,140 +2241,55 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		this.dataTableOptions = {
 			"columnDefs": [
 				{ "searchable": false, "targets": -1 },
-				{ "className": "center-vh", "targets": [0, 4, 5, 6, 8, 9] },
+				{ "className": "center-vh", "targets": [0, 5, 6, 8, 9] },
 				{ "className": "center-vh", "targets": -1 },
-				{ "className": "center-v" , "targets": [1, 2, 3, 7] },
+				{ "className": "center-v" , "targets": [1, 2, 3, 4, 7] },
 			],
 			"columns": [
 				{"data": "id"},
-				{"data": this.clientName},
-				{"data": this.brandName},
-				{"data": this.modelName},
-				{"data": this.serial},
+				{"data": "client_name", "defaultContent": ""},
+				{"data": "model"      , "defaultContent": ""},
+				{"data": "brand"      , "defaultContent": ""},
+				{"data": "serial"     , "defaultContent": "S/S"},
 				{"data": this.repairementType},
 				{"data": this.status},
-				{"data": this.technicianName, "defaultContent": "S/A"},
-				{"data": function(source, type, val){
-					return moment(source.createdAt).format('DD/MM/YYYY');
-				}, "defaultContent": ""},
-				{"data": function(source, type, val){
-					if(source.closedAt){
-						return moment(source.closedAt).format('DD/MM/YYYY');
-					}else{
-						return "Abierto";
-					}
-				}, "defaultContent": "Abierto"},
-				{"data": this.buttons, "defaultContent": "" }
+				{"data": "technician_name", "defaultContent": "S/A"},
+				{"data": "createdAt_short", "defaultContent": ""},
+				{"data": "closedAt_short" , "defaultContent": "Abierto"},
+				{"data": this.buttons     , "defaultContent": "" }
 			],
 		};
 	},
 
-	serial: function(source, type, val){
-		if (_.isUndefined(source.serial) || source.serial === ''){return 'S/S';}else{return source.serial;}
-	},
-
 	buttons: function(source, type, val){
+		var model = app.storage.get('appliances', source._id);
 		var ids = [source._id, source.service_request_id];
 		if(type === "display"){
-			return '<a href="#render/appliance/show/'+ ids[0] +'" class="btn btn-xs btn-green btn-margin"  id="appliance-details" data-id="'+ids[0]+'" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-					'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-				'</a>' +
-				'<br>' +
-				'<a href="#render/service_request/show/'+ ids[1] +'" class="btn btn-xs btn-green btn-margin" id="appliance-service-request" data-toggle="tooltip" data-placement="top" title="Orden de Servicio">' +
-					'<i class="fa fa-clipboard fa-fw"></i>' +
-				'</a>';
+			return model.showApplianceButton()+'<br>'+model.showServiceRequestButton();
 		}
 		return ids.join(' ');
 	},
 
 	dates: function(source, type, val){
-		var dates = [];
-		dates.push(App.dateDDMMYYYY(source.createdAt));
-		dates.push(App.dateDDMMYYYY(source.updatedAt));
-		if (source.closedAt) { dates.push(App.dateDDMMYYYY(source.closedAt));}
-		if (type === 'display'){
-			var html =
-				'<dt>Creado</dt>' + 
-				'<dd>'+ dates[0] +'</dd>' +
-				'<dt>Actualizado</dt>' +
-				'<dd>'+ dates[1] +'</dd>';
-			if (dates.length === 3) {
-				html = html + 
-				'<dt>Cerrado</dt>' +
-				'<dd>'+ dates[2] +'</dd>';
-			}
-			return html;
-		}
+		var model = app.storage.get('appliances', source._id);
+		if (type === 'display'){ model.datesList(); }
 		return dates.join(' ');
 	},
 
-	technicianName: function (source, type, val) {
-		if (source.technician_id){
-			try {
-				return app.storage.collection('techs').get(source.technician_id).get('name');
-			} catch (err) {
-				console.log(err.stack);
-				return "S/A";
-			}
-		}
-		return "S/A";
-	},
-
 	status: function(source, type, val){
+		var model = app.storage.get('appliances', source._id);
 		if(type === 'display'){
-			return	'<h4 style="margin: 0px;"><span class="label label-default ' + App.statusClass(source.status) + '">' + 
-								source.status +
-							'</span></h4>';
+			return model.statusLabel();
 		}
 		return source.status;
 	},
 
 	repairementType: function(source, type, val){
+		var model = app.storage.get('appliances', source._id);
 		var rep = source.repairement_type;
-		if(type === 'display' && rep === "Presupuesto"){
-			var cost = (source.cost) ? source.cost : 0;
-			return	'<dt>Presupuesto</dt>' +
-							'<dd>$'+cost+',00</dd>';
-		}
+		if(type === 'display' && rep === "Presupuesto"){ return model.budgetList(); }
 		if (parseInt(source.cost) > 0){rep = rep + ' ' + source.cost;}
 		return rep;
-	},
-
-	modelName: function (source, type, val) {
-		if (source.model_id){
-			try {
-				return app.storage.collection('models').get(source.model_id).get('model');
-			} catch (err) {
-				console.log(err.stack);
-				return "";
-			}
-		}
-		return "";
-	},
-
-	brandName: function (source, type, val) {
-		if (source.model_id){
-			try {
-				return app.storage.collection('models').get(source.model_id).get('brand');
-			} catch (err) {
-				console.log(err.stack);
-				return "";
-			}
-		}
-		return "";
-	},
-
-	clientName: function (source, type, val) {
-		if (source.client_id){
-			try {
-				if (!source.client_id){return "";}
-				return app.storage.collection('clients').get(source.client_id).get('name');
-			} catch (err) {
-				console.log(err.stack);
-				return "";
-			}
-		}
-		return "";
 	},
 });
 App.Views.ApplianceMultipleFormDetailsModalView = App.Views.BaseView.extend({
@@ -3969,53 +4091,16 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 				{ "className": "text-center", "targets": [0, 2, 3, 4, 5, 6]},
 			],
 			"columns": [
-				{"data": "id", defaultContent: ""},
-				{"data": this.clientName, "defaultContent": ""},
-				{"data": function(source, type, val){
-					if (!source.invoiceNumber || source.invoiceNumber === '')
-					{ return 'S/R'; } else { return source.invoiceNumber; }
-				}},
-				{"data": this.serviceRequestInfo, "defaultContent": ""},
-				{"data": "status", "defaultContent": ""},
-				{"data": function(source, type, val){
-					return moment(source.createdAt).format('DD/MM/YYYY');
-				}, "defaultContent": ""},
-				{"data": function(source, type, val){
-					if(source.closedAt){
-						return moment(source.closedAt).format('DD/MM/YYYY');
-					}else{
-						return "Abierto";
-					}
-				}, "defaultContent": "Abierto"},
+				{"data": "id"             , "defaultContent": ""},
+				{"data": "client_name"    , "defaultContent": ""},
+				{"data": "invoiceNumber"  , "defaultContent": "S/R"},
+				{"data": "appliancesCount", "defaultContent": "0"},
+				{"data": "status"         , "defaultContent": ""},
+				{"data": "createdAt_short", "defaultContent": ""},
+				{"data": "closedAt_short" , "defaultContent": "Abierto"},
 				{"data": this.serviceRequestButton, "defaultContent": ""}
 			]
 		};
-	},
-
-	clientName: function (source, type, val) {
-		if (source.client_id){
-			try {
-				if (!source.client_id){return "";}
-				var name = app.storage.collection('clients').get(source.client_id).get('name'); 
-				return (name) ? name : "";
-			} catch (err) {
-				console.log(err.stack);
-				return "";
-			}
-		}
-		return "";
-	},
-
-	serviceRequestInfo: function(source, type, val){
-		var appliances = source.appliances;
-		if(type === "sort"){
-			if (_.isArray(appliances)){return appliances.length;}
-			return 0;
-		}
-		if(type === "display"){
-			var length = (_.isArray(appliances)) ? appliances.length : 0;
-			return length;
-		}
 	},
 
 	serviceRequestButton: function(source, type, val){
@@ -4184,51 +4269,9 @@ App.Views.TechIndexView = App.Views.TableView.extend({
 	modelView      : App.Views.UserRowView,
 
 	awake: function(){
-		this.fetchOptions = {
-			data: {
-				techs: true,
-			}
-		};		
-		this.dataTableOptions = {
-			"columnDefs": [
-				{ "searchable": false, "targets": -1 },
-				{ "className": "center-vh", "targets": -1 },
-			],
-			"columns": [
-				{"data": function(source, type, val){
-						if(type === "sort"){return source.name;}
-						if(type === "display"){
-							var html = '<dd><i class="fa fa-user fa-fw"></i>'+source.name+'</dd>';
-							if (source.email){html = html + '<dd><i class="fa fa-envelope fa-fw"></i>'+source.email+'</dd>';}
-							return html;
-						}
-						return [source.name, source.email].join(' ');
-					} 
-				},
-				{"data": function(source, type, val){
-						if(type === "display"){
-							var html = '<dt>Roles</dt>';
-							if (source.permissions.roles.isAdmin === true){html = html + '<dd>Administrador</dd>';}
-							if (source.permissions.roles.isTech  === true){html = html + '<dd>Tecnico</dd>';}
-							return html;
-						}
-						var result = [];
-						if (source.permissions.roles.isAdmin === true){result.push('Administrador');}
-						if (source.permissions.roles.isTech  === true){result.push('Tecnico');}
-						return result.join(' ');
-					} 
-				},
-				{"data": function(source, type, val){
-						if(type === "display"){
-							return '<a href="#render/user/show/'+ source._id +'" class="btn btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-							'</a>';
-						}
-						return source._id;
-					}
-				}
-			]
-		};
+		this.fetchOptions = { data: { techs: true } };
+		_.extend(this, App.Mixins.UserIndex);
+		_.bindAll(this, 'userShowButton', 'userRoles', 'userData');		
 	},
 });
 App.Views.UserDetailsView = App.Views.ShowView.extend({
@@ -4329,49 +4372,8 @@ App.Views.UserIndexView = App.Views.TableView.extend({
 	tableEl        : '#users-table',
 	
 	awake: function(){
-		this.dataTableOptions = {
-			"columnDefs": [
-				{ "searchable": false, "targets": -1 },
-				{ "className": "center-vh", "targets": -1 },
-			],
-			"columns": [
-				{"data": function(source, type, val){
-						if(type === "sort"){return source.name;}
-						if(type === "display"){
-							var html = '<dd><i class="fa fa-user fa-fw"></i>'+source.name+'</dd>';
-							if (source.email){html = html + '<dd><i class="fa fa-envelope fa-fw"></i>'+source.email+'</dd>';}
-							return html;
-						}
-						return [source.name, source.email].join(' ');
-					},
-					"defaultContent": ""
-				},
-				{"data": function(source, type, val){
-						if(type === "display"){
-							var html = '<dt>Roles</dt>';
-							if (source.permissions.roles.isAdmin === true){html = html + '<dd>Administrador</dd>';}
-							if (source.permissions.roles.isTech  === true){html = html + '<dd>Tecnico</dd>';}
-							return html;
-						}
-						var result = [];
-						if (source.permissions.roles.isAdmin === true){result.push('Administrador');}
-						if (source.permissions.roles.isTech  === true){result.push('Tecnico');}
-						return result.join(' ');
-					},
-					"defaultContent": ""
-				},
-				{"data": function(source, type, val){
-						if(type === "display"){
-							return '<a href="#render/user/show/'+ source._id +'" class="btn btn-xs btn-green"  id="user-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-								'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-							'</a>';
-						}
-						return source._id;
-					},
-					"defaultContent": ""
-				}
-			]
-		};
+		_.extend(this, App.Mixins.UserIndex);
+		_.bindAll(this, 'userShowButton', 'userRoles', 'userData');
 	},
 });
 App.Views.UserNewView = App.Views.NewView.extend({

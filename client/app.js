@@ -92,34 +92,6 @@ window.App = {
 		}, true);
 	},
 
-	statusClass: function(status){
-		var className;
-		switch (status){
-		case "Recibido":
-				className = "btn-status-1";
-				break;
-		case "En Reparación":
-				className = "btn-status-2";
-				break;
-		case "En Espera":
-				className = "btn-status-3";
-				break;
-		case "Atrasado":
-				className = "btn-status-4";
-				break;
-		case "Reparado":
-				className = "btn-status-5";
-				break;
-		case "Entregado":
-				className = "btn-status-7";
-				break;
-		case "Enviado":
-				className = "btn-status-6";
-				break;
-		}
-		return className;
-	},
-
 	dateDDMMYYYY: function(date){
 		var parsedDate;
 		if (date instanceof Date){
