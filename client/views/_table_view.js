@@ -5,6 +5,7 @@ App.Views.TableView = App.Views.BaseView.extend({
 		this.dataTableOptions = {};
 		this.rendered = false;
 		this.synced   = (options.synced) ? options.synced : false;
+		if (this.moreEvents) {_.extend(this.events, this.moreEvents);}
 		Giraffe.View.apply(this, arguments);
 	},
 

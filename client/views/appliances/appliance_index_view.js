@@ -4,14 +4,20 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 	name     : "Equipos",
 	
 	tableEl        : '#appliances-table',
+
+	moreEvents: {
+		'click a[name=appliance-print]'   : 'printAppliance',
+		'click a[name=appliance-download]': 'downloadAppliance',
+	},
 	
 	awake: function(){
 		this.dataTableOptions = {
 			"columnDefs": [
 				{ "searchable": false, "targets": -1 },
 				{ "className": "center-vh", "targets": [0, 5, 6, 8, 9] },
-				{ "className": "center-vh", "targets": -1 },
+				{ "className": "center-v", "targets": -1 },
 				{ "className": "center-v" , "targets": [1, 2, 3, 4, 7] },
+				{ "width": "40px", "targets": -1}
 			],
 			"columns": [
 				{"data": "id"},
@@ -33,7 +39,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		var model = app.storage.get('appliances', source._id);
 		var ids = [source._id, source.service_request_id];
 		if(type === "display"){
-			return model.showApplianceButton()+'<br>'+model.showServiceRequestButton();
+			return model.showApplianceButton()+model.printApplianceButton()+model.showServiceRequestButton()+model.downloadApplianceButton();
 		}
 		return ids.join(' ');
 	},
@@ -58,5 +64,29 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		if(type === 'display' && rep === "Presupuesto"){ return model.budgetList(); }
 		if (parseInt(source.cost) > 0){rep = rep + ' ' + source.cost;}
 		return rep;
+	},
+
+	printAppliance: function(e){
+		e.preventDefault();
+		var model = this.getModelFromTarget(e);
+		if (_.isUndefined(model)){return;}
+		model.appliancePDFReportPrint();
+	},
+
+	downloadAppliance: function(e){
+		e.preventDefault();
+		var model = this.getModelFromTarget(e);
+		if (_.isUndefined(model)){return;}
+		model.appliancePDFReportDownload();
+	},
+
+	getModelFromTarget: function(e){
+		var model, id = this.$(e.target).closest('a').data('id');
+		try {
+			model = app.storage.get('appliances', id);
+		} catch (err) {
+			console.log(err.stack); return undefined;
+		}
+		return model;
 	},
 });

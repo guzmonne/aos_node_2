@@ -888,6 +888,9 @@ input[type="checkbox"]:checked:hover:before {
   margin: 2px;
 }
 
+.btn-margin-down {
+  margin-bottom: 2px;
+}
 
 /* TABLES */
 .table>thead>tr>th {
