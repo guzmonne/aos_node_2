@@ -1,12 +1,14 @@
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
-	template : HBS.service_request_index_template,
-	className: "row",
-	name     : "Ordenes de Servicio",
+	template      : HBS.service_request_index_template,
+	className     : "row",
+	name          : "Ordenes de Servicio",
+	reportName    : function(model){return 'OdeS_' + model.get('id')+ '.pdf';},
+	collectionName: "service_requests",
 	
 	tableEl  : '#service_requests-table',
 
-	events:{
-		'click button#new-service-request': 'newServiceRequest',
+	moreEvents:{
+		'click button#new-service-request'      : 'newServiceRequest',
 	},
 
 	awake: function(){
@@ -15,6 +17,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 				{ "searchable": false, "targets": -1 },
 				{ "className": "center-vh", "targets": -1 },
 				{ "className": "text-center", "targets": [0, 2, 3, 4, 5, 6]},
+				{ "width": "70px", "targets": -1},
 			],
 			"columns": [
 				{"data": "id"             , "defaultContent": ""},
@@ -31,7 +34,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 
 	serviceRequestButton: function(source, type, val){
 		var model = app.storage.get('service_requests', source._id);
-		if(type === "display"){ return model.serviceRequestButton(); }
+		if(type === "display"){ return model.showButton(); }
 		return source._id;
 	},
 

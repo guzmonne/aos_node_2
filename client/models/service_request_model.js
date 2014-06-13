@@ -1,5 +1,6 @@
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
+	name   : 'service_request',
 
 	defaults: function(){
 		return {
@@ -10,9 +11,9 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	},
 
 	awake: function(){
-		this.listenTo(this, 'change:repairement_type', this.checkCost);
 		this.listenTo(this, 'sync', this.setRelatedFields);
 		this.listenTo(this, 'add' , this.setRelatedFields);
+		App.extendMixin(this, App.Mixins.ServiceRequestPDFReport);
 	},
 
 	setRelatedFields: function(){
@@ -40,12 +41,5 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		var attributes = this.toJSON();
 		attributes.appliancesCount = this.get('appliances').length;
 		return attributes;
-	},
-
-	serviceRequestButton: function(){
-		var id = this.id;
-		return	'<a href="#render/service_request/show/'+id+'" class="btn btn-xs btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-							'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-						'</a>';
 	},
 });

@@ -1,13 +1,16 @@
 App.Views.ApplianceIndexView = App.Views.TableView.extend({
-	template : HBS.appliance_index_template,
-	className: "row",
-	name     : "Equipos",
+	template      : HBS.appliance_index_template,
+	className     : "row",
+	name          : "Equipos",
+	collectionName: "appliances",
 	
 	tableEl        : '#appliances-table',
 
 	moreEvents: {
-		'click a[name=appliance-print]'   : 'printAppliance',
-		'click a[name=appliance-download]': 'downloadAppliance',
+		'click a[name=appliance-print]'   : 'print',
+		'click a[name=appliance-download]': 'download',
+		'click #printAppliancesPDF'       : 'printAppliances',
+		'click #downloadAppliancesPDF'    : 'downloadAppliances',
 	},
 	
 	awake: function(){
@@ -39,7 +42,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		var model = app.storage.get('appliances', source._id);
 		var ids = [source._id, source.service_request_id];
 		if(type === "display"){
-			return model.showApplianceButton()+model.printApplianceButton()+model.showServiceRequestButton()+model.downloadApplianceButton();
+			return model.showButton()+model.printButton()+model.showServiceRequestButton()+model.downloadButton();
 		}
 		return ids.join(' ');
 	},
@@ -66,27 +69,17 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		return rep;
 	},
 
-	printAppliance: function(e){
+	printAppliances: function(e){
 		e.preventDefault();
-		var model = this.getModelFromTarget(e);
-		if (_.isUndefined(model)){return;}
-		model.appliancePDFReportPrint();
+		this.collection.pdfReportPrint();
 	},
 
-	downloadAppliance: function(e){
+	downloadAppliances: function(e){
 		e.preventDefault();
-		var model = this.getModelFromTarget(e);
-		if (_.isUndefined(model)){return;}
-		model.appliancePDFReportDownload();
+		this.collection.pdfReportDownload();
 	},
 
-	getModelFromTarget: function(e){
-		var model, id = this.$(e.target).closest('a').data('id');
-		try {
-			model = app.storage.get('appliances', id);
-		} catch (err) {
-			console.log(err.stack); return undefined;
-		}
-		return model;
+	showReportButtons: function(){
+		this.$('#report-buttons').removeClass('hide');
 	},
 });

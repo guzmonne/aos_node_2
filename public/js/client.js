@@ -109,6 +109,12 @@ window.App = {
 		try {callback.apply(context);}
 		catch (err){console.log(err.stack);}
 	},
+
+	extendMixin: function(target, mixin){
+		_.extend (target, mixin);
+		var functions = _.functions(mixin);
+		_.each(functions, function(f){target[f] = _.bind(target[f], target);});
+	},
 };
 
 App.PDF = (function(window, undefined){
@@ -531,6 +537,148 @@ App.Storage = (function(){
 		}
 	};
 })();
+App.Mixins.PDFReport = {
+	pdfReportDownload: function(){
+		var filename = (_.isFunction(this.reportName)) ? this.reportName() : 'file.pdf'; 
+		pdfMake.createPdf(this.pdfReport()).download(filename);
+	},
+
+	pdfReportPrint: function(){
+		pdfMake.createPdf(this.pdfReport()).print();
+	},
+};
+App.Mixins.AppliancePDFReport = _.extend({
+	reportName: function(){
+		return 'Equipo_' + this.get('id') + '.pdf';
+	},
+
+	pdfReport: function(){
+		return {
+			pageSize   : 'A4',
+			pageMargins: [ 40, 15, 40, 15 ],
+			content    : this.appliancePDFMulti(3),
+		};
+	},
+
+	appliancePDFMulti: function(copies){
+		var result = [];
+		var single = this.appliancePDFSingle();
+		for(var i = 0; i < copies; i++){
+			result.push(this.appliancePDFSingle());
+		}
+		return result;
+	},
+
+	appliancePDFSingle: function(){
+		return {
+			stack: [
+				App.PDF.punktalLogoContent(),
+				this.appliancePDFBody()
+			]
+		};
+	},
+
+	appliancePDFBody: function(){
+		var cLengthS = 12;
+		var cLengthM = 18;
+		var cLengthL = 78;
+		var bLine    = 3;
+		var lHeight  = 14;
+		var appliance, phone, address, email, accessories, obs, defect, serial;
+		try {
+			appliance        = this.attributes;
+			appliance.client = app.storage.get('clients', appliance.client_id).attributes;
+			appliance.model  = app.storage.get('models' , appliance.model_id ).attributes;
+		} catch (err) {console.log(err.stack); return;}
+		phone      = (_.isArray(appliance.client.phones)    && appliance.client.phones.length    > 0) ? appliance.client.phones[0].number : " ";
+		address    = (_.isArray(appliance.client.addresses) && appliance.client.addresses.length > 0) ? appliance.client.addresses[0]     : " ";
+		if (_.isObject(address)) {address = address.street + ', ' + address.city + ', ' + address.department + '.';} 
+		accessories = (_.isArray(appliance.accessories) && appliance.accessories.length > 1) ? appliance.accessories.join(', ')   : " ";
+		email       = (!_.isUndefined(appliance.client.email))                                ? appliance.client.email             : " ";
+		obs         = (_.isString(appliance.observations)) ? appliance.observations.replace(/(\r\n|\n|\r)/gm," ") : " ";
+		defect      = (_.isString(appliance.defect))       ? appliance.defect.replace(/(\r\n|\n|\r)/gm," ")       : " ";
+		serial      = (_.isString(appliance.serial) && appliance.serial !== '') ? appliance.serial : " ";
+		if (address.length > cLengthS)			{bLine--;}
+		if (address.length > 2 * cLengthS)	{bLine--;}
+		if (accessories.length > cLengthM)	{bLine--;}
+		if (obs.length    > cLengthL/2)			{bLine--;} 
+		if (defect.length > cLengthL/2)			{bLine--;}
+		if (bLine < 0){bLine = 0;}
+		return [
+			{
+				columns: [
+					{
+						width: 200,
+						stack: [
+							{columns: [ {text: "Nombre: "                       , width: 80, bold: true}, appliance.client.name.substring(0, cLengthM) ]},
+							{columns: [ {text: appliance.client["doc-type"]+": ", width: 80, bold: true}, appliance.client["doc-number"].substring(0, cLengthM) ]},
+							{columns: [ {text: "Telefono: "                     , width: 80, bold: true}, phone.substring(0, cLengthM) ]},
+							{columns: [ {text: "Direccion: "                    , width: 80, bold: true}, address.substring(0, 3*cLengthM) ]},
+							{columns: [ {text: "Email: "                        , width: 80, bold: true}, email.substring(0, cLengthM) ]},
+						],
+					},
+					{
+						width: '*',
+						margin: [10, 0, 0, 0],
+						stack: [
+							{	 
+								columns: [ 
+									{text: "ID: ", fontSize: 25, width: 50}, {text: appliance.id.toString(), fontSize: 25, bold: true}, 
+								], 
+								margin: [0,-14, 0, 0], 
+							},
+							{
+								columns: [
+									{text: "Marca: "  , width: 50, bold: true},
+									{text: appliance.model.brand.substring(0, cLengthS)  , width: 70},
+									{text: "Modelo: " , width: 65, bold: true},
+									{text: appliance.model.model.substring(0, cLengthM)  , width: "*"},
+								]
+							},
+							{
+								columns: [
+									{text: "Serie: ", width: 50, bold: true},
+									{text: serial.substring(0, cLengthS), width: 70},
+									{text: "Accesorios: ", width: 65, bold: true},
+									{text: accessories.substring(0, cLengthM*2), width: "*"}, //36
+								]
+							},
+							{
+								columns: [
+									{text: "Obs: ", width: 50, bold: true},
+									{text: obs.substring(0, cLengthL), width: "*"},
+								]
+							},
+							{
+								columns: [
+									{text: "Defecto: ", width: 50, bold: true},
+									{text: defect.substring(0, cLengthL), width: "*"}, 
+								]
+							},
+						],
+					},
+				],
+			},
+			{
+				table: {
+					headerRows: 1,
+					widths: ['*', '*'],
+					body: [
+						[
+							{text: " ", margin: [0, (lHeight*bLine), 0, 0]},
+							" "
+						], 
+						[
+							{"text": "Fecha de Impreso: " + moment(new Date()).format('DD/MM/YYYY HH:mm'), alignment: "left", margin: [0, 0, 0, 20]},
+							{"text": "Fecha de Ingreso: " + moment(appliance.createdAt).format('DD/MM/YYYY HH:mm'), alignment: "right"}
+						] 
+					]
+				},
+				layout: "headerLineOnly"
+			},
+		];
+	},
+}, App.Mixins.PDFReport);
 // !!!
 // Type: Mixin
 // -----
@@ -610,6 +758,148 @@ App.Mixins.SelectModel = {
 		});
 	},
 };
+App.Mixins.ServiceRequestAppliancesPDFReport = _.extend({
+	reportName: function(){
+		if (this.models.length === 0) {return 'file.pdf';}
+		var service_request_id;
+		try { 
+			service_request_id = app.storage.get('service_requests', this.models[0].get('service_request_id')).get('id');
+		} catch (err) {console.log(err.stack); return 'file.pdf';}
+		return 'Equipos_de_OdeS_' + service_request_id + '.pdf';
+	},
+
+	pdfReport: function(){
+		return {
+			pageSize   : 'A4',
+			pageMargins: [ 40, 15, 40, 15 ],
+			content    : this.reportContent()
+		};
+	},
+
+	reportContent: function(){
+		if (this.length === 0) {return;}
+		if (this.length === 1) {
+			return this.models[0].appliancePDFMulti(3);
+		}
+		var result = [];
+		_.each(this.models, function(model, index, models){
+			var stack = {
+				stack: model.appliancePDFMulti(3)
+			};
+			if (index !== (models.length - 1)){stack.pageBreak = 'after';}
+			result.push(stack);
+		});
+		return result;
+	},
+}, App.Mixins.PDFReport);
+App.Mixins.ServiceRequestPDFReport = _.extend({
+	reportName: function(){
+		return 'OdeS_' + this.get('id') + '.pdf';
+	},
+
+	pdfReport: function(){
+		return {
+			pageSize: 'A4',
+			pageMargins: [ 40, 100, 40, 100 ],
+			header: App.PDF.punktalLogoHeader(),
+			content: this.reportContent(),
+			footer: [
+				App.PDF.clientSign,
+				App.PDF.columnsLorem,
+			]
+		};
+	},
+
+	reportContent: function(){
+		var self = this;
+		var body = {}, tbody = [], clientName = '', content = [];
+		try {clientName = app.storage.get('clients', this.get('client_id')).get('name');}
+		catch(err){console.log(err.stack);}
+		var h1 = App.PDF.text([
+				{text: 'Numero de Orden: ', style: 'header'},
+				{text: this.get('id').toString(), style: 'greyHeader'},
+			]
+		);
+		var h2 = App.PDF.text(
+			[
+				{text: 'Cliente: ', style: 'subHeader'},
+				{text: clientName, style: 'greySubHeader'},
+			]
+		);
+		var tBodyHeader = [
+			App.PDF.text('IDS'          , 'tableHeader'), 
+			App.PDF.text('Marca'        , 'tableHeader'), 
+			App.PDF.text('Modelo'       , 'tableHeader'), 
+			App.PDF.text('Cantidad'     , 'tableHeader'), 
+			App.PDF.text('Observaciones', 'tableHeader')
+		];
+		tbody.push(tBodyHeader);
+		body = this.fillTableObject();
+		_.each(body, function(value, key, list){
+			var array = [
+				value._ids, 
+				value.brand,
+				value.model,
+				{text: value.qty.toString(), alignment: 'center'},
+			];
+			var obs = '';
+			if (value.serials !== ''){obs = 'Series: ' + value.serials;}
+			if (value.defects !== ''){
+				if (obs !== ''){obs = obs + '\n'; }
+				obs = obs + 'Defectos: ' + value.defects;
+			}
+			array.push(obs);
+			tbody.push(array);
+		});
+		content.push(App.PDF.columns(
+			[
+				{stack: [h1, h2]},
+				App.PDF.text(moment(new Date()).format('DD/MM/YYYY'), {margin: [0, 5, 0, 10], alignment: 'right'})
+			]
+		));
+		content.push(App.PDF.table(tbody, {widths: [ 30, 60, 50, 50, '*' ]}, 'lightHorizontalLines'));
+		return content;
+	}, 
+
+	fillTableObject: function(){
+		var body = {}, model_id, model, appliance, appliancesIds = this.get('appliances');
+		for(var i = 0; i < appliancesIds.length; i++){
+			try {
+				if (_.isObject(appliancesIds[i])){
+					appliance = appliancesIds[i];
+				} else {
+					appliance = app.storage.get('appliances', appliancesIds[i]).attributes;
+				}
+			}
+			catch(err){console.log(err.stack); throw new Error("Can't find appliance");}
+			try {
+				model_id = appliance.model_id;
+				model    = app.storage.get('models', model_id);
+			}
+			catch(err){console.log(err.stack); throw new Error("Can't find model");}
+			if (body[model_id]){
+				body[model_id].qty++;
+				body[model_id]._ids = body[model_id]._ids + '; ' + appliance.id; 
+				if (appliance.serial){
+					body[model_id].serials = body[model_id].serials + '; ' + appliance.serial; 
+				}
+				if (appliance.defect){
+					body[model_id].defects = body[model_id].defects + '; ' + appliance.defect; 
+				}
+			} else {
+				body[model_id] = {
+					_ids: appliance.id.toString(),
+					qty: 1,
+					model: model.get('model'),
+					brand: model.get('brand')
+				};
+				body[model_id].serials = (appliance.serial)  ? appliance.serial : '';
+				body[model_id].defects = (appliance.defects) ? appliance.defects : '';
+			}
+		}
+		return body;
+	},
+}, App.Mixins.PDFReport);
 // !!!
 // Type: Mixin
 // -----
@@ -694,7 +984,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		Giraffe.Model.prototype.initialize.apply(this, arguments);
+		//Giraffe.Model.prototype.initialize.apply(this, arguments);
 	},
 
 	setRelatedField: function(collectionName, relatedFieldName, attributeName, name){
@@ -767,16 +1057,38 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	},
 
 	// Just a basic function to parse a 'Date()' type.
-	dateDDMMYYYY: function(date){
-		var parsedDate;
-		if (date instanceof Date){
-			parsedDate = date;
-		} else {
-			parsedDate = new Date(date);
-		}
-		return  parsedDate.getDate() +
-			"/" + parsedDate.getMonth() + 
-			"/" + parsedDate.getFullYear();
+	//dateDDMMYYYY: function(date){
+	//	var parsedDate;
+	//	if (date instanceof Date){
+	//		parsedDate = date;
+	//	} else {
+	//		parsedDate = new Date(date);
+	//	}
+	//	return  parsedDate.getDate() +
+	//		"/" + parsedDate.getMonth() + 
+	//		"/" + parsedDate.getFullYear();
+	//},
+
+	downloadButton: function(){
+		var id = this.id;
+		return	'<a href="#" class="btn btn-xs btn-info btn-margin"  name="'+this.name+'-download" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Download">' +
+							'<i class="fa fa-download fa-fw"></i>' +
+						'</a>';
+	},
+
+	printButton: function(){
+		var id = this.id;
+		return	'<a href="#" class="btn btn-xs btn-info btn-margin"  name="'+this.name+'-print" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Imprimir">' +
+							'<i class="fa fa-print fa-fw"></i>' +
+						'</a>';
+	},
+
+	showButton: function(icon){
+		var id = this.id;
+		icon = (icon) ? icon : 'fa-ellipsis-h';
+		return	'<a href="#render/'+this.name+'/show/'+id+'" class="btn btn-xs btn-green btn-margin"  id="'+this.name+'-details" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+							'<i class="fa '+icon+' fa-fw"></i>' +
+						'</a>';
 	},
 });
 App.Models.Appliance = App.Models.BaseModel.extend({
@@ -795,6 +1107,7 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 		this.listenTo(this, 'change:repairement_type', this.checkCost);
 		this.listenTo(this, 'sync', this.setRelatedFields);
 		this.listenTo(this, 'add' , this.setRelatedFields);
+		App.extendMixin(this, App.Mixins.AppliancePDFReport);
 	},
 
 	setRelatedFields: function(){
@@ -895,153 +1208,8 @@ App.Models.Appliance = App.Models.BaseModel.extend({
 		return html;
 	},
 
-	showApplianceButton: function(){
-		var id = this.id;
-		return	'<a href="#render/appliance/show/'+id+'" class="btn btn-xs btn-green btn-margin"  id="appliance-details" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-							'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-						'</a>';
-	},
-
-	printApplianceButton: function(){
-		var id = this.id;
-		return	'<a href="#" class="btn btn-xs btn-green btn-margin"  name="appliance-print" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Imprimir">' +
-							'<i class="fa fa-print fa-fw"></i>' +
-						'</a>';
-	},
-
-	downloadApplianceButton: function(){
-		var id = this.id;
-		return	'<a href="#" class="btn btn-xs btn-green btn-margin"  name="appliance-download" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Download">' +
-							'<i class="fa fa-download fa-fw"></i>' +
-						'</a>';
-	},
-
 	showServiceRequestButton: function(){
-		var id = this.get('service_request_id');
-		return	'<a href="#render/service_request/show/'+id+'" class="btn btn-xs btn-green btn-margin" id="appliance-service-request" data-toggle="tooltip" data-placement="top" title="Orden de Servicio">' +
-							'<i class="fa fa-clipboard fa-fw"></i>' +
-						'</a>';
-	},
-
-	appliancePDFReportDownload: function(){
-		var filename, report = this.appliancePDFReport();
-		fileName = 'Equipo_' + this.get('id') + '.pdf';
-		pdfMake.createPdf(report).download(filename);
-	},
-
-	appliancePDFReportPrint: function(){
-		var filename, report = this.appliancePDFReport();
-		fileName = 'Equipo_' + this.get('id') + '.pdf';
-		pdfMake.createPdf(report).print(filename);
-	},
-
-	appliancePDFReport: function(){
-		return {
-			pageSize: 'A4',
-			pageMargins: [ 40, 20, 40, 20 ],
-			content: this.appliancePDFMulti(3),
-		};
-	},
-
-	appliancePDFMulti: function(copies){
-		var result = [];
-		var single = this.appliancePDFSingle();
-		for(var i = 0; i < copies; i++){
-			result.push(this.appliancePDFSingle());
-		}
-		return result;
-	},
-
-	appliancePDFSingle: function(){
-		return {
-			stack: [
-				App.PDF.punktalLogoContent(),
-				this.appliancePDFBody()
-			]
-		};
-	},
-
-	appliancePDFBody: function(){
-		var appliance, phone, address, email, accessories, obs, defect, serial;
-		try {
-			appliance        = this.attributes;
-			appliance.client = app.storage.get('clients', appliance.client_id).attributes;
-			appliance.model  = app.storage.get('models' , appliance.model_id).attributes;
-		} catch (err) {console.log(err.stack); return;}
-		phone      = (_.isArray(appliance.client.phones)    && appliance.client.phones.length    > 1) ? appliance.client.phones[0].number : " ";
-		address    = (_.isArray(appliance.client.addresses) && appliance.client.addresses.length > 1) ? appliance.client.addresses[0]     : " ";
-		if (_.isObject(address)) {address = address.street + ',\n' + address.city + ',\n' + address.department + '.';} 
-		accessories = (_.isArray(appliance.accessories) && appliance.accessories.length > 1) ? appliance.accessories.join(', ')   : " ";
-		email      = (!_.isUndefined(appliance.client.email))                                ? appliance.client.email            : " ";
-		obs        = (_.isString(appliance.observations)) ? appliance.observations  : " ";
-		defect     = (_.isString(appliance.defect))       ? appliance.defect        : " ";
-		obs        = (obs.length > 78)                    ? obs.substring(0, 78)    : obs;
-		defect     = (defect.length > 78)                 ? defect.substring(0, 78) : defect;
-		serial     = (_.isString(appliance.serial) && appliance.serial !== '') ? appliance.serial : " "; 
-		return [
-			{
-				columns: [
-					{
-						width: 200,
-						stack: [
-							{columns: [ {text: "Nombre: "                       , width: 80, bold: true}, appliance.client.name ]},
-							{columns: [ {text: appliance.client["doc-type"]+": ", width: 80, bold: true}, appliance.client["doc-number"] ]},
-							{columns: [ {text: "Telefono: "                     , width: 80, bold: true}, phone ]},
-							{columns: [ {text: "Direccion: "                    , width: 80, bold: true}, address ]},
-							{columns: [ {text: "Email: "                        , width: 80, bold: true}, email ]},
-						],
-					},
-					{
-						width: '*',
-						margin: [10, 0, 0, 0],
-						stack: [
-							{	 
-								columns: [ 
-									{text: "ID: ", fontSize: 25, width: 50}, {text: appliance.id.toString(), fontSize: 25, bold: true}, 
-								], 
-								margin: [0,-14, 0, 0], 
-							},
-							{
-								columns: [
-									{text: "Marca: "  , width: 50, bold: true},
-									{text: appliance.model.brand  , width: 70},
-									{text: "Modelo: " , width: 65, bold: true},
-									{text: appliance.model.model  , width: "*"},
-								]
-							},
-							{
-								columns: [
-									{text: "Serie: ", width: 50, bold: true},
-									{text: serial, width: 70},
-									{text: "Accesorios: ", width: 65, bold: true},
-									{text: accessories, width: "*"}, //36
-								]
-							},
-							{
-								columns: [
-									{text: "Obs: ", width: 50, bold: true},
-									{text: obs, width: "*"},//78
-								]
-							},
-							{
-								columns: [
-									{text: "Defecto: ", width: 50, bold: true},
-									{text: defect, width: "*"}, //78
-								]
-							},
-						],
-					},
-				],
-			},
-			{
-				table: {
-					headerRows: 1,
-					widths: ['*', '*'],
-					body: [[" ", " "], [{"text": "Fecha de Impreso: " + moment(new Date()).format('DD/MM/YYYY HH:ss'), alignment: "left", margin: [0, 0, 0, 20]}, {"text": "Fecha de Ingreso: " + moment(appliance.createdAt).format('DD/MM/YYYY HH:ss'), alignment: "right", margin: [0, 0, 0, 20]}] ]
-				},
-				layout: "headerLineOnly"
-			},
-		];
+		return App.Models.BaseModel.prototype.showButton.apply({id: this.get('service_request_id'), name: "service_request"}, ['fa-clipboard']);
 	},
 });
 App.Models.Client = App.Models.BaseModel.extend({
@@ -1074,6 +1242,7 @@ App.Models.Model = App.Models.BaseModel.extend({
 });
 App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	urlRoot: '/api/service_requests',
+	name   : 'service_request',
 
 	defaults: function(){
 		return {
@@ -1084,9 +1253,9 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 	},
 
 	awake: function(){
-		this.listenTo(this, 'change:repairement_type', this.checkCost);
 		this.listenTo(this, 'sync', this.setRelatedFields);
 		this.listenTo(this, 'add' , this.setRelatedFields);
+		App.extendMixin(this, App.Mixins.ServiceRequestPDFReport);
 	},
 
 	setRelatedFields: function(){
@@ -1114,13 +1283,6 @@ App.Models.ServiceRequest = App.Models.BaseModel.extend({
 		var attributes = this.toJSON();
 		attributes.appliancesCount = this.get('appliances').length;
 		return attributes;
-	},
-
-	serviceRequestButton: function(){
-		var id = this.id;
-		return	'<a href="#render/service_request/show/'+id+'" class="btn btn-xs btn-green"  id="service_request-details" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
-							'<i class="fa fa-ellipsis-h fa-fw"></i>' +
-						'</a>';
 	},
 });
 App.Models.User = App.Models.BaseModel.extend({
@@ -1158,10 +1320,18 @@ App.Models.User = App.Models.BaseModel.extend({
 });
 App.Collections.BaseCollection = Giraffe.Collection.extend({
 	comparator: 'id',
+
+	initialize: function(){
+		this.awake.apply(this, arguments);
+	},
 });
 App.Collections.Appliances = App.Collections.BaseCollection.extend({
 	url: '/api/appliances',
 	model: App.Models.Appliance,
+
+	awake: function(){
+		App.extendMixin(this, App.Mixins.ServiceRequestAppliancesPDFReport);
+	},
 });
 App.Collections.Clients = Giraffe.Collection.extend({
 	url  : '/api/clients',
@@ -1476,28 +1646,53 @@ App.Views.BaseView = Giraffe.View.extend({
     }
   },
 
-	// sync: function(type, options){
-	//	if (!type){return;}
-	//	var success, self = this;
-	//	options        = (options) ? options : {};
-	//	success        = options.success;
-	//	options.remove = (options.remove)    ? options.remove    : true;
-	//	options.add    = (options.add)       ? options.add       : true;
-	//	options.merge  = (options.merge)     ? options.merge     : true;
-	//	options.success = function(){
-	//		if (success) {success.apply(this, arguments);}
-	//		self.afterSync();
-	//	};
-	//	if (type === "model" && this.model){
-	//		this.model.fetch(options);
-	//	}
-	//	if (type === "collection" && this.collection){
-	//		this.collection.fetch(options);
-	//	}
- //  },
+	sync: function(type, options){
+		if (!type){return;}
+		var success, self = this;
+		options        = (options) ? options : {};
+		success        = options.success;
+		options.remove = (options.remove)    ? options.remove    : true;
+		options.add    = (options.add)       ? options.add       : true;
+		options.merge  = (options.merge)     ? options.merge     : true;
+		options.success = function(){
+			if (success) {success.apply(this, arguments);}
+			self.afterSync();
+		};
+		if (type === "model" && this.model){
+			this.model.fetch(options);
+		}
+		if (type === "collection" && this.collection){
+			this.collection.fetch(options);
+		}
+  },
 
   invokeSetHeader: function(){
 		this.invoke('setHeader');
+	},
+
+	print: function(e){
+		e.preventDefault();
+		var model = this.getModelFromTarget(e);
+		if (_.isUndefined(model)){return;}
+		model.pdfReportPrint();
+	},
+
+	download: function(e){
+		e.preventDefault();
+		var model = this.getModelFromTarget(e);
+		if (_.isUndefined(model)){return;}
+		fileName = (_.isFunction(this.reportName)) ? this.reportName(model) : 'file.pdf';
+		model.pdfReportDownload(fileName);
+	},
+
+	getModelFromTarget: function(e){
+		var model, id = this.$(e.target).closest('a').data('id');
+		try {
+			model = app.storage.get(this.collectionName, id);
+		} catch (err) {
+			console.log(err.stack); return undefined;
+		}
+		return model;
 	},
 });
 App.Views.CarouselView = App.Views.BaseView.extend({
@@ -2364,15 +2559,18 @@ App.Views.ApplianceEditFormView = App.Views.BaseView.extend({
 	},
 });
 App.Views.ApplianceIndexView = App.Views.TableView.extend({
-	template : HBS.appliance_index_template,
-	className: "row",
-	name     : "Equipos",
+	template      : HBS.appliance_index_template,
+	className     : "row",
+	name          : "Equipos",
+	collectionName: "appliances",
 	
 	tableEl        : '#appliances-table',
 
 	moreEvents: {
-		'click a[name=appliance-print]'   : 'printAppliance',
-		'click a[name=appliance-download]': 'downloadAppliance',
+		'click a[name=appliance-print]'   : 'print',
+		'click a[name=appliance-download]': 'download',
+		'click #printAppliancesPDF'       : 'printAppliances',
+		'click #downloadAppliancesPDF'    : 'downloadAppliances',
 	},
 	
 	awake: function(){
@@ -2404,7 +2602,7 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		var model = app.storage.get('appliances', source._id);
 		var ids = [source._id, source.service_request_id];
 		if(type === "display"){
-			return model.showApplianceButton()+model.printApplianceButton()+model.showServiceRequestButton()+model.downloadApplianceButton();
+			return model.showButton()+model.printButton()+model.showServiceRequestButton()+model.downloadButton();
 		}
 		return ids.join(' ');
 	},
@@ -2431,28 +2629,18 @@ App.Views.ApplianceIndexView = App.Views.TableView.extend({
 		return rep;
 	},
 
-	printAppliance: function(e){
+	printAppliances: function(e){
 		e.preventDefault();
-		var model = this.getModelFromTarget(e);
-		if (_.isUndefined(model)){return;}
-		model.appliancePDFReportPrint();
+		this.collection.pdfReportPrint();
 	},
 
-	downloadAppliance: function(e){
+	downloadAppliances: function(e){
 		e.preventDefault();
-		var model = this.getModelFromTarget(e);
-		if (_.isUndefined(model)){return;}
-		model.appliancePDFReportDownload();
+		this.collection.pdfReportDownload();
 	},
 
-	getModelFromTarget: function(e){
-		var model, id = this.$(e.target).closest('a').data('id');
-		try {
-			model = app.storage.get('appliances', id);
-		} catch (err) {
-			console.log(err.stack); return undefined;
-		}
-		return model;
+	showReportButtons: function(){
+		this.$('#report-buttons').removeClass('hide');
 	},
 });
 App.Views.ApplianceMultipleFormDetailsModalView = App.Views.BaseView.extend({
@@ -3894,8 +4082,8 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 	className: 'row',
 
 	events: {
-		'click #printPDF'   : 'printPDF',
-		'click #downloadPDF': 'downloadPDF',
+		'click #printPDF'          : 'print',
+		'click #downloadPDF'       : 'download',
 	},
 
 	bindings: {
@@ -3957,121 +4145,20 @@ App.Views.ServiceRequestDetailsView = App.Views.ShowView.extend({
 			}, {
 				success: function(){
 					self.appliancesIndex.attachTo(el, {method: 'html'});
+					self.appliancesIndex.showReportButtons();
 				}
 			}),
 		});
 	},
 
-	buildReport: function(){
-		//if (this.report){return this.report;}
-		var self = this;
-		var body = {}, tbody = [], clientName = '', content = [];
-		try {clientName = app.storage.get('clients', this.model.get('client_id')).get('name');}
-		catch(err){console.log(err.stack);}
-		var h1 = App.PDF.text([
-				{text: 'Numero de Orden: ', style: 'header'},
-				{text: this.model.get('id').toString(), style: 'greyHeader'},
-			]
-		);
-		var h2 = App.PDF.text(
-			[
-				{text: 'Cliente: ', style: 'subHeader'},
-				{text: clientName, style: 'greySubHeader'},
-			]
-		);
-		var tBodyHeader = [
-			App.PDF.text('IDS'          , 'tableHeader'), 
-			App.PDF.text('Marca'        , 'tableHeader'), 
-			App.PDF.text('Modelo'       , 'tableHeader'), 
-			App.PDF.text('Cantidad'     , 'tableHeader'), 
-			App.PDF.text('Observaciones', 'tableHeader')
-		];
-		tbody.push(tBodyHeader);
-		body = this.fillTableObject();
-		_.each(body, function(value, key, list){
-			var array = [
-				value._ids, 
-				value.brand,
-				value.model,
-				{text: value.qty.toString(), alignment: 'center'},
-			];
-			var obs = '';
-			if (value.serials !== ''){obs = 'Series: ' + value.serials;}
-			if (value.defects !== ''){
-				if (obs !== ''){obs = obs + '\n'; }
-				obs = obs + 'Defectos: ' + value.defects;
-			}
-			array.push(obs);
-			tbody.push(array);
-		});
-		content.push(App.PDF.columns(
-			[
-				{stack: [h1, h2]},
-				App.PDF.text(moment(new Date()).format('DD/MM/YYYY'), {margin: [0, 5, 0, 10], alignment: 'right'})
-			]
-		));
-		content.push(App.PDF.table(tbody, {widths: [ 30, 60, 50, 50, '*' ]}, 'lightHorizontalLines'));
-		return {
-			pageSize: 'A4',
-			pageMargins: [ 40, 100, 40, 100 ],
-			header: App.PDF.punktalLogoHeader(),
-			content: content,
-			footer: [
-				App.PDF.clientSign,
-				App.PDF.columnsLorem,
-			]
-		};
+	print: function(e){
+		e.preventDefault();
+		this.model.pdfReportPrint();
 	},
 
-	downloadPDF: function(){
-		var filename, report = this.buildReport();
-		fileName = 'OdeS_' + this.model.get('id') + '.pdf';
-		pdfMake.createPdf(report).download(fileName);
-	},
-
-	printPDF: function(){
-		var filename, report = this.buildReport();
-		fileName = 'OdeS_' + this.model.get('id') + '.pdf';
-		pdfMake.createPdf(report).print(filename);
-	},
-
-	fillTableObject: function(){
-		var body = {}, model_id, model, appliance, appliancesIds = this.model.get('appliances');
-		for(var i = 0; i < appliancesIds.length; i++){
-			try {
-				if (_.isObject(appliancesIds[i])){
-					appliance = appliancesIds[i];
-				} else {
-					appliance = app.storage.get('appliances', appliancesIds[i]).attributes;
-				}
-			}
-			catch(err){console.log(err.stack); throw new Error("Can't find appliance");}
-			try {
-				model_id = appliance.model_id;
-				model    = app.storage.get('models', model_id);
-			}
-			catch(err){console.log(err.stack); throw new Error("Can't find model");}
-			if (body[model_id]){
-				body[model_id].qty++;
-				body[model_id]._ids = body[model_id]._ids + '; ' + appliance.id; 
-				if (appliance.serial){
-					body[model_id].serials = body[model_id].serials + '; ' + appliance.serial; 
-				}
-				if (appliance.defect){
-					body[model_id].defects = body[model_id].defects + '; ' + appliance.defect; 
-				}
-			} else {
-				body[model_id] = {
-					_ids: appliance.id.toString(),
-					qty: 1,
-					model: model.get('model'),
-					brand: model.get('brand')
-				};
-				body[model_id].serials = (appliance.serial)  ? appliance.serial : '';
-				body[model_id].defects = (appliance.defects) ? appliance.defects : '';
-			}
-		}
-		return body;
+	download: function(e){
+		e.preventDefault();
+		this.model.pdfReportDownload();
 	},
 });
 App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
@@ -4240,14 +4327,16 @@ App.Views.ServiceRequestFormView = App.Views.BaseView.extend({
 	},
 });
 App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
-	template : HBS.service_request_index_template,
-	className: "row",
-	name     : "Ordenes de Servicio",
+	template      : HBS.service_request_index_template,
+	className     : "row",
+	name          : "Ordenes de Servicio",
+	reportName    : function(model){return 'OdeS_' + model.get('id')+ '.pdf';},
+	collectionName: "service_requests",
 	
 	tableEl  : '#service_requests-table',
 
-	events:{
-		'click button#new-service-request': 'newServiceRequest',
+	moreEvents:{
+		'click button#new-service-request'      : 'newServiceRequest',
 	},
 
 	awake: function(){
@@ -4256,6 +4345,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 				{ "searchable": false, "targets": -1 },
 				{ "className": "center-vh", "targets": -1 },
 				{ "className": "text-center", "targets": [0, 2, 3, 4, 5, 6]},
+				{ "width": "70px", "targets": -1},
 			],
 			"columns": [
 				{"data": "id"             , "defaultContent": ""},
@@ -4272,7 +4362,7 @@ App.Views.ServiceRequestIndexView = App.Views.TableView.extend({
 
 	serviceRequestButton: function(source, type, val){
 		var model = app.storage.get('service_requests', source._id);
-		if(type === "display"){ return model.serviceRequestButton(); }
+		if(type === "display"){ return model.showButton(); }
 		return source._id;
 	},
 

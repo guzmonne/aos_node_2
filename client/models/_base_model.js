@@ -4,7 +4,7 @@ App.Models.BaseModel = Giraffe.Model.extend({
 
 	initialize: function(){
 		this.awake.apply(this, arguments);
-		Giraffe.Model.prototype.initialize.apply(this, arguments);
+		//Giraffe.Model.prototype.initialize.apply(this, arguments);
 	},
 
 	setRelatedField: function(collectionName, relatedFieldName, attributeName, name){
@@ -77,15 +77,37 @@ App.Models.BaseModel = Giraffe.Model.extend({
 	},
 
 	// Just a basic function to parse a 'Date()' type.
-	dateDDMMYYYY: function(date){
-		var parsedDate;
-		if (date instanceof Date){
-			parsedDate = date;
-		} else {
-			parsedDate = new Date(date);
-		}
-		return  parsedDate.getDate() +
-			"/" + parsedDate.getMonth() + 
-			"/" + parsedDate.getFullYear();
+	//dateDDMMYYYY: function(date){
+	//	var parsedDate;
+	//	if (date instanceof Date){
+	//		parsedDate = date;
+	//	} else {
+	//		parsedDate = new Date(date);
+	//	}
+	//	return  parsedDate.getDate() +
+	//		"/" + parsedDate.getMonth() + 
+	//		"/" + parsedDate.getFullYear();
+	//},
+
+	downloadButton: function(){
+		var id = this.id;
+		return	'<a href="#" class="btn btn-xs btn-info btn-margin"  name="'+this.name+'-download" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Download">' +
+							'<i class="fa fa-download fa-fw"></i>' +
+						'</a>';
+	},
+
+	printButton: function(){
+		var id = this.id;
+		return	'<a href="#" class="btn btn-xs btn-info btn-margin"  name="'+this.name+'-print" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Imprimir">' +
+							'<i class="fa fa-print fa-fw"></i>' +
+						'</a>';
+	},
+
+	showButton: function(icon){
+		var id = this.id;
+		icon = (icon) ? icon : 'fa-ellipsis-h';
+		return	'<a href="#render/'+this.name+'/show/'+id+'" class="btn btn-xs btn-green btn-margin"  id="'+this.name+'-details" data-id="'+id+'" data-toggle="tooltip" data-placement="top" title="Mas Información">' +
+							'<i class="fa '+icon+' fa-fw"></i>' +
+						'</a>';
 	},
 });

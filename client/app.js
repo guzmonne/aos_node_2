@@ -109,6 +109,12 @@ window.App = {
 		try {callback.apply(context);}
 		catch (err){console.log(err.stack);}
 	},
+
+	extendMixin: function(target, mixin){
+		_.extend (target, mixin);
+		var functions = _.functions(mixin);
+		_.each(functions, function(f){target[f] = _.bind(target[f], target);});
+	},
 };
 
 App.PDF = (function(window, undefined){
